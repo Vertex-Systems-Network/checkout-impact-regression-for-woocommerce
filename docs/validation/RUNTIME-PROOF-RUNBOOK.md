@@ -194,9 +194,9 @@ A PASS is limited to the exact recorded environment and test cases. It is not a 
 ## 9. Current execution status
 
 - Worksheet: prepared.
-- Staging environment: not provided.
-- Local PHP/WordPress/Docker runtime: unavailable in the current workspace.
-- Browser Playground: blocked by worker/storage-worker initialization failure on the fresh attempt; no checkout tests ran.
-- Browser Playground: did not launch because the site requested browser verification.
-- Checkout cases, side-effect audit and cleanup: not executed.
+- Temporary WordPress admin runtime: WPRun WordPress 6.9.1 / PHP 8.4 booted.
+- WooCommerce: not installed; the installer marked the available 11.2.2 release incompatible with WordPress 6.9.1.
+- Plugin ZIP: packaged locally, but the browser file picker did not expose a usable local-file transfer, so installation and activation were not attempted/completed.
+- Plugin activation, admin UI behavior, capability cases, checkout cases, side-effect audit and cleanup: not executed.
+- Browser Playground: blocked at browser verification before WordPress loaded.
 - Phase 6: closed as an explicit no-go/support-exclusion decision; no runtime pass is claimed. Read [closure decision](PHASE-6-CLOSURE-DECISION.md).
