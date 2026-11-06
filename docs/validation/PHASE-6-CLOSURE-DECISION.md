@@ -52,4 +52,4 @@ Before enabling any excluded mode:
 
 ## Downstream consequence
 
-Phase 7 remains **Not started**. Implementation tasks that require automatic checkout capture/replay remain gated and must fail closed. The UI/specification, data contracts and non-executing planning work may be used as design references, but no report may claim live checkout observation or compatibility.
+Phase 7 has started with only a read-only bootstrap/admin shell source slice. It has not been runtime-tested; no scenario data is stored and no checkout request is made. Implementation tasks that require automatic checkout capture/replay remain gated and must fail closed. No report may claim live checkout observation or compatibility.
