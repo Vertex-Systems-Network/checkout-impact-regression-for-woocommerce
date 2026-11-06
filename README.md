@@ -23,11 +23,11 @@ This repository is in the **pre-development planning** stage. The plan below is 
 | 3. Options bank and system architecture | Complete (planning) | ██████████ 100% | 2026-11-06 | 2026-11-06 |
 | 4. Checkout scenario and comparison design | Complete (design) | ██████████ 100% | 2026-11-06 | 2026-11-06 |
 | 5. UX and React-based admin interface | Complete (UX/prototype) | ██████████ 100% | 2026-11-06 | 2026-11-06 |
-| 6. Pre-development technical proof | In progress (safety, source, adapter, canonicalization, change-event + queue designs done; runtime proof blocked) | ████████░░ 75% | 2026-11-06 | TBD |
+| 6. Pre-development technical proof | In progress (design spikes + operator runbook done; runtime proof blocked) | ████████░░ 80% | 2026-11-06 | TBD |
 | 7. Plugin implementation and verification | Not started | ░░░░░░░░░░ 0% | TBD | TBD |
 | 8. Release readiness | Not started | ░░░░░░░░░░ 0% | TBD | TBD |
 
-**Overall planning progress: 75%** — unweighted average across the nine tracked phases, with Phase 6 at 75% for completed safety, source, adapter, canonicalization, change-event and queue design work (Phases 0–5 complete for their documented planning/design deliverables). Phase 5 delivers the React production-interface blueprint and interactive UX concept; the prototype is not connected to WooCommerce. The published Checkout API reference and WooCommerce 10.9 release/source differ on persisted draft creation for fresh sessions; exact-version runtime validation is still pending. This workspace has no local PHP/WordPress/Docker stack, no disposable staging store was provided, and the browser-based Playground did not launch because it requested browser verification.
+**Overall planning progress: 76%** — unweighted average across the nine tracked phases, with Phase 6 at 80% for completed safety, source, adapter, canonicalization, change-event and queue designs plus an operator runbook (Phases 0–5 complete for their documented planning/design deliverables). Phase 5 delivers the React production-interface blueprint and interactive UX concept; the prototype is not connected to WooCommerce. The published Checkout API reference and WooCommerce 10.9 release/source differ on persisted draft creation for fresh sessions; exact-version runtime validation is still pending. This workspace has no local PHP/WordPress/Docker stack, no disposable staging store was provided, and the browser-based Playground did not launch because it requested browser verification.
 
 ## Start here
 
@@ -40,7 +40,7 @@ This repository is in the **pre-development planning** stage. The plan below is 
 7. Read the [scenario and comparison specification](docs/design/SCENARIO-AND-COMPARISON-SPEC.md) before changing scenario, baseline or diff semantics.
 8. Review the [admin UX/React specification](docs/design/ADMIN-UX-SPEC.md) and [interactive interface prototype](docs/design/admin-interface-prototype.html) for the planned screens and states.
 9. Read the [requirements and compatibility plan](docs/requirements/REQUIREMENTS.md); planned targets are not tested compatibility claims.
-10. For Phase 6 checkout safety, adapter boundaries, canonical field mapping, change-event handling and runtime proof cases, read [Pre-development safe checkout proof](docs/validation/PREDEVELOPMENT-SAFE-CHECKOUT-PROOF.md), the [Store API observation adapter spike](docs/validation/STORE-API-OBSERVATION-ADAPTER-SPIKE.md), the [Store API canonicalization spike](docs/validation/STORE-API-CANONICALIZATION-SPIKE.md) and the [change-source hooks spike](docs/validation/CHANGE-SOURCE-HOOKS-SPIKE.md) and the [background run scheduling spike](docs/validation/BACKGROUND-RUN-SCHEDULING-SPIKE.md).
+10. For Phase 6 checkout safety, adapter boundaries, canonical field mapping, change-event handling and runtime proof cases, read [Pre-development safe checkout proof](docs/validation/PREDEVELOPMENT-SAFE-CHECKOUT-PROOF.md), the [Store API observation adapter spike](docs/validation/STORE-API-OBSERVATION-ADAPTER-SPIKE.md), the [Store API canonicalization spike](docs/validation/STORE-API-CANONICALIZATION-SPIKE.md) and the [change-source hooks spike](docs/validation/CHANGE-SOURCE-HOOKS-SPIKE.md) and the [background run scheduling spike](docs/validation/BACKGROUND-RUN-SCHEDULING-SPIKE.md) and the [runtime proof runbook](docs/validation/RUNTIME-PROOF-RUNBOOK.md).
 11. Update the phase status, progress bar, start date, and end date in this README when project progress changes. Keep detailed decisions and evidence in the development plan.
 
 ## Product principles
