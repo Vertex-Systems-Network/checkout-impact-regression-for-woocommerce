@@ -16,34 +16,29 @@ define( 'WPECIR_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WPECIR_URL', plugin_dir_url( __FILE__ ) );
 
 /**
- * Register a minimal PSR-4 loader for this plugin's namespace.
+ * Load the Composer-generated PSR-4 autoloader.
  *
- * Namespace prefix: WPEssential\\CheckoutImpactRegression\\
- * Base directory:   includes/
- *
- * No Composer-generated files or CLI are required.
- *
- * @param string $class Fully-qualified class name.
- * @return void
+ * The release package must include the generated vendor directory.
  */
-spl_autoload_register(
-	static function ( $class ) {
-		$prefix   = 'WPEssential\\CheckoutImpactRegression\\';
-		$base_dir = WPECIR_PATH . 'includes/';
-		$length   = strlen( $prefix );
+$wpecir_autoload_file = WPECIR_PATH . 'vendor/autoload.php';
 
-		if ( 0 !== strncmp( $prefix, $class, $length ) ) {
-			return;
+if ( ! is_readable( $wpecir_autoload_file ) ) {
+	add_action(
+		'admin_notices',
+		static function () {
+			if ( ! current_user_can( 'manage_woocommerce' ) && ! current_user_can( 'manage_options' ) ) {
+				return;
+			}
+
+			$message = __( 'WPEssential Checkout Impact Regression could not load its Composer dependencies. Reinstall the complete plugin package.', 'wpessential-checkout-impact-regression' );
+			printf( '<div class="notice notice-error"><p>%s</p></div>', esc_html( $message ) );
 		}
+	);
 
-		$relative_class = substr( $class, $length );
-		$file           = $base_dir . str_replace( '\\', '/', $relative_class ) . '.php';
+	return;
+}
 
-		if ( is_readable( $file ) ) {
-			require_once $file;
-		}
-	}
-);
+require_once $wpecir_autoload_file;
 
 register_activation_hook(
 	WPECIR_FILE,
