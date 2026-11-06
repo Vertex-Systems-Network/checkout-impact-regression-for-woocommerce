@@ -90,6 +90,7 @@ Any failed assertion, unknown side effect, non-repeatable result, unavailable si
 | Safe-run protocol | Complete (design) | This document |
 | Disposable staging environment | Blocked / not provided | No store connection or environment credentials available in this work session |
 | Local runtime availability | Unavailable | PHP, Docker and WP-CLI executables are not installed in this workspace; no local WordPress/WooCommerce runtime can be started here |
+| Browser-based Playground | Blocked | WordPress Playground displayed a browser verification challenge after one retry; no WordPress/WooCommerce site started and no verification bypass was attempted |
 | Classic checkout runtime proof | Not run | Requires isolated staging environment |
 | Checkout Blocks runtime proof | Not run | Requires isolated staging environment |
 | Draft/retry-path cleanup proof | Not run | API reference and newer release/source behavior differ; exact-version runtime validation required |
