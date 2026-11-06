@@ -36,7 +36,7 @@ final class WPECIR_Admin_Page {
 	 * @return void
 	 */
 	public function register_menu() {
-		$capability = class_exists( 'WooCommerce' ) ? 'manage_woocommerce' : 'manage_options';
+		$capability = $this->get_required_capability();
 
 		add_menu_page(
 			__( 'Checkout Impact', 'wpessential-checkout-impact-regression' ),
@@ -85,12 +85,21 @@ final class WPECIR_Admin_Page {
 	}
 
 	/**
+	 * Resolve the capability used by both menu registration and rendering.
+	 *
+	 * @return string
+	 */
+	private function get_required_capability() {
+		return class_exists( 'WooCommerce' ) ? 'manage_woocommerce' : 'manage_options';
+	}
+
+	/**
 	 * Render the React mount point.
 	 *
 	 * @return void
 	 */
 	public function render_page() {
-		if ( ! current_user_can( 'manage_woocommerce' ) && ! current_user_can( 'manage_options' ) ) {
+		if ( ! current_user_can( $this->get_required_capability() ) ) {
 			wp_die(
 				esc_html__( 'You do not have permission to view this page.', 'wpessential-checkout-impact-regression' ),
 				esc_html__( 'Access denied', 'wpessential-checkout-impact-regression' ),
