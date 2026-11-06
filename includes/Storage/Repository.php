@@ -484,7 +484,7 @@ final class Repository {
 	public function record_change_event( $source, $object_type, $object_id, $context_hash, $occurred_at = '', $system_generated = false ) {
 		global $wpdb;
 
-		if ( ! $this->can_manage() ) {
+		if ( ! $system_generated && ! $this->can_manage() ) {
 			return new \WP_Error( 'wpecir_forbidden', 'You are not allowed to record change events.' );
 		}
 
