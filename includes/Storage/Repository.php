@@ -481,7 +481,7 @@ final class Repository {
 	 * @param string $occurred_at  UTC MySQL datetime.
 	 * @return int|\WP_Error
 	 */
-	public function record_change_event( $source, $object_type, $object_id, $context_hash, $occurred_at = '' ) {
+	public function record_change_event( $source, $object_type, $object_id, $context_hash, $occurred_at = '', $system_generated = false ) {
 		global $wpdb;
 
 		if ( ! $this->can_manage() ) {
