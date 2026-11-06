@@ -540,7 +540,7 @@ final class Repository {
 	public function purge_expired_runs( $limit = 100, $system_generated = false ) {
 		global $wpdb;
 
-		if ( ! $this->can_manage() ) {
+		if ( ! $system_generated && ! $this->can_manage() ) {
 			return new \WP_Error( 'wpecir_forbidden', 'You are not allowed to clean up run history.' );
 		}
 
