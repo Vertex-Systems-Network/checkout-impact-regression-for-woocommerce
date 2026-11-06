@@ -1,20 +1,24 @@
 ( function ( wp, config ) {
 	'use strict';
 
-	if ( ! wp || ! wp.element || ! config ) {
+	if ( ! wp || ! wp.element || ! wp.i18n || ! config ) {
 		return;
 	}
 
 	const h = wp.element.createElement;
+	const __ = wp.i18n.__;
+	const text = function ( message ) {
+		return __( message, 'wpessential-checkout-impact-regression' );
+	};
 
 	function StatusCard( props ) {
 		return h(
 			'section',
 			{ className: 'wpecir-card', 'aria-labelledby': props.id },
-			h( 'p', { className: 'wpecir-card__eyebrow' }, props.eyebrow ),
-			h( 'h2', { id: props.id }, props.title ),
-			h( 'p', { className: 'wpecir-card__body' }, props.body ),
-			h( 'span', { className: 'wpecir-status wpecir-status--' + props.tone }, props.status )
+			h( 'p', { className: 'wpecir-card__eyebrow' }, text( props.eyebrow ) ),
+			h( 'h2', { id: props.id }, text( props.title ) ),
+			h( 'p', { className: 'wpecir-card__body' }, text( props.body ) ),
+			h( 'span', { className: 'wpecir-status wpecir-status--' + props.tone }, text( props.status ) )
 		);
 	}
 
@@ -30,15 +34,15 @@
 				h(
 					'div',
 					null,
-					h( 'p', { className: 'wpecir-eyebrow' }, 'WPEssential' ),
-					h( 'h1', null, 'Checkout Impact' ),
+					h( 'p', { className: 'wpecir-eyebrow' }, text( 'WPEssential' ) ),
+					h( 'h1', null, text( 'Checkout Impact' ) ),
 					h(
 						'p',
 						{ className: 'wpecir-intro' },
-						'Review the foundation for before-and-after checkout scenario comparisons.'
+						text( 'Review the foundation for before-and-after checkout scenario comparisons.' )
 					)
 				),
-				h( 'span', { className: 'wpecir-phase-badge' }, 'Development preview' )
+				h( 'span', { className: 'wpecir-phase-badge' }, text( 'Development preview' ) )
 			),
 			h(
 				'section',
@@ -51,11 +55,11 @@
 				h(
 					'div',
 					null,
-					h( 'h2', null, 'Automatic checkout checks are disabled' ),
+					h( 'h2', null, text( 'Automatic checkout checks are disabled' ) ),
 					h(
 						'p',
 						null,
-						'No checkout, payment, shipping, coupon, or order requests are being run. Runtime support is not approved until an isolated, version-specific safety proof is complete.'
+						text( 'No checkout, payment, shipping, coupon, or order requests are being run. Runtime support is not approved until an isolated, version-specific safety proof is complete.' )
 					)
 				)
 			),
@@ -66,14 +70,14 @@
 					h(
 						'p',
 						null,
-						'WooCommerce is not active. Activate WooCommerce to continue with WooCommerce-specific development.'
+						text( 'WooCommerce is not active. Activate WooCommerce to continue with WooCommerce-specific development.' )
 					)
 				)
 				: null,
 			h(
 				'section',
 				{ className: 'wpecir-section', 'aria-labelledby': 'wpecir-foundation-title' },
-				h( 'h2', { id: 'wpecir-foundation-title' }, 'Implementation status' ),
+				h( 'h2', { id: 'wpecir-foundation-title' }, text( 'Implementation status' ) ),
 				h(
 					'div',
 					{ className: 'wpecir-card-grid' },
@@ -81,8 +85,8 @@
 						id: 'wpecir-status-bootstrap',
 						eyebrow: 'Platform',
 						title: 'Admin shell',
-						body: 'The plugin loads a permission-checked WordPress admin screen.',
-						status: 'Available in this preview',
+						body: 'The plugin source contains a permission-checked WordPress admin screen. Runtime activation has not been verified.',
+						status: 'Source added; not runtime-tested',
 						tone: 'neutral',
 					} ),
 					h( StatusCard, {
@@ -110,11 +114,11 @@
 				h(
 					'div',
 					null,
-					h( 'h2', { id: 'wpecir-next-title' }, 'Next implementation slice' ),
+					h( 'h2', { id: 'wpecir-next-title' }, text( 'Next implementation slice' ) ),
 					h(
 						'p',
 						null,
-						'Finalize privacy-first scenario storage and versioning before enabling the scenario builder or saving store data.'
+						text( 'Finalize privacy-first scenario storage and versioning before enabling the scenario builder or saving store data.' )
 					)
 				)
 			)
