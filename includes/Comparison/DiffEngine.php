@@ -40,8 +40,8 @@ final class DiffEngine {
 				$diffs[ $field ] = array( 'state' => 'not_comparable', 'reason' => 'context_mismatch' );
 				continue;
 			}
-			$before = isset( $baseline[ $field ] ) ? Normalizer::observation( $baseline[ $field ] ) : new \WP_Error( 'wpecir_absent_baseline', 'Field absent from baseline.' );
-			$after  = isset( $current[ $field ] ) ? Normalizer::observation( $current[ $field ] ) : new \WP_Error( 'wpecir_absent_current', 'Field absent from current observation.' );
+			$before = isset( $baseline[ $raw_field ] ) ? Normalizer::observation( $baseline[ $raw_field ] ) : new \WP_Error( 'wpecir_absent_baseline', 'Field absent from baseline.' );
+			$after  = isset( $current[ $raw_field ] ) ? Normalizer::observation( $current[ $raw_field ] ) : new \WP_Error( 'wpecir_absent_current', 'Field absent from current observation.' );
 			if ( is_wp_error( $before ) || is_wp_error( $after ) ) {
 				$diffs[ $field ] = array( 'state' => 'not_comparable', 'reason' => 'incomplete_observation' );
 				continue;
