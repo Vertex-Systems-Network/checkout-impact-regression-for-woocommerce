@@ -1,0 +1,10 @@
+---
+description: Always load the canonical WPEssential Checkout Impact Regression project context and workflow.
+alwaysApply: true
+---
+
+This repository plans and builds the WPEssential Checkout Impact Regression add-on.
+
+Before making changes, read `AGENTS.md`, `README.md`, and `docs/DEVELOPMENT-PLAN.md`. Treat `AGENTS.md` as canonical contributor rules, README as the phase/status tracker, and the development plan as the scope and backlog source of truth.
+
+Work only on a task with satisfied dependencies and explicit acceptance criteria. Keep the product focused on comparing before/after behavior across saved checkout scenarios. Cite official sources for compatibility and competitor claims; distinguish facts, assumptions, and proposals. Do not add a product CLI or CLI commands before final release. Update README status/progress/date only when evidence supports the change and report completed criteria, evidence, blockers, and remaining work.
