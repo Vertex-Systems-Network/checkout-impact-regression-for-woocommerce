@@ -2,10 +2,10 @@
 /**
  * Access-controlled persistence for scenarios, baselines and change events.
  *
- * @package WPEssential\\CheckoutImpactRegression\\Storage
+ * @package WPEssential\CheckoutImpactRegression\Storage
  */
 
-namespace WPEssential\\CheckoutImpactRegression\\Storage;
+namespace WPEssential\CheckoutImpactRegression\Storage;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -49,20 +49,20 @@ final class Repository {
 	 *
 	 * @param mixed  $payload Data to validate.
 	 * @param string $field   Field label for errors.
-	 * @return string|\\WP_Error
+	 * @return string|\WP_Error
 	 */
 	private function encode_safe_payload( $payload, $field ) {
 		if ( ! is_array( $payload ) ) {
-			return new \\WP_Error( 'wpecir_invalid_payload', sprintf( 'The %s payload must be an object or list.', $field ) );
+			return new \WP_Error( 'wpecir_invalid_payload', sprintf( 'The %s payload must be an object or list.', $field ) );
 		}
 
 		if ( $this->contains_sensitive_key( $payload ) || $this->contains_email_value( $payload ) ) {
-			return new \\WP_Error( 'wpecir_sensitive_payload', sprintf( 'The %s payload contains personal or secret data. Use synthetic scenario values.', $field ) );
+			return new \WP_Error( 'wpecir_sensitive_payload', sprintf( 'The %s payload contains personal or secret data. Use synthetic scenario values.', $field ) );
 		}
 
 		$json = wp_json_encode( $payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
 		if ( ! is_string( $json ) || strlen( $json ) > 65536 ) {
-			return new \\WP_Error( 'wpecir_payload_too_large', sprintf( 'The %s payload is invalid or exceeds 64 KB.', $field ) );
+			return new \WP_Error( 'wpecir_payload_too_large', sprintf( 'The %s payload is invalid or exceeds 64 KB.', $field ) );
 		}
 
 		return $json;
@@ -116,18 +116,18 @@ final class Repository {
 	 * @param string $title       Scenario label.
 	 * @param array  $input       Synthetic scenario inputs.
 	 * @param array  $expectation Expected assertions.
-	 * @return array|\\WP_Error
+	 * @return array|\WP_Error
 	 */
 	public function create_scenario( $title, $input, $expectation ) {
 		global $wpdb;
 
 		if ( ! $this->can_manage() ) {
-			return new \\WP_Error( 'wpecir_forbidden', 'You are not allowed to manage checkout scenarios.' );
+			return new \WP_Error( 'wpecir_forbidden', 'You are not allowed to manage checkout scenarios.' );
 		}
 
 		$title = sanitize_text_field( $title );
 		if ( '' === $title || strlen( $title ) > 191 ) {
-			return new \\WP_Error( 'wpecir_invalid_title', 'Scenario title is required and must be 191 characters or fewer.' );
+			return new \WP_Error( 'wpecir_invalid_title', 'Scenario title is required and must be 191 characters or fewer.' );
 		}
 
 		$input_json       = $this->encode_safe_payload( $input, 'scenario input' );
@@ -155,7 +155,7 @@ final class Repository {
 		);
 
 		if ( false === $ok ) {
-			return new \\WP_Error( 'wpecir_scenario_create_failed', 'The scenario could not be saved.' );
+			return new \WP_Error( 'wpecir_scenario_create_failed', 'The scenario could not be saved.' );
 		}
 
 		$scenario_id = (int) $wpdb->insert_id;
@@ -175,18 +175,18 @@ final class Repository {
 	 * @param array $input       Synthetic scenario inputs.
 	 * @param array $expectation Expected assertions.
 	 * @param string $title      Optional replacement label.
-	 * @return array|\\WP_Error
+	 * @return array|\WP_Error
 	 */
 	public function add_scenario_version( $scenario_id, $input, $expectation, $title = '' ) {
 		global $wpdb;
 
 		if ( ! $this->can_manage() ) {
-			return new \\WP_Error( 'wpecir_forbidden', 'You are not allowed to manage checkout scenarios.' );
+			return new \WP_Error( 'wpecir_forbidden', 'You are not allowed to manage checkout scenarios.' );
 		}
 
 		$scenario = $wpdb->get_row( $wpdb->prepare( 'SELECT id FROM ' . $this->table( 'scenarios' ) . ' WHERE id = %d', absint( $scenario_id ) ) );
 		if ( ! $scenario ) {
-			return new \\WP_Error( 'wpecir_scenario_not_found', 'The requested scenario does not exist.' );
+			return new \WP_Error( 'wpecir_scenario_not_found', 'The requested scenario does not exist.' );
 		}
 
 		$input_json       = $this->encode_safe_payload( $input, 'scenario input' );
@@ -222,7 +222,7 @@ final class Repository {
 	 * @param int    $scenario_id Scenario identifier.
 	 * @param string $input_json  Encoded inputs.
 	 * @param string $expect_json Encoded expectations.
-	 * @return int|\\WP_Error
+	 * @return int|\WP_Error
 	 */
 	private function insert_scenario_version( $scenario_id, $input_json, $expect_json ) {
 		global $wpdb;
@@ -245,7 +245,7 @@ final class Repository {
 		);
 
 		if ( false === $ok ) {
-			return new \\WP_Error( 'wpecir_version_create_failed', 'The scenario version could not be saved.' );
+			return new \WP_Error( 'wpecir_version_create_failed', 'The scenario version could not be saved.' );
 		}
 
 		return (int) $wpdb->insert_id;
@@ -255,18 +255,18 @@ final class Repository {
 	 * Retrieve a scenario and its latest version.
 	 *
 	 * @param int $scenario_id Scenario identifier.
-	 * @return array|\\WP_Error
+	 * @return array|\WP_Error
 	 */
 	public function get_scenario( $scenario_id ) {
 		global $wpdb;
 
 		if ( ! $this->can_manage() ) {
-			return new \\WP_Error( 'wpecir_forbidden', 'You are not allowed to view checkout scenarios.' );
+			return new \WP_Error( 'wpecir_forbidden', 'You are not allowed to view checkout scenarios.' );
 		}
 
 		$row = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM ' . $this->table( 'scenarios' ) . ' WHERE id = %d', absint( $scenario_id ) ), ARRAY_A );
 		if ( ! $row ) {
-			return new \\WP_Error( 'wpecir_scenario_not_found', 'The requested scenario does not exist.' );
+			return new \WP_Error( 'wpecir_scenario_not_found', 'The requested scenario does not exist.' );
 		}
 
 		$version = $wpdb->get_row(
@@ -286,13 +286,13 @@ final class Repository {
 	 *
 	 * @param int $page     One-based page number.
 	 * @param int $per_page Page size, capped at 100.
-	 * @return array|\\WP_Error
+	 * @return array|\WP_Error
 	 */
 	public function list_scenarios( $page = 1, $per_page = 25 ) {
 		global $wpdb;
 
 		if ( ! $this->can_manage() ) {
-			return new \\WP_Error( 'wpecir_forbidden', 'You are not allowed to view checkout scenarios.' );
+			return new \WP_Error( 'wpecir_forbidden', 'You are not allowed to view checkout scenarios.' );
 		}
 
 		$page     = max( 1, absint( $page ) );
@@ -311,13 +311,13 @@ final class Repository {
 	 * List immutable versions for a scenario.
 	 *
 	 * @param int $scenario_id Scenario identifier.
-	 * @return array|\\WP_Error
+	 * @return array|\WP_Error
 	 */
 	public function list_scenario_versions( $scenario_id ) {
 		global $wpdb;
 
 		if ( ! $this->can_manage() ) {
-			return new \\WP_Error( 'wpecir_forbidden', 'You are not allowed to view checkout scenarios.' );
+			return new \WP_Error( 'wpecir_forbidden', 'You are not allowed to view checkout scenarios.' );
 		}
 
 		$rows = $wpdb->get_results(
@@ -349,13 +349,13 @@ final class Repository {
 	 * @param int    $version_id  Scenario version identifier.
 	 * @param array  $observation Normalized observations.
 	 * @param string $context     Comparison context fingerprint.
-	 * @return array|\\WP_Error
+	 * @return array|\WP_Error
 	 */
 	public function approve_baseline( $scenario_id, $version_id, $observation, $context ) {
 		global $wpdb;
 
 		if ( ! $this->can_manage() ) {
-			return new \\WP_Error( 'wpecir_forbidden', 'You are not allowed to approve a baseline.' );
+			return new \WP_Error( 'wpecir_forbidden', 'You are not allowed to approve a baseline.' );
 		}
 
 		$version = $wpdb->get_row(
@@ -366,7 +366,7 @@ final class Repository {
 			)
 		);
 		if ( ! $version ) {
-			return new \\WP_Error( 'wpecir_version_not_found', 'A baseline must reference a version of the selected scenario.' );
+			return new \WP_Error( 'wpecir_version_not_found', 'A baseline must reference a version of the selected scenario.' );
 		}
 
 		$observation_json = $this->encode_safe_payload( $observation, 'baseline observation' );
@@ -376,7 +376,7 @@ final class Repository {
 
 		$context = sanitize_text_field( $context );
 		if ( ! preg_match( '/^[a-f0-9]{64}$/', $context ) ) {
-			return new \\WP_Error( 'wpecir_invalid_context', 'A SHA-256 context fingerprint is required.' );
+			return new \WP_Error( 'wpecir_invalid_context', 'A SHA-256 context fingerprint is required.' );
 		}
 
 		$table    = $this->table( 'baselines' );
@@ -399,7 +399,7 @@ final class Repository {
 		);
 
 		if ( false === $ok ) {
-			return new \\WP_Error( 'wpecir_baseline_create_failed', 'The approved baseline could not be saved.' );
+			return new \WP_Error( 'wpecir_baseline_create_failed', 'The approved baseline could not be saved.' );
 		}
 
 		return array(
@@ -416,13 +416,13 @@ final class Repository {
 	 * List baselines for a scenario without mutating their history.
 	 *
 	 * @param int $scenario_id Scenario identifier.
-	 * @return array|\\WP_Error
+	 * @return array|\WP_Error
 	 */
 	public function list_baselines( $scenario_id ) {
 		global $wpdb;
 
 		if ( ! $this->can_manage() ) {
-			return new \\WP_Error( 'wpecir_forbidden', 'You are not allowed to view baselines.' );
+			return new \WP_Error( 'wpecir_forbidden', 'You are not allowed to view baselines.' );
 		}
 
 		$rows = $wpdb->get_results(
@@ -443,13 +443,13 @@ final class Repository {
 	 * Delete a scenario and dependent history after an authorized request.
 	 *
 	 * @param int $scenario_id Scenario identifier.
-	 * @return true|\\WP_Error
+	 * @return true|\WP_Error
 	 */
 	public function delete_scenario( $scenario_id ) {
 		global $wpdb;
 
 		if ( ! $this->can_manage() ) {
-			return new \\WP_Error( 'wpecir_forbidden', 'You are not allowed to delete checkout scenarios.' );
+			return new \WP_Error( 'wpecir_forbidden', 'You are not allowed to delete checkout scenarios.' );
 		}
 
 		$scenario_id = absint( $scenario_id );
@@ -465,7 +465,7 @@ final class Repository {
 		$deleted = $wpdb->delete( $this->table( 'scenarios' ), array( 'id' => $scenario_id ), array( '%d' ) );
 
 		if ( false === $deleted ) {
-			return new \\WP_Error( 'wpecir_scenario_delete_failed', 'The scenario could not be deleted completely.' );
+			return new \WP_Error( 'wpecir_scenario_delete_failed', 'The scenario could not be deleted completely.' );
 		}
 
 		return true;
@@ -479,13 +479,13 @@ final class Repository {
 	 * @param string $object_id    Non-secret object identifier.
 	 * @param string $context_hash Context fingerprint.
 	 * @param string $occurred_at  UTC MySQL datetime.
-	 * @return int|\\WP_Error
+	 * @return int|\WP_Error
 	 */
 	public function record_change_event( $source, $object_type, $object_id, $context_hash, $occurred_at = '' ) {
 		global $wpdb;
 
 		if ( ! $this->can_manage() ) {
-			return new \\WP_Error( 'wpecir_forbidden', 'You are not allowed to record change events.' );
+			return new \WP_Error( 'wpecir_forbidden', 'You are not allowed to record change events.' );
 		}
 
 		$source      = sanitize_key( $source );
@@ -494,12 +494,12 @@ final class Repository {
 		$context_hash= sanitize_text_field( $context_hash );
 		$allowed     = array( 'plugin_update', 'woocommerce_setting', 'plugin_setting', 'manual' );
 		if ( ! in_array( $source, $allowed, true ) || '' === $object_type || '' === $object_id || strlen( $object_id ) > 191 || ! preg_match( '/^[a-f0-9]{64}$/', $context_hash ) ) {
-			return new \\WP_Error( 'wpecir_invalid_event', 'The change event is incomplete or contains unsupported data.' );
+			return new \WP_Error( 'wpecir_invalid_event', 'The change event is incomplete or contains unsupported data.' );
 		}
 
 		$occurred_at = '' !== $occurred_at ? sanitize_text_field( $occurred_at ) : current_time( 'mysql', true );
-		if ( ! preg_match( '/^\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}$/', $occurred_at ) ) {
-			return new \\WP_Error( 'wpecir_invalid_event_time', 'The event timestamp must be a UTC MySQL datetime.' );
+		if ( ! preg_match( '/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/', $occurred_at ) ) {
+			return new \WP_Error( 'wpecir_invalid_event_time', 'The event timestamp must be a UTC MySQL datetime.' );
 		}
 
 		$object_hash = hash( 'sha256', $object_type . ':' . $object_id );
@@ -525,7 +525,7 @@ final class Repository {
 		);
 
 		if ( false === $ok ) {
-			return new \\WP_Error( 'wpecir_event_create_failed', 'The change event could not be saved.' );
+			return new \WP_Error( 'wpecir_event_create_failed', 'The change event could not be saved.' );
 		}
 
 		return (int) $wpdb->insert_id;
@@ -535,13 +535,13 @@ final class Repository {
 	 * Purge a bounded batch of expired run records and their child rows.
 	 *
 	 * @param int $limit Maximum records to purge.
-	 * @return int|\\WP_Error Number of removed runs.
+	 * @return int|\WP_Error Number of removed runs.
 	 */
 	public function purge_expired_runs( $limit = 100 ) {
 		global $wpdb;
 
 		if ( ! $this->can_manage() ) {
-			return new \\WP_Error( 'wpecir_forbidden', 'You are not allowed to clean up run history.' );
+			return new \WP_Error( 'wpecir_forbidden', 'You are not allowed to clean up run history.' );
 		}
 
 		$limit = min( 500, max( 1, absint( $limit ) ) );
