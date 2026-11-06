@@ -3,7 +3,7 @@
 **Phase:** 3 — Options bank and system architecture  
 **Status:** Design proposal complete for planning; no implementation has been validated.  
 **Date:** 2026-11-06  
-**Related:** [Options bank](../research/OPTIONS-BANK.md) · [System inventory](SYSTEM-INVENTORY.md) · [Requirements](../requirements/REQUIREMENTS.md) · [Integration matrix](INTEGRATION-MATRIX.md) · [Scenario/comparison spec](../design/SCENARIO-AND-COMPARISON-SPEC.md)
+**Related:** [Options bank](../research/OPTIONS-BANK.md) · [System inventory](SYSTEM-INVENTORY.md) · [Requirements](../requirements/REQUIREMENTS.md) · [Integration matrix](INTEGRATION-MATRIX.md) · [Scenario/comparison spec](../design/SCENARIO-AND-COMPARISON-SPEC.md) · [Storage/retention decision proposal](STORAGE-AND-RETENTION-DECISION.md)
 
 ## 1. Architecture goals
 
@@ -81,7 +81,7 @@ These are conceptual contracts. Phase 4 must define exact schema, field optional
 | EvidenceRef | SYS-09 | run/finding refs, artifact type, redaction state, retention and access metadata | Store only necessary evidence; no secrets; policy-controlled access and deletion. |
 | ReviewAction | SYS-02 | actor, time, finding/baseline refs, action, reason | Approval/acknowledgement is explicit and auditable; prior versions survive. |
 
-**Storage decision deferred:** choose custom tables, WordPress content types, or a hybrid only after scenario volume, indexing, privacy export/erasure, multisite and migration requirements are validated. Do not store large run histories in autoloaded options. Phase 6 must prove the chosen storage/migration approach before implementation.
+**Storage decision gate:** the [storage/retention decision proposal](STORAGE-AND-RETENTION-DECISION.md) recommends versioned per-site custom tables after reviewing scenario volume, indexing, privacy export/erasure, multisite and migration needs. The recommendation is not accepted until reviewed, and Phase 6 runtime migration proof remains mandatory before implementation. Do not store growing run histories in autoloaded options.
 
 ## 5. Proposed decision records
 
