@@ -2,10 +2,10 @@
 /**
  * Creates the plugin's per-site schema.
  *
- * @package WPEssential\\CheckoutImpactRegression\\Storage
+ * @package WPEssential\CheckoutImpactRegression\Storage
  */
 
-namespace WPEssential\\CheckoutImpactRegression\\Storage;
+namespace WPEssential\CheckoutImpactRegression\Storage;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -42,7 +42,7 @@ final class Schema {
 	/**
 	 * Run schema installation during plugin activation.
 	 *
-	 * @return true|\\WP_Error
+	 * @return true|\WP_Error
 	 */
 	public static function install() {
 		return self::maybe_upgrade( true );
@@ -52,7 +52,7 @@ final class Schema {
 	 * Upgrade the plugin's own schema when needed.
 	 *
 	 * @param bool $activation Whether this is the plugin activation path.
-	 * @return true|\\WP_Error
+	 * @return true|\WP_Error
 	 */
 	public static function maybe_upgrade( $activation = false ) {
 		$installed_version = get_option( self::VERSION_OPTION, '' );
@@ -62,7 +62,7 @@ final class Schema {
 		}
 
 		if ( ! $activation && ! current_user_can( 'manage_woocommerce' ) && ! current_user_can( 'manage_options' ) ) {
-			return new \\WP_Error( 'wpecir_schema_forbidden', 'Schema upgrade requires an authorized store administrator.' );
+			return new \WP_Error( 'wpecir_schema_forbidden', 'Schema upgrade requires an authorized store administrator.' );
 		}
 
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
@@ -81,7 +81,7 @@ final class Schema {
 			$found = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) );
 
 			if ( $table !== $found ) {
-				return new \\WP_Error( 'wpecir_schema_incomplete', 'The plugin storage schema could not be verified.' );
+				return new \WP_Error( 'wpecir_schema_incomplete', 'The plugin storage schema could not be verified.' );
 			}
 		}
 
