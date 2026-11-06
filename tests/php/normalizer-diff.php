@@ -54,6 +54,7 @@ check( 'unchanged' === $diff['shipping_method']['state'], 'equal observed value 
 check( 'added' === $diff['coupon_discount']['state'], 'new current value is added' );
 check( 'not_comparable' === $diff['payment_available']['state'], 'unsupported baseline cannot become unchanged' );
 
+check( is_wp_error( DiffEngine::compare( $baseline, $current, '', str_repeat( 'b', 64 ) ) ), 'missing context fingerprints are rejected' );
 $mismatch = DiffEngine::compare( $baseline, $current, str_repeat( 'a', 64 ), str_repeat( 'b', 64 ) );
 check( 'not_comparable' === $mismatch['shipping_cost']['state'], 'different context blocks comparison' );
 
