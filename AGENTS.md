@@ -6,8 +6,9 @@ This repository contains the planning and future implementation work for the WPE
 
 1. Read `README.md` for the product purpose, current project status, and phase tracker.
 2. Read `docs/DEVELOPMENT-PLAN.md` before proposing features, architecture, or code.
-3. Follow decisions recorded in the plan. If a decision is missing or contradictory, document the gap and propose a decision; do not silently invent a requirement.
-4. Keep the README phase status, progress bar, and dates synchronized with meaningful completed work. Record rationale, evidence, and open questions in the detailed plan.
+3. Use `docs/AI-TOOL-RULES.md` to confirm how your current tool loads repository instructions; tool-specific entry points must remain consistent with this file.
+4. Follow decisions recorded in the plan. If a decision is missing or contradictory, document the gap and propose a decision; do not silently invent a requirement.
+5. Keep the README phase status, progress bar, and dates synchronized with meaningful completed work. Record rationale, evidence, and open questions in the detailed plan.
 
 ## Product boundaries
 
