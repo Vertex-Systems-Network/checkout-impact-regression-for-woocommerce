@@ -27,7 +27,7 @@ This repository is in the **pre-development planning** stage. The plan below is 
 | 7. Plugin implementation and verification | Not started | ░░░░░░░░░░ 0% | TBD | TBD |
 | 8. Release readiness | Not started | ░░░░░░░░░░ 0% | TBD | TBD |
 
-**Overall planning progress: 75%** — unweighted average across the nine tracked phases, with Phase 6 at 75% for completed safety, source, adapter, canonicalization, change-event and queue design work (Phases 0–5 complete for their documented planning/design deliverables). Phase 5 delivers the React production-interface blueprint and interactive UX concept; the prototype is not connected to WooCommerce. The published Checkout API reference and WooCommerce 10.9 release/source differ on persisted draft creation for fresh sessions; exact-version runtime validation is still pending. This workspace has no local PHP/WordPress/Docker stack, and no disposable staging store was provided.
+**Overall planning progress: 75%** — unweighted average across the nine tracked phases, with Phase 6 at 75% for completed safety, source, adapter, canonicalization, change-event and queue design work (Phases 0–5 complete for their documented planning/design deliverables). Phase 5 delivers the React production-interface blueprint and interactive UX concept; the prototype is not connected to WooCommerce. The published Checkout API reference and WooCommerce 10.9 release/source differ on persisted draft creation for fresh sessions; exact-version runtime validation is still pending. This workspace has no local PHP/WordPress/Docker stack, no disposable staging store was provided, and the browser-based Playground did not launch because it requested browser verification.
 
 ## Start here
 
