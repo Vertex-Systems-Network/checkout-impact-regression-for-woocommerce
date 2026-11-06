@@ -40,7 +40,7 @@ jobs:
         run: |
           package_dir="dist/wpessential-checkout-impact-regression"
           mkdir -p "$package_dir"
-          cp -R wpessential-checkout-impact-regression.php assets includes vendor "$package_dir/"
+          cp -R wpessential-checkout-impact-regression.php uninstall.php assets includes vendor "$package_dir/"
           (
             cd dist
             zip -qr wpessential-checkout-impact-regression-0.2.0.zip wpessential-checkout-impact-regression
