@@ -23,11 +23,11 @@ This repository is in the **pre-development planning** stage. The plan below is 
 | 3. Options bank and system architecture | Complete (planning) | ██████████ 100% | 2026-11-06 | 2026-11-06 |
 | 4. Checkout scenario and comparison design | Complete (design) | ██████████ 100% | 2026-11-06 | 2026-11-06 |
 | 5. UX and React-based admin interface | Complete (UX/prototype) | ██████████ 100% | 2026-11-06 | 2026-11-06 |
-| 6. Pre-development technical proof | In progress (protocol + source audit done; runtime proof blocked) | ████░░░░░░ 35% | 2026-11-06 | TBD |
+| 6. Pre-development technical proof | In progress (protocol, source audit + adapter design done; runtime proof blocked) | █████░░░░░ 45% | 2026-11-06 | TBD |
 | 7. Plugin implementation and verification | Not started | ░░░░░░░░░░ 0% | TBD | TBD |
 | 8. Release readiness | Not started | ░░░░░░░░░░ 0% | TBD | TBD |
 
-**Overall planning progress: 71%** — unweighted average across the nine tracked phases, with Phase 6 at 35% for completed protocol and source-audit work (Phases 0–5 complete for their documented planning/design deliverables). Phase 5 delivers the React production-interface blueprint and interactive UX concept; the prototype is not connected to WooCommerce. The published Checkout API reference and WooCommerce 10.9 release/source differ on persisted draft creation for fresh sessions; exact-version runtime validation is still pending.
+**Overall planning progress: 72%** — unweighted average across the nine tracked phases, with Phase 6 at 45% for completed protocol, source-audit and adapter-boundary work (Phases 0–5 complete for their documented planning/design deliverables). Phase 5 delivers the React production-interface blueprint and interactive UX concept; the prototype is not connected to WooCommerce. The published Checkout API reference and WooCommerce 10.9 release/source differ on persisted draft creation for fresh sessions; exact-version runtime validation is still pending.
 
 ## Start here
 
@@ -40,7 +40,7 @@ This repository is in the **pre-development planning** stage. The plan below is 
 7. Read the [scenario and comparison specification](docs/design/SCENARIO-AND-COMPARISON-SPEC.md) before changing scenario, baseline or diff semantics.
 8. Review the [admin UX/React specification](docs/design/ADMIN-UX-SPEC.md) and [interactive interface prototype](docs/design/admin-interface-prototype.html) for the planned screens and states.
 9. Read the [requirements and compatibility plan](docs/requirements/REQUIREMENTS.md); planned targets are not tested compatibility claims.
-10. For Phase 6 checkout safety research and the runtime proof checklist, read [Pre-development safe checkout proof](docs/validation/PREDEVELOPMENT-SAFE-CHECKOUT-PROOF.md).
+10. For Phase 6 checkout safety research and the runtime proof checklist, read [Pre-development safe checkout proof](docs/validation/PREDEVELOPMENT-SAFE-CHECKOUT-PROOF.md) and the [Store API observation adapter spike](docs/validation/STORE-API-OBSERVATION-ADAPTER-SPIKE.md).
 11. Update the phase status, progress bar, start date, and end date in this README when project progress changes. Keep detailed decisions and evidence in the development plan.
 
 ## Product principles
