@@ -7,6 +7,25 @@
 
 This document is a paper/evidence worksheet for a store operator with an isolated disposable WooCommerce staging clone. It contains no executable commands and does not authorize testing on a live store.
 
+## 0. Environment provisioning gate
+
+Do not begin runtime proof until every item below is true. This is a provisioning checklist, not a request to place credentials or customer data in this repository or chat.
+
+| Gate | Required evidence before test |
+|---|---|
+| Disposable target | A staging clone or isolated test store that can be reset without affecting production |
+| Access path | Authorized operator can install and inspect WordPress/WooCommerce and the exact checkout extensions; secrets remain in the operator's secret manager |
+| Data safety | Synthetic products, addresses, coupons, and customer identity only; no copied live customer/order data |
+| Payment safety | Test gateway credentials only; no live payment credentials or charge path |
+| External effects | Email, webhooks, fulfillment, subscriptions, analytics, and carrier booking are disabled or routed to safe sinks |
+| Recovery | Snapshot/backup and a tested reset procedure exist before the first case |
+| Version lock | Exact PHP, WordPress, WooCommerce, checkout mode, theme, gateway, shipping, WPML/WCML or Polylang versions are recorded |
+| Evidence | A reviewer can inspect redacted request/response and side-effect deltas without secrets or personal data |
+
+If any gate fails, stop and record the matrix entry as **blocked**, not passed. Do not use a live store as a substitute.
+
+**Environment finding for this planning session:** workspace inspection found no PHP, Docker, WP-CLI, or WordPress project, and no disposable staging target was supplied. Therefore no executable runtime test can be run here. Phase 6 stays at 85%; this checklist does not count as runtime evidence.
+
 ## 1. Run identity
 
 | Field | Value |
