@@ -29,6 +29,8 @@ This repository is in the **pre-development planning** stage. The plan below is 
 
 **Overall planning progress: 76%** — unweighted average across the nine tracked phases, with Phase 6 at 85% for completed safety, source, adapter, canonicalization, change-event, queue, multilingual-context designs plus an operator runbook (Phases 0–5 complete for their documented planning/design deliverables). Phase 5 delivers the React production-interface blueprint and interactive UX concept; the prototype is not connected to WooCommerce. The published Checkout API reference and WooCommerce 10.9 release/source differ on persisted draft creation for fresh sessions; exact-version runtime validation is still pending. This workspace has no local PHP/WordPress/Docker stack, no disposable staging store was provided, and the browser-based Playground did not launch because it requested browser verification. Phase 6 runtime proof is gated on the [isolated environment provisioning checklist](docs/validation/RUNTIME-PROOF-RUNBOOK.md#0-environment-provisioning-gate) tracked as ENV-001.
 
+**Documentation check (2026-11-06):** all 23 relative links in this README and all 20 relative links in the development plan resolve to files in the repository. This verifies documentation navigation only; it does not change the Phase 6 runtime blocker.
+
 ## Start here
 
 1. Read [AGENTS.md](AGENTS.md) before making project changes. It explains how AI coding tools should work in this repository.
