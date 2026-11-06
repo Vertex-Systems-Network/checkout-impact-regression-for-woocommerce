@@ -1,6 +1,6 @@
 # Storage and retention decision
 
-**Status:** Accepted design; v0.2.0 schema scaffold is present in source, but runtime migration, record access, privacy/retention behavior, and compatibility remain unverified.  
+**Status:** Accepted design; schema, scenario/version/baseline repository methods, privacy hooks and preserve-by-default uninstall behavior are implemented in source. PHP lint/package passed in workflow run #24; WordPress migration, record/privacy behavior, scheduled retention, and compatibility remain unverified.  
 **Date:** 2026-11-06  
 **Owner:** Product/engineering (planning authorization recorded)  
 **Related:** [Architecture](ARCHITECTURE.md), [Requirements](../requirements/REQUIREMENTS.md), [Phase 6 closure](../validation/PHASE-6-CLOSURE-DECISION.md)
@@ -9,7 +9,7 @@
 
 Use versioned, per-site custom database tables for scenario versions, approved baseline versions, change events, run records, normalized observations, and findings. Keep small configuration values in non-autoloaded WordPress options. Do not store growing run history or serialized scenario suites in autoloaded options. This choice is accepted for planning; it does not authorize skipping the runtime proof gates below.
 
-This recommendation is based on the product's related versioned records, indexed history queries, retention cleanup, and explicit access/deletion lifecycle. WordPress guidance says to prefer post meta where practical; the implementation review must document why this relational history and lifecycle are not practical as post meta. If the implementation cannot justify that boundary, reconsider private custom post types plus metadata.
+Implementation now has administrator-guarded scenario/version/baseline operations, privacy exporter/eraser callbacks, bounded expired-run purge, and opt-in uninstall erasure. Run/observation CRUD and a scheduled purge are not implemented; runtime migration, query integrity, privacy, retention and uninstall behavior remain gated on an isolated disposable database proof. This recommendation is based on the product's related versioned records, indexed history queries, retention cleanup, and explicit access/deletion lifecycle. WordPress guidance says to prefer post meta where practical; the implementation review must document why this relational history and lifecycle are not practical as post meta. If the implementation cannot justify that boundary, reconsider private custom post types plus metadata.
 
 Use `$wpdb->prefix` for site-scoped table names and WordPress-supported schema versioning/upgrade routines. Do not support network-wide multisite operation in the initial release. A multisite network may use per-site plugin activation only after per-site isolation, upgrade, cleanup, and permissions are proven; network activation remains unsupported initially.
 
