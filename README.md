@@ -13,7 +13,7 @@ This is a change-impact regression tool. Checkout pass/fail monitoring is useful
 
 ## Project status
 
-This repository is in the **pre-development planning** stage. The plan below is the source of truth for phases and progress. Dates are recorded as YYYY-MM-DD; **TBD** means the schedule has not yet been estimated.
+This repository is in the **early implementation** stage. Checkout replay and observation remain unsupported until exact runtime proofs reopen that scope. The plan below is the source of truth for phases and progress. Dates are recorded as YYYY-MM-DD; **TBD** means the schedule has not yet been estimated.
 
 | Phase | Status | Progress | Start date | End date |
 |---|---|---:|---|---|
@@ -24,10 +24,10 @@ This repository is in the **pre-development planning** stage. The plan below is 
 | 4. Checkout scenario and comparison design | Complete (design) | ██████████ 100% | 2026-11-06 | 2026-11-06 |
 | 5. UX and React-based admin interface | Complete (UX/prototype) | ██████████ 100% | 2026-11-06 | 2026-11-06 |
 | 6. Pre-development technical proof | Complete (no-go decision; runtime modes unsupported) | ██████████ 100% | 2026-11-06 | 2026-11-06 |
-| 7. Plugin implementation and verification | Not started | ░░░░░░░░░░ 0% | TBD | TBD |
+| 7. Plugin implementation and verification | In progress (read-only admin shell; runtime unverified) | ░░░░░░░░░░ 5% | 2026-11-06 | TBD |
 | 8. Release readiness | Not started | ░░░░░░░░░░ 0% | TBD | TBD |
 
-**Overall planning progress: 78%** — unweighted average across the nine tracked phases, with Phase 6 closed at 100% as an explicit no-go/support-exclusion decision. This closure is not a runtime pass: no automatic checkout replay mode or integration is approved, and all untested combinations remain unsupported until version-specific evidence reopens the gate (Phases 0–5 are complete for their documented planning/design deliverables). Phase 5 delivers the React production-interface blueprint and interactive UX concept; the prototype is not connected to WooCommerce. The published Checkout API reference and WooCommerce 10.9 release/source differ on persisted draft behavior; exact-version runtime validation has not been performed. This workspace has no local PHP/WordPress/Docker stack or supplied disposable staging store. An earlier Playground attempt hit browser verification; a fresh Blueprint attempt failed during worker/storage-worker initialization. See the [Phase 6 closure decision](docs/validation/PHASE-6-CLOSURE-DECISION.md) and [reopen checklist](docs/validation/RUNTIME-PROOF-RUNBOOK.md#0-environment-provisioning-gate).
+**Overall tracked progress: 78%** — unweighted average across nine phases: Phases 0–6 are closed for their documented outcomes, Phase 7 is 5% complete, and Phase 8 has not started. Phase 6 closed with an explicit no-go/support-exclusion decision, not a runtime pass: no automatic checkout replay mode or integration is approved; untested combinations remain unsupported until version-specific evidence reopens that scope. Phase 7 has only a read-only plugin/admin shell so far; its WordPress activation has not been runtime-tested, no scenario data is stored, and no checkout request is made. The plugin's stored-scenario comparison goal remains the target, but cannot be represented as available functionality. See the [Phase 6 closure decision](docs/validation/PHASE-6-CLOSURE-DECISION.md) and [reopen checklist](docs/validation/RUNTIME-PROOF-RUNBOOK.md#0-environment-provisioning-gate).
 
 **Documentation check (2026-11-06):** all 74 relative links across the repository’s 25 Markdown/HTML documents resolve; this includes 25 README links and 15 development-plan links. Navigation verification is not runtime evidence.
 
@@ -45,7 +45,8 @@ This repository is in the **pre-development planning** stage. The plan below is 
 10. For Phase 6 checkout safety, adapter boundaries, canonical field mapping, change-event handling and runtime proof cases, read the [safe checkout proof protocol](docs/validation/PREDEVELOPMENT-SAFE-CHECKOUT-PROOF.md), [Store API observation adapter spike](docs/validation/STORE-API-OBSERVATION-ADAPTER-SPIKE.md), [Store API canonicalization spike](docs/validation/STORE-API-CANONICALIZATION-SPIKE.md), [change-source hooks spike](docs/validation/CHANGE-SOURCE-HOOKS-SPIKE.md), [background run scheduling spike](docs/validation/BACKGROUND-RUN-SCHEDULING-SPIKE.md) and [runtime proof runbook](docs/validation/RUNTIME-PROOF-RUNBOOK.md), including the exact isolated-environment provisioning gate and V-01–V-07 before/after operator matrix.
 11. Read the [multilingual checkout compatibility spike](docs/validation/MULTILINGUAL-CHECKOUT-COMPATIBILITY-SPIKE.md) for WPML/WCML and Polylang scenario fingerprints and proof cases; these integrations are not runtime-supported.
 12. Read the [Phase 6 closure decision](docs/validation/PHASE-6-CLOSURE-DECISION.md) before treating any automatic replay mode as implementation-ready.
-13. Update the phase status, progress bar, start date, and end date in this README when project progress changes. Keep detailed decisions and evidence in the development plan.
+13. Review the [plugin bootstrap](wpessential-checkout-impact-regression.php), [permission-checked admin page](includes/class-wpecir-admin-page.php), [React admin shell](assets/js/admin.js), and [admin styles](assets/css/admin.css). This first slice is source-only and has not been runtime-tested.
+14. Update the phase status, progress bar, start date, and end date in this README when project progress changes. Keep detailed decisions and evidence in the development plan.
 
 ## Product principles
 
