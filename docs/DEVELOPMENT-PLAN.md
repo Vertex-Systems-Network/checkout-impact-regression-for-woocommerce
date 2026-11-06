@@ -281,7 +281,9 @@ Dates remain TBD until the team estimates the work. Record actual start/end date
 
 ### Phase 7 — Plugin implementation and verification
 
-**Status:** Not started
+**Status:** In progress (2026-11-06); first source slice is a read-only plugin bootstrap/admin shell. It has not been activated or runtime-tested. No scenario data is stored, and no checkout request or background run is made.
+
+**Completed slice:** IMPL-001 bootstrap and a React admin status screen are present as source. The screen explicitly says scenario storage is unavailable and all checkout modes are disabled. Phase 6's no-go decision remains binding: checkout observation/replay and integrations are unsupported until a version-specific proof reopens them. Storage implementation remains deferred until its privacy, migration and retention decision is finalized.
 
 **Deliverables:** implementation in approved slices; automated/manual verification artifacts; compatibility results; security and performance evidence; docs.
 
@@ -331,7 +333,7 @@ Backlog items should be assigned to an assistant only when the task is bounded a
 | ENV-001 | 6 | P0 | Provision isolated, disposable WooCommerce runtime to reopen replay support | SPIKE-001–009; authorized staging operator | Resettable non-production store, synthetic data, test-only gateway, external side-effect containment, exact version fingerprint and redacted evidence access are available; secrets never enter repo/chat | Deferred gate; required before any replay mode can be enabled |
 | UX-001 | 5 | P1 | Define admin information architecture and interactive scenario/report prototype | REQ-001, PLAN-004, SCN-001–003 | Prototype covers setup, market/cart, expected values, before/after impact, evidence, history and prototype-only safety blocks; React component/API ownership is documented | Complete (2026-11-06; design artifact only) |
 | UX-002 | 5 | P1 | Specify accessible interaction and async/error/unsupported states | UX-001, REQ-008 | Keyboard/focus, labels, announcements, contrast, responsive behavior and empty/loading/error/partial/blocked/unsupported states are explicitly designed | Complete (2026-11-06; not assistive-technology tested) |
-| IMPL-001 | 7 | P0 | Establish plugin bootstrap and dependency/capability guards | Phase 6 exit; REQ-002 | Plugin loads safely only with supported WordPress/WooCommerce/PHP; no product CLI is introduced; dependency failures are visible and non-fatal | Not started |
+| IMPL-001 | 7 | P0 | Establish plugin bootstrap and dependency/capability guards | Phase 6 exit; REQ-002 | Plugin loads safely only with scoped WordPress/WooCommerce/PHP; no product CLI is introduced; dependency failures are visible and non-fatal | In progress (bootstrap and admin shell source added; activation/runtime unverified) |
 | IMPL-002 | 7 | P0 | Implement privacy-first storage and domain records | IMPL-001; SYS-13; retention decision | Versioned scenario, baseline, event, run and observation records have migrations, access checks, redaction and uninstall/retention behavior | Not started |
 | IMPL-003 | 7 | P0 | Implement change-context event collector | IMPL-002; SPIKE-006 runtime gate | Supported plugin updates/settings changes are idempotently recorded with safe fingerprints; unknown sources remain explicit; event is correlation only | Not started |
 | IMPL-004 | 7 | P0 | Implement scenario catalog and React scenario builder | IMPL-002; UX-001; SYS-01 | Authorized user can create/edit/version synthetic scenarios; validation, accessible states and localization-ready UI match the spec | Not started |
@@ -377,6 +379,7 @@ When asking ChatGPT, Cursor, Claude, Gemini, or another assistant to work, provi
 - **D-011:** Target a free edition on WordPress.org and a paid edition on the WooCommerce.com Marketplace; marketplace submissions and vendor approval remain future release gates.
 - **D-012:** Keep channel-specific packages and update ownership explicit. The WordPress.org edition must not behave as trialware or download/install the paid package from an external server; validate the free/paid split with both marketplaces before release.
 - **D-013:** Close Phase 6 as a no-go/support-exclusion decision because runtime proof could not be run. No automatic checkout replay or checkout integration is supported until an exact matrix entry is proven and Phase 6 is reopened; this closure is not a runtime pass.
+- **D-014:** The initial admin shell uses WordPress-bundled React (`wp.element`) and `wp-i18n` without a separate build tool or CLI. This is a source-level implementation choice, not a compatibility claim; verify it against the exact supported WordPress matrix before release.
 
 ### Open questions for discovery
 
