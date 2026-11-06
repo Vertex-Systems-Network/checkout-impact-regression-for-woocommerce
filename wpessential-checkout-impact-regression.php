@@ -45,9 +45,16 @@ spl_autoload_register(
 	}
 );
 
+register_activation_hook(
+	WPECIR_FILE,
+	array( \WPEssential\CheckoutImpactRegression\Storage\Schema::class, 'install' )
+);
+
 add_action(
 	'plugins_loaded',
 	static function () {
+		\WPEssential\CheckoutImpactRegression\Storage\Schema::register_hooks();
+
 		$admin_page = new \WPEssential\CheckoutImpactRegression\Admin\AdminPage();
 		$admin_page->register_hooks();
 	},
