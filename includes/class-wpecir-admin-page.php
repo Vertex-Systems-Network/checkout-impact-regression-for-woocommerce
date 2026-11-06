@@ -70,7 +70,7 @@ final class WPECIR_Admin_Page {
 		wp_enqueue_script(
 			'wpecir-admin',
 			WPECIR_URL . 'assets/js/admin.js',
-			array( 'wp-element' ),
+			array( 'wp-element', 'wp-i18n' ),
 			WPECIR_VERSION,
 			true
 		);
