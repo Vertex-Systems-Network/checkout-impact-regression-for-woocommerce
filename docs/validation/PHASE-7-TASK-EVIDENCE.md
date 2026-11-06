@@ -13,14 +13,14 @@
 | Change-context collector (IMPL-003) | Implemented in source; runtime pending | Bootstrap registers plugin-upgrade and option add/update/delete hooks. WooCommerce settings and filtered option names are tracked; identity/secret fields are redacted and only a SHA-256 projection is stored. Events are correlation context, not proof of checkout impact. Hook coverage, bulk updates and dedupe remain unverified. |
 | Privacy exporter/eraser | Implemented in source; runtime pending | WordPress privacy hooks export authorship identifiers/timestamps and anonymize author IDs in scenario/version/baseline records. Database behavior has not been exercised in WordPress. |
 | Retention and uninstall | Partial; runtime pending | Repository has bounded expired-run deletion, but it is not scheduled and no run API populates expiry. uninstall.php preserves by default and drops tables/options only when wpecir_erase_data_on_uninstall is explicitly yes. There is no UI for that option. |
-| Scenario React builder/API (IMPL-004) | Not started | The existing React admin shell remains non-executing. No scenario REST controller or CRUD UI is registered. |
+| Scenario React builder/API (IMPL-004) | Partial; source added | Admin-only REST endpoints list/create/delete scenarios; the React screen creates and lists scenarios from synthetic country, product, currency, shipping and coupon fields, with delete confirmation. It uses WP REST nonce middleware. Version editing, strict per-field API schema, accessibility review and browser/runtime verification remain pending. Saving only writes scenario configuration; no checkout request is issued. |
 | Checkout adapters/orchestration (IMPL-005/006/009) | Blocked by Phase 6 NO-GO | No approved isolated replay proof exists. No checkout request/replay route or run executor was enabled. |
 | Normalizer/diff and impact reports (IMPL-007/008/010) | Not started | No deterministic observation normalizer/diff, report/history UI, notification or export flow exists. |
-| Compatibility/security/performance/accessibility matrix (IMPL-011) | Pending | No current-source WordPress/WooCommerce runtime or supported-version matrix was tested. |
+| Compatibility/security/performance/accessibility matrix (IMPL-011) | Pending | No current-source WordPress/WooCommerce runtime or supported-version matrix was tested. CI now also runs node --check on the React admin script, but that is syntax-only evidence. |
 
 ## Workflow and package evidence
 
-PHP 8.3 workflow run #24 passed for commit b1b3631f02c061b27ae0426938757aec2df92a3c, including strict Composer validation, optimized autoload generation, PHP syntax lint, ZIP integrity and artifact creation. Artifact 13548598573 is available until 2027-02-04. The local workspace has no PHP or Composer executable.
+PHP 8.3 workflow run #24 passed earlier for the repository, including strict Composer validation, optimized autoload generation, PHP syntax lint, ZIP integrity and artifact creation. After the scenario REST/UI changes, workflow run #35 passed the workflow including the new node --check step on commit ccc9a079d922b37ec5fb97ac75a3485affe7d0bc. Later doc-only commit checks are running; the artifact from run #24 does not include the scenario REST/UI code. The local workspace has no PHP or Composer executable.
 
 The shared test site still has v0.1.0 active. It has not activated current v0.2.0 source, and no schema migration was tested there. Do not use the earlier artifact as the current package.
 
