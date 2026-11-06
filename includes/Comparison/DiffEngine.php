@@ -31,7 +31,8 @@ final class DiffEngine {
 		$fields = array_unique( array_merge( array_keys( $baseline ), array_keys( $current ) ) );
 		$diffs  = array();
 		foreach ( $fields as $field ) {
-			$field = sanitize_key( $field );
+			$raw_field = (string) $field;
+			$field     = sanitize_key( str_replace( '.', '_', $raw_field ) );
 			if ( ! preg_match( '/^[a-z0-9_]+$/', $field ) ) {
 				continue;
 			}
