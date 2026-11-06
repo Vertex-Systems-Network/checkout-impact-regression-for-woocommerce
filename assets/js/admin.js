@@ -164,7 +164,7 @@
 					h( 'div', { className: 'wpecir-panel__heading wpecir-panel__heading--row' }, h( 'div', null, h( 'p', { className: 'wpecir-card__eyebrow' }, text( 'Scenario library' ) ), h( 'h2', { id: 'wpecir-list-title' }, text( 'Saved scenarios' ) ) ), h( 'button', { type: 'button', className: 'button', onClick: refresh, disabled: loading }, text( 'Refresh' ) ) ),
 					loading ? h( 'p', { role: 'status' }, text( 'Loading saved scenarios…' ) ) : scenarios.length ? h( 'ul', { className: 'wpecir-scenario-list' }, scenarios.map( function ( scenario ) {
 						return h( 'li', { className: 'wpecir-scenario-row', key: scenario.id },
-							h( 'div', null, h( 'h3', null, scenario.title ), h( 'p', null, text( 'Updated ' ) + scenario.updated_at + ' · ' + text( 'Status: ' ) + scenario.status ),
+							h( 'div', null, h( 'h3', null, scenario.title ), h( 'p', null, text( 'Updated ' ) + scenario.updated_at + ' · ' + text( 'Status: ' ) + scenario.status ) ),
 							h( 'button', { type: 'button', className: 'button button-link-delete', onClick: function () { removeScenario( scenario.id ); } }, text( 'Delete' ) )
 						);
 					} ) ) : h( 'p', { className: 'wpecir-empty' }, text( 'No scenarios saved yet. Create one using synthetic values above.' ) )
