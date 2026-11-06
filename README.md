@@ -29,7 +29,7 @@ This repository is in the **pre-development planning** stage. The plan below is 
 
 **Overall planning progress: 78%** — unweighted average across the nine tracked phases, with Phase 6 closed at 100% as an explicit no-go/support-exclusion decision. This closure is not a runtime pass: no automatic checkout replay mode or integration is approved, and all untested combinations remain unsupported until version-specific evidence reopens the gate (Phases 0–5 are complete for their documented planning/design deliverables). Phase 5 delivers the React production-interface blueprint and interactive UX concept; the prototype is not connected to WooCommerce. The published Checkout API reference and WooCommerce 10.9 release/source differ on persisted draft behavior; exact-version runtime validation has not been performed. This workspace has no local PHP/WordPress/Docker stack or supplied disposable staging store. An earlier Playground attempt hit browser verification; a fresh Blueprint attempt failed during worker/storage-worker initialization. See the [Phase 6 closure decision](docs/validation/PHASE-6-CLOSURE-DECISION.md) and [reopen checklist](docs/validation/RUNTIME-PROOF-RUNBOOK.md#0-environment-provisioning-gate).
 
-**Documentation check (2026-11-06):** all 23 relative links in this README and all 20 relative links in the development plan resolve to files in the repository. This verifies documentation navigation only; it does not change the Phase 6 runtime blocker.
+**Documentation check (2026-11-06):** all 74 relative links across the repository’s 25 Markdown/HTML documents resolve; this includes 25 README links and 15 development-plan links. Navigation verification is not runtime evidence.
 
 ## Start here
 
