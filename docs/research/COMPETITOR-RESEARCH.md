@@ -82,3 +82,50 @@ All sources below were reviewed on 2026-11-06:
 - [ShopMonitor — test-flow setup wizard](https://shopmonitor.io/knowledge-base/add-website)
 - [ShopMonitor — WordPress plugin listing](https://wordpress.org/plugins/shopmonitorio/)
 - [ShopMonitor — website settings and WordPress plugin integration](https://shopmonitor.io/knowledge-base/website-settings)
+
+
+## Extended adjacent-product review
+
+The initial two-product scan was expanded to direct checkout testers, checkout diagnostics, store-health monitors, and change-history tools. The sources are vendor or WordPress.org product materials, not independent hands-on tests. **Checked 2026-11-06.**
+
+| Product | Publicly documented capabilities | Boundary / relevance to our positioning |
+|---|---|---|
+| [CheckView](https://checkview.io/docs/woocommerce-testing/) | Scheduled external browser flows for product/cart/checkout; configurable product, billing and shipping details; test gateway/Stripe test mode; screenshots, logs, notifications. Its test-flow setup permits a selected shipping country/address and product per flow. | Strong overlap in saved, configurable checkout tests. Public docs reviewed describe per-flow test results and reports, but no explicit approved-baseline diff of normalized shipping/coupon/tax/total fields across a scenario suite was found. Not confirmed absent. |
+| [Cobalt Checkout Diagnostics](https://wordpress.org/plugins/cobalt-checkout-diagnostics/) | Local read-only checks, configuration snapshots and “changes check against previous run,” run history, evidence and optional scheduling. Covers shipping, gateways, checkout type, HPOS, scheduled-task health and block checkout total consistency. | Closest documented overlap with previous-run comparison. Its listing explicitly says it does not place orders or process payments and local checks do not prove a real external customer can complete checkout. A live scenario-diff distinction may matter, but needs user validation. |
+| [Qasim Checkout Test Lab](https://wordpress.org/plugins/qasim-checkout-test-lab-for-woocommerce/) | User-started private test checkout for classic/block checkout; address/cart preview showing shipping methods and reasons a method is hidden; test payment gateway and manual test orders. | Very close to the “why is shipping missing for Germany?” diagnostic. Its public description presents manual test/preview and warns preview does not test gateways; test orders are real WooCommerce orders until cleanup and may temporarily affect analytics/coupon usage. No saved multi-scenario before/after comparison documented. |
+| [ShopMonitor](https://shopmonitor.io/woocommerce-checkout-testen) | External scheduled customer-like journey through variants, cart, fields, shipping/payment and order confirmation; AI-assisted test-flow setup; step replay/evidence, history, agency grouping. | Strong flow-testing competitor. Public sources reviewed did not explicitly document normalized before/after diffs across saved scenario sets. Not confirmed absent. |
+| [Cart Lookout](https://wordpress.org/plugins/cartlookout/) | Hosted scheduled browser test; health screen for checkout pages/payment states/orders; recent plugin/theme changes and updater outcomes; documented synthetic product/test gateway, cleanup, and failure evidence. | Combines change awareness with checkout health. Position cannot rely on detecting updates or generic safe test orders alone. |
+| [Checkout Watch](https://wordpress.org/plugins/checkout-watch/) | Free local read-only diagnostics/cart dry run; optional external scheduled cart-to-payment checks, alerts, history and evidence through its service. Listing explicitly distinguishes local scan limits from proof of actual checkout/payment. | Similar local-diagnostic + hosted-monitor split. Its public materials describe health findings and monitoring incidents, not a cross-scenario expected-value baseline diff. Not confirmed absent. |
+| [UptimeStore](https://wordpress.org/plugins/uptimestore/) | External service with store health checks, gateway/page/order-flow monitoring, plugin/theme and selected settings change records, and alerts. | Tracks changes and operational health. Change timelines are adjacent to impact attribution but not equivalent to scenario-level checkout outcome comparison. |
+| [Sentrix ChangeMonitor](https://wordpress.org/plugins/sentrix-by-ilabs/) | Records plugin activation/deactivation/updates, theme, gateway enable/live-test/settings, checkout settings, and selected store-setting changes, with importance and retention. Its SalesGuard module reviews payment activity. | Direct overlap for change event history and diagnostic context; public listing says it does not restore settings or alert on each change. No actual checkout scenario replay/value diff described. |
+| [WRN Store Monitor Lite](https://wordpress.org/plugins/wrn-store-monitor-lite/) | Operational dashboard for failed/stuck orders, gateway failure patterns, checkout configuration, inventory, environment, email and cron health; schedules/alerts/exports; Pro adds continuous checkout/cart/AJAX monitoring and AI diagnosis. | Adjacent operational health and incident diagnostics, not a saved-customer checkout scenario regression workflow in the reviewed listing. |
+| [CheckOO](https://wordpress.org/plugins/checkoo/) | Local scheduled synthetic $0 checkout via a mock gateway, email alert, recent pass/fail timeline, cleanup and HPOS claim. | Competes on local synthetic checkout and low external dependency. Public listing presents pass/fail monitoring, not region/coupon scenario suite or baseline value-diff. Its claims have not been independently tested. |
+
+### What this changes
+
+- The market is broader than pass/fail monitoring. Products publicly advertise configuration comparison (Cobalt), scenario-specific shipping explanation (Qasim), update/change history (Cart Lookout, UptimeStore, Sentrix), and scheduled browser flows (Cart Lookout, ShopMonitor, CheckView, Checkout Watch).
+- The original claim “existing monitors mostly detect checkout success/failure” is directionally useful but too broad to use as a competitive fact. Narrow it to: **the product hypothesis is a managed suite of saved checkout scenarios with approved baselines and field-level before/after impact diffs tied to change context**. Validate this in demos and user interviews.
+- Qasim already illustrates the country/cart-specific missing-shipping-method problem. The proposed product must show repeatability, baseline comparison, change linkage and multi-scenario impact in a way a one-off manual preview does not; verify whether this is valuable to users.
+- Cobalt's previous-run configuration snapshots mean “compare before/after settings” alone is not unique. The sharper candidate is comparing *observed checkout outcomes* for multiple scenarios against an explicit approved baseline, while retaining configuration snapshots as evidence.
+- Regressions are not always technically inferable as expected changes. Users need an explicit baseline approval/expected-change workflow, with audit history and no silent learning.
+- Product architecture must choose local diagnostics, controlled in-store runner, hosted browser runner, or a hybrid only after privacy, safe-order side effects, reliability and cost are tested.
+
+## Market research limits
+
+- This is a public-materials desk review from 2026-11-06. No subscriptions, private dashboards, vendor interviews, source-code audit, hands-on installation, or independent feature validation were performed.
+- Some WordPress.org entries have very small public installation counts or are recently released; listing claims should not be treated as maturity or reliability evidence.
+- Competitor feature absence in marketing/docs is not proof that a capability is absent in the product.
+- Pricing and plan limits were not used to set the proposed $119/year price because plan promotions and included usage differ and can change. Price validation is still open.
+
+
+## Additional sources reviewed on 2026-11-06
+
+- [CheckView — WooCommerce testing](https://checkview.io/docs/woocommerce-testing/)
+- [CheckView — creating a WooCommerce test flow](https://checkview.io/docs/creating-a-woocommerce-test-flow/)
+- [Cobalt Checkout Diagnostics — WordPress.org](https://wordpress.org/plugins/cobalt-checkout-diagnostics/)
+- [Qasim Checkout Test Lab — WordPress.org](https://wordpress.org/plugins/qasim-checkout-test-lab-for-woocommerce/)
+- [Checkout Watch — WordPress.org](https://wordpress.org/plugins/checkout-watch/)
+- [UptimeStore — WordPress.org](https://wordpress.org/plugins/uptimestore/)
+- [Sentrix — WordPress.org](https://wordpress.org/plugins/sentrix-by-ilabs/)
+- [WRN Store Monitor Lite — WordPress.org](https://wordpress.org/plugins/wrn-store-monitor-lite/)
+- [CheckOO — WordPress.org](https://wordpress.org/plugins/checkoo/)
