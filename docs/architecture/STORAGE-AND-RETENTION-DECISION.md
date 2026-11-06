@@ -1,11 +1,11 @@
-# Proposed storage and retention decision
+# Storage and retention decision
 
-**Status:** Accepted for planning; runtime implementation remains gated.  
+**Status:** Accepted for planning; implementation and compatibility claims remain gated on exact-version runtime evidence.  
 **Date:** 2026-11-06  
 **Owner:** Product/engineering (planning authorization recorded)  
 **Related:** [Architecture](ARCHITECTURE.md), [Requirements](../requirements/REQUIREMENTS.md), [Phase 6 closure](../validation/PHASE-6-CLOSURE-DECISION.md)
 
-## Recommendation
+## Accepted planning choice
 
 Use versioned, per-site custom database tables for scenario versions, approved baseline versions, change events, run records, normalized observations, and findings. Keep small configuration values in non-autoloaded WordPress options. Do not store growing run history or serialized scenario suites in autoloaded options. This choice is accepted for planning; it does not authorize skipping the runtime proof gates below.
 
@@ -13,7 +13,7 @@ This recommendation is based on the product's related versioned records, indexed
 
 Use `$wpdb->prefix` for site-scoped table names and WordPress-supported schema versioning/upgrade routines. Do not support network-wide multisite operation in the initial release. A multisite network may use per-site plugin activation only after per-site isolation, upgrade, cleanup, and permissions are proven; network activation remains unsupported initially.
 
-## Proposed lifecycle
+## Planning lifecycle decision
 
 - Scenario definitions and approved baselines are versioned and retained until an authorized store administrator deletes them.
 - Run details, observations, and findings use a proposed default retention of 30 days, configurable from 7 to 365 days. Purge expired records in bounded background batches; preserve referential integrity and surface cleanup failures.
@@ -21,6 +21,7 @@ Use `$wpdb->prefix` for site-scoped table names and WordPress-supported schema v
 - Deactivation does not delete merchant records.
 - Store only synthetic/minimized destination attributes required for zone resolution. Never store card data, gateway credentials, real shopper names, email addresses, or full street addresses in scenario/run records.
 - Register WordPress privacy exporter/eraser support for any personal data that could enter supported fields despite the synthetic-data default; redact before export and honor deletion requests.
+- The first implementation stores no payment or carrier API credentials. If a later release adds provider credentials, require a separate secret-storage decision; do not assume database storage is encrypted by the plugin.
 
 ## Acceptance gates before implementation
 
