@@ -21,13 +21,13 @@ This repository is in the **pre-development planning** stage. The plan below is 
 | 1. Market and competitor research | Complete | ██████████ 100% | 2026-11-06 | 2026-11-06 |
 | 2. Requirements and compatibility matrix | Complete (planning) | ██████████ 100% | 2026-11-06 | 2026-11-06 |
 | 3. Options bank and system architecture | Complete (planning) | ██████████ 100% | 2026-11-06 | 2026-11-06 |
-| 4. Checkout scenario and comparison design | Not started | ░░░░░░░░░░ 0% | TBD | TBD |
+| 4. Checkout scenario and comparison design | Complete (design) | ██████████ 100% | 2026-11-06 | 2026-11-06 |
 | 5. UX and React-based admin interface | Not started | ░░░░░░░░░░ 0% | TBD | TBD |
 | 6. Pre-development technical proof | Not started | ░░░░░░░░░░ 0% | TBD | TBD |
 | 7. Plugin implementation and verification | Not started | ░░░░░░░░░░ 0% | TBD | TBD |
 | 8. Release readiness | Not started | ░░░░░░░░░░ 0% | TBD | TBD |
 
-**Overall planning progress: 44%** — unweighted average across the nine tracked phases (Phases 0–3 complete for their documented planning deliverables). Phase 3 defines proposed ownership, architecture and integration boundaries; provider integrations and safe checkout execution remain unvalidated.
+**Overall planning progress: 56%** — unweighted average across the nine tracked phases (Phases 0–4 complete for their documented planning/design deliverables). Phase 4 defines scenario and comparison semantics; safe checkout replay and runtime compatibility remain unvalidated.
 
 ## Start here
 
@@ -37,8 +37,9 @@ This repository is in the **pre-development planning** stage. The plan below is 
 4. Check the [competitor research report](docs/research/COMPETITOR-RESEARCH.md) for dated findings and source links.
 5. Use the [deduplicated options bank](docs/research/OPTIONS-BANK.md) and [system inventory](docs/architecture/SYSTEM-INVENTORY.md) before adding scope or proposing architecture.
 6. Read the [proposed architecture and data flow](docs/architecture/ARCHITECTURE.md) and [shipping/payment integration matrix](docs/architecture/INTEGRATION-MATRIX.md).
-7. Read the [requirements and compatibility plan](docs/requirements/REQUIREMENTS.md); planned targets are not tested compatibility claims.
-8. Update the phase status, progress bar, start date, and end date in this README when project progress changes. Keep detailed decisions and evidence in the development plan.
+7. Read the [scenario and comparison specification](docs/design/SCENARIO-AND-COMPARISON-SPEC.md) before changing scenario, baseline or diff semantics.
+8. Read the [requirements and compatibility plan](docs/requirements/REQUIREMENTS.md); planned targets are not tested compatibility claims.
+9. Update the phase status, progress bar, start date, and end date in this README when project progress changes. Keep detailed decisions and evidence in the development plan.
 
 ## Product principles
 
