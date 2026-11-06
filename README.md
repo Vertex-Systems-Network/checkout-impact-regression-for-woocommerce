@@ -54,6 +54,7 @@ This repository is in the **pre-development planning** stage. The plan below is 
 - Finalize and document PHP, WordPress, WooCommerce, WPML, and Polylang compatibility before implementation scope is locked.
 - **Do not add a CLI to the product before the final release.** No CLI product interface or CLI commands are in scope during planning and implementation.
 - Treat Store API Cart Tokens as session identifiers, not side-effect isolation; use the [adapter spike](docs/validation/STORE-API-OBSERVATION-ADAPTER-SPIKE.md) for the observation boundary.
+- The sequenced Phase 7 implementation backlog is recorded in the [development plan](docs/DEVELOPMENT-PLAN.md); tasks that depend on safe replay stay gated by Phase 6 runtime evidence.
 - Do not claim compatibility or automated detection capability until it has been validated.
 
 ## Planned research references
