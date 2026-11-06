@@ -110,30 +110,30 @@ final class ScenarioController {
 	 * @param mixed $title Scenario label.
 	 * @param array $input Scenario inputs.
 	 * @param array $expectation Expected values.
-	 * @return true|\\WP_Error
+	 * @return true|\WP_Error
 	 */
 	private static function validate_scenario( $title, $input, $expectation ) {
 		$country  = isset( $input['market']['country'] ) ? strtoupper( sanitize_text_field( $input['market']['country'] ) ) : '';
 		$currency = isset( $input['currency'] ) ? strtoupper( sanitize_text_field( $input['currency'] ) ) : '';
 		$items    = isset( $input['cart']['items'] ) ? $input['cart']['items'] : array();
 		if ( ! is_string( $title ) || '' === trim( $title ) || ! preg_match( '/^[A-Z]{2}$/', $country ) || ! preg_match( '/^[A-Z]{3}$/', $currency ) || ! is_array( $items ) || 1 !== count( $items ) ) {
-			return new \\WP_Error( 'wpecir_invalid_scenario', __( 'Enter a name, two-letter country, three-letter currency, and one synthetic cart item.', 'wpessential-checkout-impact-regression' ), array( 'status' => 400 ) );
+			return new \WP_Error( 'wpecir_invalid_scenario', __( 'Enter a name, two-letter country, three-letter currency, and one synthetic cart item.', 'wpessential-checkout-impact-regression' ), array( 'status' => 400 ) );
 		}
 		$item = reset( $items );
 		if ( ! is_array( $item ) || empty( $item['product_id'] ) || absint( $item['product_id'] ) < 1 || empty( $item['quantity'] ) || absint( $item['quantity'] ) < 1 || absint( $item['quantity'] ) > 100 ) {
-			return new \\WP_Error( 'wpecir_invalid_cart_item', __( 'Use a valid test product ID and a quantity from 1 to 100.', 'wpessential-checkout-impact-regression' ), array( 'status' => 400 ) );
+			return new \WP_Error( 'wpecir_invalid_cart_item', __( 'Use a valid test product ID and a quantity from 1 to 100.', 'wpessential-checkout-impact-regression' ), array( 'status' => 400 ) );
 		}
 		$allowed = array( 'shipping_method', 'shipping_cost', 'coupon_code', 'coupon_discount' );
 		foreach ( $expectation as $key => $value ) {
 			if ( ! in_array( $key, $allowed, true ) ) {
-				return new \\WP_Error( 'wpecir_invalid_expectation', __( 'An expected field is not supported by this scenario builder version.', 'wpessential-checkout-impact-regression' ), array( 'status' => 400 ) );
+				return new \WP_Error( 'wpecir_invalid_expectation', __( 'An expected field is not supported by this scenario builder version.', 'wpessential-checkout-impact-regression' ), array( 'status' => 400 ) );
 			}
 			if ( in_array( $key, array( 'shipping_cost', 'coupon_discount' ), true ) && ( ! is_numeric( $value ) || (float) $value < 0 ) ) {
-				return new \\WP_Error( 'wpecir_invalid_expectation_value', __( 'Expected monetary values must be non-negative numbers.', 'wpessential-checkout-impact-regression' ), array( 'status' => 400 ) );
+				return new \WP_Error( 'wpecir_invalid_expectation_value', __( 'Expected monetary values must be non-negative numbers.', 'wpessential-checkout-impact-regression' ), array( 'status' => 400 ) );
 			}
 		}
 		if ( isset( $expectation['coupon_discount'] ) && empty( $expectation['coupon_code'] ) ) {
-			return new \\WP_Error( 'wpecir_coupon_expectation', __( 'A coupon discount expectation requires a coupon code.', 'wpessential-checkout-impact-regression' ), array( 'status' => 400 ) );
+			return new \WP_Error( 'wpecir_coupon_expectation', __( 'A coupon discount expectation requires a coupon code.', 'wpessential-checkout-impact-regression' ), array( 'status' => 400 ) );
 		}
 
 		return true;
