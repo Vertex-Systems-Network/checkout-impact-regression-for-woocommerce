@@ -63,6 +63,12 @@ Competitor research begins in Phase 1. Initial references supplied for review:
 
 Research must verify the current feature set and limitations from primary product materials, record findings and sources, and use them to build a deduplicated options bank. No feature should be copied into scope without a user need, rationale, and acceptance criteria.
 
+## Planned distribution
+
+The release target is a **free edition for the WordPress.org Plugin Directory** and a **paid edition for the WooCommerce.com Marketplace**. These are planning targets only; neither marketplace application nor product submission has been made. The free edition must provide genuine standalone value and comply with WordPress.org's licensing and no-trialware rules. Paid packaging, update ownership, pricing and cross-marketplace presentation still require review.
+
+See the [distribution and marketplace submission plan](docs/release/DISTRIBUTION-PLAN.md) for current requirements, release gates, edition decisions and official references. The proposed $119/year price is not approved.
+
 ## License
 
-No license has been selected yet.
+No license has been selected yet. A GPL-compatible release license is a submission prerequisite and remains a decision.
