@@ -107,6 +107,6 @@ final class WPECIR_Admin_Page {
 			);
 		}
 
-		echo '<div class="wrap wpecir-admin-wrap"><div id="wpecir-admin-root" aria-live="polite"></div></div>';
+		echo '<div class="wrap wpecir-admin-wrap"><div id="wpecir-admin-root" aria-live="polite"><p role="status">' . esc_html__( 'Loading the Checkout Impact admin screen… If this message remains visible, the WordPress interface script did not start.', 'wpessential-checkout-impact-regression' ) . '</p></div></div>';
 	}
 }
