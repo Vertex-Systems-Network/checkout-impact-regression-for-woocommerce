@@ -34,3 +34,22 @@ jobs:
           while IFS= read -r -d '' file; do
             php -l "$file"
           done < <(find . -type f -name '*.php' -not -path './.git/*' -print0)
+
+      - name: Build installable plugin ZIP with Composer vendor files
+        shell: bash
+        run: |
+          package_dir="dist/wpessential-checkout-impact-regression"
+          mkdir -p "$package_dir"
+          cp -R wpessential-checkout-impact-regression.php assets includes vendor "$package_dir/"
+          (
+            cd dist
+            zip -qr wpessential-checkout-impact-regression-0.2.0.zip wpessential-checkout-impact-regression
+            unzip -t wpessential-checkout-impact-regression-0.2.0.zip
+          )
+
+      - name: Upload installable plugin ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: wpessential-checkout-impact-regression-0.2.0
+          path: dist/wpessential-checkout-impact-regression-0.2.0.zip
+          if-no-files-found: error
