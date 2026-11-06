@@ -9,7 +9,7 @@
 
 Use versioned, per-site custom database tables for scenario versions, approved baseline versions, change events, run records, normalized observations, and findings. Keep small configuration values in non-autoloaded WordPress options. Do not store growing run history or serialized scenario suites in autoloaded options. This choice is accepted for planning; it does not authorize skipping the runtime proof gates below.
 
-This recommendation is based on the product's related versioned records, indexed history queries, retention cleanup, and explicit access/deletion lifecycle. WordPress guidance says to prefer post meta where practical; the project must therefore document why the relational history and lifecycle are not practical as post meta before accepting this choice. If the implementation cannot justify that boundary, reconsider private custom post types plus metadata.
+This recommendation is based on the product's related versioned records, indexed history queries, retention cleanup, and explicit access/deletion lifecycle. WordPress guidance says to prefer post meta where practical; the implementation review must document why this relational history and lifecycle are not practical as post meta. If the implementation cannot justify that boundary, reconsider private custom post types plus metadata.
 
 Use `$wpdb->prefix` for site-scoped table names and WordPress-supported schema versioning/upgrade routines. Do not support network-wide multisite operation in the initial release. A multisite network may use per-site plugin activation only after per-site isolation, upgrade, cleanup, and permissions are proven; network activation remains unsupported initially.
 
