@@ -44,11 +44,20 @@ register_activation_hook(
 	WPECIR_FILE,
 	array( \WPEssential\CheckoutImpactRegression\Storage\Schema::class, 'install' )
 );
+register_activation_hook(
+	WPECIR_FILE,
+	array( \WPEssential\CheckoutImpactRegression\Storage\RetentionScheduler::class, 'schedule' )
+);
+register_deactivation_hook(
+	WPECIR_FILE,
+	array( \WPEssential\CheckoutImpactRegression\Storage\RetentionScheduler::class, 'unschedule' )
+);
 
 add_action(
 	'plugins_loaded',
 	static function () {
 		\WPEssential\CheckoutImpactRegression\Storage\Schema::register_hooks();
+		\WPEssential\CheckoutImpactRegression\Storage\RetentionScheduler::register_hooks();
 		\WPEssential\CheckoutImpactRegression\Privacy\PersonalData::register_hooks();
 		\WPEssential\CheckoutImpactRegression\Events\ChangeEventCollector::register_hooks();
 		add_action( 'rest_api_init', array( \WPEssential\CheckoutImpactRegression\Rest\ScenarioController::class, 'register_routes' ) );
