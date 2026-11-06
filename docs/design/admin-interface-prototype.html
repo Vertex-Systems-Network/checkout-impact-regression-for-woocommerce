@@ -64,19 +64,45 @@
 
       <section id="wizard" class="view" aria-labelledby="wizard-title">
         <button class="btn back" data-view="scenarios">← Back to scenarios</button>
-        <div class="page-head"><div><h1 id="wizard-title">Create a scenario</h1><p class="sub">Build a repeatable test profile without real customer data.</p></div><span class="pill">Step 1 of 4</span></div>
-        <div class="steps" aria-label="Scenario setup progress"><div class="step current">1 · Cart</div><div class="step">2 · Customer</div><div class="step">3 · Expectations</div><div class="step">4 · Review</div></div>
-        <section class="card"><div class="card-head"><h2>Scenario details</h2></div><div class="card-body" style="padding-top:18px">
-          <div class="form-grid">
-            <div class="field full"><label for="scenario-name">Scenario name</label><input id="scenario-name" value="Germany · standard parcel"><small>Use a name that makes the market and cart easy to recognize.</small></div>
-            <div class="field"><label for="product">Product</label><select id="product"><option>Everyday T-shirt · Large · Black</option><option>Gift card · Virtual</option></select></div>
-            <div class="field"><label for="quantity">Quantity</label><input id="quantity" type="number" min="1" value="1"></div>
-            <div class="field"><label for="country">Ship-to country</label><select id="country"><option>Germany (DE)</option><option>United Kingdom (GB)</option><option>United States (US)</option></select></div>
-            <div class="field"><label for="mode">Checkout experience</label><select id="mode"><option>Checkout Blocks</option><option>Classic checkout</option></select></div>
-            <div class="field full"><label for="postcode">Synthetic postcode (if needed)</label><input id="postcode" value="10115"><small>Use a non-customer test value. Some shipping rules require a postcode to resolve the same zone.</small></div>
+        <div class="page-head"><div><h1 id="wizard-title">Create a scenario</h1><p class="sub">Build a repeatable profile using synthetic cart and market inputs.</p></div><span class="pill" id="wizard-step-label">Step 1 of 4</span></div>
+        <div class="steps" aria-label="Scenario setup progress"><div class="step current" data-step-label="1" aria-current="step">1 · Cart</div><div class="step" data-step-label="2">2 · Customer &amp; checkout</div><div class="step" data-step-label="3">3 · Expected behavior</div><div class="step" data-step-label="4">4 · Review</div></div>
+        <section class="card"><div class="card-head"><h2 id="wizard-card-title">Scenario details</h2></div><div class="card-body" style="padding-top:18px">
+          <div data-wizard-step="1">
+            <div class="form-grid">
+              <div class="field full"><label for="scenario-name">Scenario name</label><input id="scenario-name" value="Germany · standard parcel"><small>Use a name that makes the market and cart easy to recognize.</small></div>
+              <div class="field"><label for="product">Product</label><select id="product"><option>Everyday T-shirt · Large · Black</option><option>Gift card · Virtual</option></select></div>
+              <div class="field"><label for="quantity">Quantity</label><input id="quantity" type="number" min="1" value="1"></div>
+            </div>
+            <div class="callout" style="margin-top:18px">This example uses fictional catalogue data. Deleted or unsupported products would be explained before a comparison.</div>
           </div>
-          <div class="callout" style="margin-top:18px">Payment data, card details and real shopper identities are not part of a scenario.</div>
-          <div class="actions" style="justify-content:flex-end;margin-top:20px"><button class="btn" data-view="scenarios">Cancel</button><button class="btn primary" id="wizard-next">Continue to expectations</button></div>
+          <div data-wizard-step="2" hidden>
+            <div class="form-grid">
+              <div class="field"><label for="country">Ship-to country</label><select id="country"><option>Germany (DE)</option><option>United Kingdom (GB)</option><option>United States (US)</option></select></div>
+              <div class="field"><label for="currency">Currency context</label><select id="currency"><option>Store currency · EUR</option><option>Market currency · GBP</option><option>Market currency · USD</option></select></div>
+              <div class="field"><label for="postcode">Synthetic postcode</label><input id="postcode" value="10115"><small>Use only a synthetic test value; some shipping zones need a postcode.</small></div>
+              <div class="field"><label for="mode">Checkout experience</label><select id="mode"><option>Checkout Blocks</option><option>Classic checkout</option></select></div>
+              <div class="field full"><label for="customer">Customer mode</label><select id="customer"><option>Guest · synthetic context</option><option>Synthetic test account (not enabled)</option></select></div>
+            </div>
+            <div class="callout" style="margin-top:18px">No real shopper account, payment details or card data belong in this scenario.</div>
+          </div>
+          <div data-wizard-step="3" hidden>
+            <p class="sub" style="margin:0 0 14px">Choose the fields this scenario should compare. A selected field is not automatically supported; compatibility is checked for each run.</p>
+            <div class="grid" style="gap:10px">
+              <label class="callout"><input type="checkbox" checked> Shipping method presence and price</label>
+              <label class="callout"><input type="checkbox" checked> Payment method availability</label>
+              <label class="callout"><input type="checkbox"> Coupon eligibility and discount</label>
+              <label class="callout"><input type="checkbox" checked> Tax, fees and final total</label>
+            </div>
+            <div class="callout" style="margin-top:14px">Actual checkout completion is not selected here. Scenario replay remains disabled until its safety proof passes.</div>
+          </div>
+          <div data-wizard-step="4" hidden>
+            <div class="grid detail-grid">
+              <article class="card diff-card"><h3>Cart and market</h3><div class="value-row"><span class="label">Scenario</span><span id="review-name">Germany · standard parcel</span></div><div class="value-row"><span class="label">Cart</span><span id="review-product">Everyday T-shirt · Large · Black × 1</span></div><div class="value-row"><span class="label">Destination</span><span id="review-country">Germany (DE) · 10115</span></div><div class="value-row"><span class="label">Checkout</span><span id="review-mode">Checkout Blocks</span></div></article>
+              <article class="card diff-card"><h3>Expected behavior</h3><div class="value-row"><span class="label">Shipping</span><span>Compare availability and price</span></div><div class="value-row"><span class="label">Payment</span><span>Compare availability only</span></div><div class="value-row"><span class="label">Totals</span><span>Compare in selected currency</span></div><div class="value-row"><span class="label">Baseline</span><span>Not captured · approval is separate</span></div></article>
+            </div>
+            <div class="callout" style="margin-top:16px">Saving a draft does not run checkout or approve a baseline. Prototype data will not be saved.</div>
+          </div>
+          <div class="actions" style="justify-content:space-between;margin-top:20px"><button class="btn" id="wizard-back" hidden>← Back</button><span></span><div class="actions"><button class="btn" data-view="scenarios">Cancel</button><button class="btn primary" id="wizard-next">Continue</button></div></div>
         </div></section>
       </section>
 
@@ -123,8 +149,27 @@ const nav=[...document.querySelectorAll("[data-view]")],views=[...document.query
 function show(name){views.forEach(v=>v.classList.toggle("active",v.id===name));nav.forEach(b=>{if(b.matches("nav button")){if(b.dataset.view===name)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")}});const target=document.getElementById(name+"-title");if(target)target.focus({preventScroll:true});window.scrollTo(0,0)}
 nav.forEach(b=>b.addEventListener("click",e=>{e.preventDefault();show(b.dataset.view)}));
 function note(text){toast.textContent=text;toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),3200)}
-document.getElementById("new-scenario").addEventListener("click",()=>show("wizard"));
-document.getElementById("wizard-next").addEventListener("click",()=>note("Prototype only: scenario setup is not connected to a store."));
+document.getElementById("new-scenario").addEventListener("click",()=>{wizardIndex=1;renderWizard();show("wizard")});
+let wizardIndex=1;
+const wizardTitles=["Scenario details","Customer and checkout","Expected behavior","Review scenario"];
+function renderWizard(){
+  document.querySelectorAll("[data-wizard-step]").forEach(el=>{el.hidden=Number(el.dataset.wizardStep)!==wizardIndex});
+  document.querySelectorAll("[data-step-label]").forEach(el=>{const n=Number(el.dataset.stepLabel);el.classList.toggle("current",n===wizardIndex);if(n===wizardIndex)el.setAttribute("aria-current","step");else el.removeAttribute("aria-current")});
+  document.getElementById("wizard-step-label").textContent="Step "+wizardIndex+" of 4";
+  document.getElementById("wizard-card-title").textContent=wizardTitles[wizardIndex-1];
+  document.getElementById("wizard-back").hidden=wizardIndex===1;
+  document.getElementById("wizard-next").textContent=wizardIndex===4?"Save draft scenario":"Continue";
+}
+document.getElementById("wizard-back").addEventListener("click",()=>{if(wizardIndex>1){wizardIndex--;renderWizard();document.getElementById("wizard-card-title").focus()}});
+document.getElementById("wizard-next").addEventListener("click",()=>{
+  if(wizardIndex===1&&!document.getElementById("scenario-name").value.trim()){document.getElementById("scenario-name").focus();note("Enter a scenario name to continue.");return}
+  if(wizardIndex<4){wizardIndex++;renderWizard();document.getElementById("wizard-card-title").focus();return}
+  document.getElementById("review-name").textContent=document.getElementById("scenario-name").value;
+  document.getElementById("review-product").textContent=document.getElementById("product").selectedOptions[0].text+" × "+document.getElementById("quantity").value;
+  document.getElementById("review-country").textContent=document.getElementById("country").selectedOptions[0].text+" · "+document.getElementById("postcode").value;
+  document.getElementById("review-mode").textContent=document.getElementById("mode").selectedOptions[0].text;
+  note("Prototype only: draft was not saved to a store.");
+});
 document.getElementById("report-review").addEventListener("click",()=>note("Prototype only: no baseline or review action was saved."));
 document.getElementById("show-run-note").addEventListener("click",()=>note("Run blocked: safe replay has not been verified."));
 document.getElementById("blocked-details").addEventListener("click",e=>{e.preventDefault();note("Run blocked before checkout: safety proof is pending.")});
