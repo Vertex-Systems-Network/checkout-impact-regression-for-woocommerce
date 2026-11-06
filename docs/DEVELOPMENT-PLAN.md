@@ -217,13 +217,15 @@ Dates remain TBD until the team estimates the work. Record actual start/end date
 
 ### Phase 1 — Market and competitor research
 
-**Status:** In progress (40%); started 2026-11-06. End date: TBD.
+**Status:** Complete (100%); started and completed 2026-11-06.
 
-**Completed evidence:** First-pass, source-linked review of Cart Lookout and ShopMonitor is recorded in [Competitor research](research/COMPETITOR-RESEARCH.md). PLAN-001 and PLAN-002 are complete. Public materials show both offer scheduled browser checkout tests and diagnostics; Cart Lookout additionally documents recent update/change evidence, and ShopMonitor documents AI-assisted flow setup and step replay.
+**Completed evidence:** A dated public-materials desk review of 10 direct/adjacent products, including the named Cart Lookout and ShopMonitor, is recorded in [Competitor research](research/COMPETITOR-RESEARCH.md). A deduplicated, ID-based [options bank](research/OPTIONS-BANK.md) and proposed [system inventory](architecture/SYSTEM-INVENTORY.md) are recorded. Pricing pages were reviewed where official public prices were available; the $119/year proposal remains unvalidated and is not treated as a decision. Completed backlog: PLAN-001 through PLAN-005.
 
-**Remaining:** Review adjacent products, validate the candidate before/after scenario-diff distinction with demos/vendor answers and target users, and complete the market matrix/options bank.
+**Finding:** Generic checkout tests, update/change awareness, local configuration snapshots, manual country-specific shipping previews, and run evidence are already documented across products. The narrower product hypothesis is a persistent approved baseline plus field-level before/after observed checkout outcome diffs across a saved scenario suite, linked to change context. No public material reviewed establishes this as an exclusive market gap; validate it through demos and user interviews before locking positioning.
 
-**Exit criteria:** Cart Lookout, ShopMonitor, and relevant alternatives are reviewed from authoritative materials; every claimed capability has a source; gaps and uncertainty are explicit.
+**Limits:** Desk review only; no private account/demo, plugin installation, source audit, vendor interview, or independent reliability test. This phase is complete for the stated desk-research deliverables, not an exhaustive proof that all competitors/features have been found.
+
+**Exit criteria met:** Relevant products were reviewed from official/vendor materials; claims in the report are sourced; overlaps, uncertainty, pricing caveats, option IDs, ownership, dependencies, risks, and system boundaries are recorded.
 
 ### Phase 2 — Requirements and compatibility matrix
 
@@ -289,9 +291,9 @@ Backlog items should be assigned to an assistant only when the task is bounded a
 |---|---:|---|---|---|---|---|
 | PLAN-001 | 1 | P0 | Review Cart Lookout from official WordPress.org materials | None | Dated notes distinguish verified behavior, unknowns, and source links; findings added to competitor matrix | Complete (2026-11-06; see competitor research report) |
 | PLAN-002 | 1 | P0 | Review ShopMonitor from official vendor materials | None | Dated notes capture verified features, supported platform, limitations, and source links | Complete (2026-11-06; first-pass public materials reviewed) |
-| PLAN-003 | 1 | P1 | Identify adjacent WooCommerce checkout monitoring and testing tools | PLAN-001, PLAN-002 | Candidate list justified by relevance; no unsupported feature claims | Not started |
-| PLAN-004 | 1 | P0 | Build the deduplicated feature/options bank | PLAN-001–003 | Each option has unique ID, user need, system owner, priority, dependencies, risk, and acceptance criteria; duplicate concepts are merged | Not started |
-| PLAN-005 | 1 | P0 | Build the system inventory and responsibility map | PLAN-004 | Each system has one owner responsibility, inputs/outputs, state ownership, failure modes, and named dependencies; overlap is resolved | Not started |
+| PLAN-003 | 1 | P1 | Identify adjacent WooCommerce checkout monitoring and testing tools | PLAN-001, PLAN-002 | Candidate list justified by relevance; no unsupported feature claims | Complete (2026-11-06; 10 products reviewed in public materials) |
+| PLAN-004 | 1 | P0 | Build the deduplicated feature/options bank | PLAN-001–003 | Each option has unique ID, user need, system owner, priority, dependencies, risk, and acceptance criteria; duplicate concepts are merged | Complete (2026-11-06; see OPTIONS-BANK.md) |
+| PLAN-005 | 1 | P0 | Build the system inventory and responsibility map | PLAN-004 | Each system has one owner responsibility, inputs/outputs, state ownership, failure modes, and named dependencies; overlap is resolved | Complete (2026-11-06; see SYSTEM-INVENTORY.md) |
 | REQ-001 | 2 | P0 | Define scenario personas and checkout journeys | PLAN-004 | Journeys cover region-specific shipping, payment availability, coupon behavior, unchanged control scenario, and inconclusive execution | Not started |
 | REQ-002 | 2 | P0 | Verify platform requirements and propose compatibility matrix | Official PHP/WP/WooCommerce/WPML/Polylang docs | Version ranges are sourced, testable, and clearly labeled proposed until accepted | Not started |
 | REQ-003 | 2 | P0 | Define privacy, permissions, retention, and safe test constraints | REQ-001 | Data inventory, access model, retention, redaction, and no-real-charge constraints have acceptance criteria | Not started |
@@ -341,7 +343,7 @@ When asking ChatGPT, Cursor, Claude, Gemini, or another assistant to work, provi
 - What severity/confidence model is useful without producing alert fatigue?
 - Which shipping providers have official APIs and test environments that can be used safely?
 - What requirements differ when WPML or Polylang changes language, currency, or localized checkout presentation?
-- Which license and pricing packaging decisions belong to this add-on versus WPEssential?
+- Which license and pricing packaging decisions belong to this add-on versus WPEssential, and do hosted runner costs support the proposed $119/year paid tier?
 
 ## 11. Change control
 
