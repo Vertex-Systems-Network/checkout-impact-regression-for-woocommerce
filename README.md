@@ -38,7 +38,7 @@ This repository is in the **early implementation** stage. Checkout replay and ob
 3. Use [AI tool instruction loading](docs/AI-TOOL-RULES.md) to confirm the correct entry point for Cursor, Claude, Gemini, or ChatGPT.
 4. Check the [competitor research report](docs/research/COMPETITOR-RESEARCH.md) for dated findings and source links.
 5. Use the [deduplicated options bank](docs/research/OPTIONS-BANK.md) and [system inventory](docs/architecture/SYSTEM-INVENTORY.md) before adding scope or proposing architecture.
-6. Read the [proposed architecture and data flow](docs/architecture/ARCHITECTURE.md) and [shipping/payment integration matrix](docs/architecture/INTEGRATION-MATRIX.md).
+6. Read the [proposed architecture and data flow](docs/architecture/ARCHITECTURE.md), [storage/retention decision proposal](docs/architecture/STORAGE-AND-RETENTION-DECISION.md), and [shipping/payment integration matrix](docs/architecture/INTEGRATION-MATRIX.md).
 7. Read the [scenario and comparison specification](docs/design/SCENARIO-AND-COMPARISON-SPEC.md) before changing scenario, baseline or diff semantics.
 8. Review the [admin UX/React specification](docs/design/ADMIN-UX-SPEC.md) and [interactive interface prototype](docs/design/admin-interface-prototype.html) for the planned screens and states.
 9. Read the [requirements and compatibility plan](docs/requirements/REQUIREMENTS.md); planned targets are not tested compatibility claims.
