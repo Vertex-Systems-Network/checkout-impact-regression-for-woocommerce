@@ -8,7 +8,7 @@
 
 | Task | Status | Evidence and limit |
 |---|---|---|
-| Composer PSR-4 and bootstrap (IMPL-001) | Partial; latest workflow pending | Composer maps the plugin namespace to includes/ and bootstrap loads generated vendor/autoload.php. PHP 8.3 CI previously validated Composer, generated the optimized autoloader, linted PHP and packaged vendor files. That run predates the latest source changes. WordPress v0.2 activation and dependency/capability behavior remain unverified. |
+| Composer PSR-4 and bootstrap (IMPL-001) | Source lint/package pass; runtime partial | Workflow run #24 passed on commit b1b3631f02c061b27ae0426938757aec2df92a3c: Composer strict validation, optimized autoloader generation, PHP lint including generated files, ZIP integrity and artifact creation. WordPress v0.2 activation and dependency/capability behavior remain unverified. Artifact ID 13548598573 expires 2027-02-04. |
 | Scenario and baseline repository (IMPL-002) | Implemented in source; runtime pending | Repository provides scenario create/version, read/list, baseline approval/list, delete, idempotent redacted event recording and bounded expired-run purge methods. Payloads reject sensitive field keys/email values. No REST endpoints expose these methods. |
 | Change-context collector (IMPL-003) | Implemented in source; runtime pending | Bootstrap registers plugin-upgrade and option add/update/delete hooks. WooCommerce settings and filtered option names are tracked; identity/secret fields are redacted and only a SHA-256 projection is stored. Events are correlation context, not proof of checkout impact. Hook coverage, bulk updates and dedupe remain unverified. |
 | Privacy exporter/eraser | Implemented in source; runtime pending | WordPress privacy hooks export authorship identifiers/timestamps and anonymize author IDs in scenario/version/baseline records. Database behavior has not been exercised in WordPress. |
@@ -20,7 +20,7 @@
 
 ## Workflow and package evidence
 
-The previous successful PHP 8.3 workflow validated Composer/autoload, linted PHP and built an installable ZIP. That run predates the latest repository, privacy/event hook, uninstall and workflow changes. The current workflow includes uninstall.php; its new run must succeed before this source revision is called lint/package verified. The local workspace has no PHP or Composer executable.
+PHP 8.3 workflow run #24 passed for commit b1b3631f02c061b27ae0426938757aec2df92a3c, including strict Composer validation, optimized autoload generation, PHP syntax lint, ZIP integrity and artifact creation. Artifact 13548598573 is available until 2027-02-04. The local workspace has no PHP or Composer executable.
 
 The shared test site still has v0.1.0 active. It has not activated current v0.2.0 source, and no schema migration was tested there. Do not use the earlier artifact as the current package.
 
