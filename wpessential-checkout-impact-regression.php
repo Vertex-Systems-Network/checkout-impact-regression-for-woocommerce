@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin Name: WPEssential Checkout Impact Regression
- * Description: Compare saved checkout scenarios after store changes. Runtime checkout observation is currently disabled pending proof.
+ * Description: Development scaffold for future checkout scenario comparisons; automatic checkout requests are disabled.
  * Version: 0.1.0
  * Text Domain: wpessential-checkout-impact-regression
  */
