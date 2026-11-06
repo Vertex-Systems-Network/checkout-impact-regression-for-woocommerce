@@ -78,7 +78,7 @@ final class Schema {
 		}
 
 		foreach ( $tables as $table ) {
-			$found = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table ) );
+			$found = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $wpdb->esc_like( $table ) ) );
 
 			if ( $table !== $found ) {
 				return new \WP_Error( 'wpecir_schema_incomplete', 'The plugin storage schema could not be verified.' );
