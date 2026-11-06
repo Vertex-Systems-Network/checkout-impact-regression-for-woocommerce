@@ -12,14 +12,15 @@ This document is a proof protocol, not evidence that replay is safe. A documente
 
 ## Verified WooCommerce behavior that affects the design
 
-- The Store API checkout **GET** returns checkout data and creates a draft order with the `checkout-draft` status. It is not a read-only probe.
-- Checkout **PUT** updates checkout state and may recalculate totals; treat it as a mutation.
-- Checkout **POST** processes checkout and may process an order/payment. It is prohibited in this proof.
+- **Version-sensitive GET behavior:** the Store API Checkout reference currently says GET returns a persisted `checkout-draft` order. WooCommerce 10.9 release notes say persisted draft creation is deferred later for new sessions; current WooCommerce source returns a no-order response for fresh checkout form interactions and defers draft creation to place-order POST. The public API reference has not caught up with that behavior. A failed-payment retry/session that already has an order can take a different path. Because this project's proposed floor is WooCommerce 10.8+, inspect the exact release tag and verify behavior per patch version; do not generalize 10.9+ behavior to 10.8.
+- Checkout **GET** is still not assumed side-effect-free: it can read/update session-associated checkout state or follow a retry path. Treat the endpoint as stateful and do not call it in automatic replay until the pinned version and extension hooks are tested.
+- Checkout **PUT** persists checkout fields/session state and may recalculate totals; treat it as a mutation.
+- Checkout **POST** processes checkout and may create the draft/order and process payment. It is prohibited in this proof.
 - Checkout Blocks invoke checkout processing when a shopper places an order; payment method availability is extension-specific and can depend on cart, totals, address and other runtime conditions.
 - WooCommerce's testing guidance warns that test orders may still affect emails, analytics, extensions and other integrations; staging and explicit side-effect controls are required.
-- The reviewed public docs do not establish a current cleanup guarantee for draft orders. The spike must observe and prove cleanup for the exact tested version; do not rely on an assumed time-to-live.
+- Runtime evidence must record any persisted draft order if one is created through a retry or extension path; no cleanup guarantee is assumed. Verify exact-version cleanup rather than relying on an assumed time-to-live.
 
-Sources: [Store API Checkout](https://developer.woocommerce.com/docs/apis/store-api/resources-endpoints/checkout/), [How the Checkout block processes an order](https://developer.woocommerce.com/docs/block-development/getting-started/how-checkout-block-processes-an-order/), [Payment method integration for Checkout Blocks](https://developer.woocommerce.com/docs/block-development/extensible-blocks/cart-and-checkout-blocks/checkout-payment-methods/payment-method-integration/), [Testing orders](https://woocommerce.com/document/testing-orders/), [WooCommerce update guide](https://woocommerce.com/document/update-woocommerce/).
+Sources: [Store API Checkout reference](https://developer.woocommerce.com/docs/apis/store-api/resources-endpoints/checkout/) (currently stale on new-session draft persistence), [WooCommerce 10.9 release notes](https://developer.woocommerce.com/2026/06/23/woocommerce-10-9/) (draft creation deferred later), [current Checkout route source](https://github.com/woocommerce/woocommerce/blob/trunk/plugins/woocommerce/src/StoreApi/Routes/V1/Checkout.php), [Checkout Block order processing](https://developer.woocommerce.com/docs/block-development/extensible-blocks/cart-and-checkout-blocks/how-checkout-processes-an-order/), [Payment method integration for Checkout Blocks](https://developer.woocommerce.com/docs/block-development/extensible-blocks/cart-and-checkout-blocks/checkout-payment-methods/payment-method-integration/), [Testing orders](https://woocommerce.com/document/testing-orders/).
 
 ## Mandatory isolated test environment
 
@@ -43,11 +44,11 @@ Run each row separately for Classic shortcode checkout and Checkout Blocks. Thir
 |---|---|---|---|
 | P-01 | Load cart and update a synthetic destination | Shipping packages/rates, totals, taxes, payment availability, network requests | Cart/session state may mutate. Stop if external or persistent effects escape the test boundary. |
 | P-02 | Apply a synthetic coupon | Eligibility, discount, coupon usage count, totals | Stop if usage count or external state changes unexpectedly; restore only from verified disposable snapshot. |
-| P-03 | Load checkout page / Checkout Store API data | Request paths, draft order IDs/status, observed checkout fields | Checkout GET may create a draft. Record each draft artifact; do not call PUT or POST. |
+| P-03 | Load checkout page / Checkout Store API data | Request paths, response `order_id`/status, session changes, any persisted order IDs, observed fields | Run only after exact version pinning in disposable staging. Compare the fresh-session and existing failed-payment/retry path; never assume GET creates or cannot create a persisted order. Do not call PUT or POST. |
 | P-04 | Repeat identical observation | Field-level output and side-effect snapshots | Require stable observations or classify the capture as flaky/inconclusive. |
 | P-05 | Cleanup and reset | Remaining drafts, jobs, email/webhook/analytics sinks, stock and counters | Cleanup is proven only when all recorded artifacts are gone or explicitly retained with safe documented semantics. |
 
-Never click Place Order, call checkout POST, capture/void/refund a payment, buy a label, or run against a live store. A draft order is a persistent test artifact, even when it is not a placed order; it must be counted and its cleanup verified. If the product's proposed runner cannot reliably identify and clean up its own draft artifacts, checkout GET is not an acceptable observation mechanism.
+Never click Place Order, call checkout POST, capture/void/refund a payment, buy a label, or run against a live store. Any persisted draft order is a test artifact and must be counted and its cleanup verified. Even when no persisted order is expected for a fresh session on a newer version, checkout GET remains stateful until exact-version and extension behavior is proven. If the runner cannot reliably identify and clean up artifacts it creates, checkout GET is not an acceptable observation mechanism.
 
 ## Evidence checklist per run
 
@@ -90,9 +91,13 @@ Any failed assertion, unknown side effect, non-repeatable result, unavailable si
 | Disposable staging environment | Blocked / not provided | No store connection or environment credentials available in this work session |
 | Classic checkout runtime proof | Not run | Requires isolated staging environment |
 | Checkout Blocks runtime proof | Not run | Requires isolated staging environment |
-| Draft cleanup proof | Not run | Current public docs reviewed do not establish a cleanup guarantee |
+| Draft/retry-path cleanup proof | Not run | API reference and newer release/source behavior differ; exact-version runtime validation required |
 | Plugin implementation | Not started | Phase 7 remains out of scope |
 | CLI | Not added | Explicitly deferred until final release decision |
+
+## Source-audit conclusion (desk research)
+
+The checkout API reference and newer release/source behavior disagree about whether a fresh checkout GET persists a draft order. WooCommerce 10.9 release notes describe deferred draft creation for new sessions; the current source route also has a no-order fresh-session response and a separate retry path. This is strong enough to reject a version-agnostic endpoint assumption, but it is not runtime validation and does not establish extension side effects or the exact WooCommerce 10.8 floor behavior.
 
 ## Next action
 
