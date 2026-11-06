@@ -249,11 +249,13 @@ Dates remain TBD until the team estimates the work. Record actual start/end date
 
 ### Phase 4 — Checkout scenario and comparison design
 
-**Status:** Not started
+**Status:** Complete for design deliverables; 2026-11-06.
 
-**Deliverables:** scenario schema; baseline/version strategy; normalized observation schema; diff and classification rules; safe execution proof; sample impact reports.
+**Completed evidence:** [Scenario and comparison specification](design/SCENARIO-AND-COMPARISON-SPEC.md) defines the conceptual scenario fields and versions, immutable baseline rules/context binding, typed observations, exact money representation, comparability constraints, run/field/finding states, deterministic V-01–V-07 vectors, a sample impact report, and the Phase 6 safe-run proof criteria. The schema covers shipping, payment availability, coupon/discount, tax/fees/totals, controls and unsupported/inconclusive cases.
 
-**Exit criteria:** representative shipping, payment, tax, and coupon scenarios can be compared deterministically in a non-production or otherwise safe environment without real charges or unintended orders.
+**Phase boundary:** Phase 4 finalizes comparison semantics and expected vectors; it does not claim executable or runtime-tested behavior. WooCommerce's Store API checkout GET creates a draft order, and POST processes order/payment. Cart API operations can mutate session/cart state. The spec therefore forbids treating checkout endpoints as read-only probes and leaves actual safe replay to Phase 6 SPIKE-001. SCN-001 through SCN-003 are complete as design work.
+
+**Exit criteria met:** representative expected outcomes and comparator behavior are specified deterministically; context mismatch and missing/unsupported data do not become false green results; report examples and safety boundaries are documented. Executable replay proof remains a later technical gate, not a Phase 4 completion claim.
 
 ### Phase 5 — UX and React-based admin interface
 
@@ -304,6 +306,9 @@ Backlog items should be assigned to an assistant only when the task is bounded a
 | ARCH-001 | 3 | P0 | Map WooCommerce shipping/payment extension and carrier API options | REQ-002, PLAN-005 | Official docs and sandbox/API facts are recorded; region, credential, rate-limit, and dependency data included | Complete (2026-11-06; integration matrix; provider support untested) |
 | ARCH-002 | 3 | P0 | Propose end-to-end architecture and data flow | PLAN-004, PLAN-005, REQ-001–003 | Diagram covers change trigger through report, data stores, permissions, retries, redaction, and failure paths | Complete (2026-11-06; proposed architecture; technical proof pending) |
 | ARCH-003 | 3 | P0 | Define baseline, normalized result, and diff schemas | ARCH-002 | Schemas distinguish missing, changed, unchanged, unsupported, flaky, and inconclusive values with versioning rules | Complete (2026-11-06; conceptual contracts; Phase 4 schema design pending) |
+| SCN-001 | 4 | P0 | Specify scenario inputs, versions and baseline context binding | REQ-001, ARCH-002 | Schema captures synthetic cart/destination/locale/currency/tax/checkout mode and validates immutable scenario/baseline rules | Complete (2026-11-06; scenario spec) |
+| SCN-002 | 4 | P0 | Define normalized observations, comparability and field diffs | SCN-001, ARCH-003 | Money, shipping, payment, coupon, tax and validation fields have normalization, context matching and explicit missing/unsupported states | Complete (2026-11-06; scenario spec; no runtime claim) |
+| SCN-003 | 4 | P0 | Specify impact report vectors and safe-run boundary | SCN-002, REQ-003 | Deterministic expected vectors cover region shipping, price shift, unchanged control, coupon, partial, unsupported and context mismatch; safe-run proof is assigned to SPIKE-001 | Complete (2026-11-06; design examples; replay untested) |
 | SPIKE-001 | 6 | P0 | Validate safe checkout replay for supported checkout modes | REQ-002, REQ-003, ARCH-001–003 | Evidence proves or rejects safe repeatable scenarios without real charges or unintended side effects | Not started |
 | UX-001 | 5 | P1 | Prototype scenario builder and impact report in React | REQ-001, PLAN-004 | Prototype covers setup, before/after values, affected scenario, evidence, and accessible states | Not started |
 
