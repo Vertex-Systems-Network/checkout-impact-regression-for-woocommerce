@@ -99,6 +99,10 @@ Any failed assertion, unknown side effect, non-repeatable result, unavailable si
 
 The checkout API reference and newer release/source behavior disagree about whether a fresh checkout GET persists a draft order. WooCommerce 10.9 release notes describe deferred draft creation for new sessions; the current source route also has a no-order fresh-session response and a separate retry path. This is strong enough to reject a version-agnostic endpoint assumption, but it is not runtime validation and does not establish extension side effects or the exact WooCommerce 10.8 floor behavior.
 
+## Related adapter design
+
+The [Store API observation adapter spike](STORE-API-OBSERVATION-ADAPTER-SPIKE.md) defines the cart-versus-payment capture boundary and adds CART-01 through CART-06 runtime cases. Those cases are required inputs to SPIKE-001; they have not been executed.
+
 ## Next action
 
 Provide access to a disposable staging clone or have a store operator execute this protocol and share redacted evidence. Then complete SPIKE-001 by recording exact pass/fail results per supported mode and gateway/extension class. Until then, automatic checkout replay remains blocked; product behavior must not be represented as runtime-validated.
