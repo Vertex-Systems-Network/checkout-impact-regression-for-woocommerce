@@ -103,7 +103,7 @@ The checkout API reference and newer release/source behavior disagree about whet
 
 ## Related adapter design
 
-The [Store API observation adapter spike](STORE-API-OBSERVATION-ADAPTER-SPIKE.md) defines the cart-versus-payment capture boundary and adds CART-01 through CART-06 runtime cases. Those cases are required inputs to SPIKE-001; they have not been executed.
+The [Store API observation adapter spike](STORE-API-OBSERVATION-ADAPTER-SPIKE.md) defines the cart-versus-payment capture boundary and adds CART-01 through CART-06 runtime cases. Those cases are required inputs to SPIKE-001; they have not been executed. Use the [runtime proof runbook](RUNTIME-PROOF-RUNBOOK.md) to record environment, preflight, results, side-effect deltas, cleanup and sign-off.
 
 ## Next action
 
