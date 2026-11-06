@@ -27,7 +27,7 @@ This repository is in the **pre-development planning** stage. The plan below is 
 | 7. Plugin implementation and verification | Not started | ░░░░░░░░░░ 0% | TBD | TBD |
 | 8. Release readiness | Not started | ░░░░░░░░░░ 0% | TBD | TBD |
 
-**Overall planning progress: 71%** — unweighted average across the nine tracked phases, with Phase 6 at 35% for completed protocol and source-audit work (Phases 0–5 complete for their documented planning/design deliverables). Phase 5 delivers the React production-interface blueprint and interactive UX concept; the prototype is not connected to WooCommerce. Safe checkout replay and runtime compatibility remain unvalidated.
+**Overall planning progress: 71%** — unweighted average across the nine tracked phases, with Phase 6 at 35% for completed protocol and source-audit work (Phases 0–5 complete for their documented planning/design deliverables). Phase 5 delivers the React production-interface blueprint and interactive UX concept; the prototype is not connected to WooCommerce. The published Checkout API reference and WooCommerce 10.9 release/source differ on persisted draft creation for fresh sessions; exact-version runtime validation is still pending.
 
 ## Start here
 
