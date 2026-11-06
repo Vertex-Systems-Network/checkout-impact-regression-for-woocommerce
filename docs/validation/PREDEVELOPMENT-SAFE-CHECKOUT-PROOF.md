@@ -89,6 +89,7 @@ Any failed assertion, unknown side effect, non-repeatable result, unavailable si
 | Official behavior research | Complete (desk research) | Sources listed above; checked 2026-11-06 |
 | Safe-run protocol | Complete (design) | This document |
 | Disposable staging environment | Blocked / not provided | No store connection or environment credentials available in this work session |
+| Local runtime availability | Unavailable | PHP, Docker and WP-CLI executables are not installed in this workspace; no local WordPress/WooCommerce runtime can be started here |
 | Classic checkout runtime proof | Not run | Requires isolated staging environment |
 | Checkout Blocks runtime proof | Not run | Requires isolated staging environment |
 | Draft/retry-path cleanup proof | Not run | API reference and newer release/source behavior differ; exact-version runtime validation required |
