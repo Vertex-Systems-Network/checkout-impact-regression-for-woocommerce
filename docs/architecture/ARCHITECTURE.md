@@ -81,7 +81,7 @@ These are conceptual contracts. Phase 4 must define exact schema, field optional
 | EvidenceRef | SYS-09 | run/finding refs, artifact type, redaction state, retention and access metadata | Store only necessary evidence; no secrets; policy-controlled access and deletion. |
 | ReviewAction | SYS-02 | actor, time, finding/baseline refs, action, reason | Approval/acknowledgement is explicit and auditable; prior versions survive. |
 
-**Storage decision gate:** the [storage/retention decision proposal](STORAGE-AND-RETENTION-DECISION.md) recommends versioned per-site custom tables after reviewing scenario volume, indexing, privacy export/erasure, multisite and migration needs. The recommendation is not accepted until reviewed, and Phase 6 runtime migration proof remains mandatory before implementation. Do not store growing run histories in autoloaded options.
+**Storage decision gate:** the [storage/retention decision](STORAGE-AND-RETENTION-DECISION.md) records the accepted planning choice of versioned per-site custom tables for relational history and non-autoloaded options for small configuration. Exact-version migration, privacy and retention runtime proof remains mandatory before implementation. Do not store growing run histories in autoloaded options.
 
 ## 5. Proposed decision records
 
