@@ -2,10 +2,10 @@
 /**
  * WordPress privacy exporter and eraser integration.
  *
- * @package WPEssential\\CheckoutImpactRegression\\Privacy
+ * @package WPEssential\CheckoutImpactRegression\Privacy
  */
 
-namespace WPEssential\\CheckoutImpactRegression\\Privacy;
+namespace WPEssential\CheckoutImpactRegression\Privacy;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
