@@ -2,12 +2,12 @@
 /**
  * Collects supported change events without storing option values or secrets.
  *
- * @package WPEssential\\CheckoutImpactRegression\\Events
+ * @package WPEssential\CheckoutImpactRegression\Events
  */
 
-namespace WPEssential\\CheckoutImpactRegression\\Events;
+namespace WPEssential\CheckoutImpactRegression\Events;
 
-use WPEssential\\CheckoutImpactRegression\\Storage\\Repository;
+use WPEssential\CheckoutImpactRegression\Storage\Repository;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
