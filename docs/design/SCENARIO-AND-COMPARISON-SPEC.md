@@ -211,13 +211,13 @@ The percent in V-02 is a display aid only; the primary delta is exact currency a
 
 This phase finalizes the **design** but cannot prove safe replay without a technical spike. WooCommerce documents that GET checkout data creates a draft order; POST checkout processes orders and payments. Store API cart updates also mutate session/cart state. Therefore:
 
-- Do not use checkout GET/PUT/POST for baseline or regression observation.
-- Do not submit Place Order, click payment controls, capture/void/refund payments, create labels/shipments, or test with live provider credentials.
-- Any future cart/session mutation must run in a disposable, isolated test environment/session and be reviewed for plugin hooks, emails, stock, webhooks, analytics, subscriptions, fulfillment and persistent customer state.
-- If isolation/side-effect prevention is not demonstrated for an exact checkout/integration combination, mark it unsupported and disable automatic replay.
-- Completion evidence remains `not_attempted` until the safe-run spike proves an alternative path and defines what “complete” means without a real order.
+- Checkout Store API GET is not read-only: it creates a `checkout-draft` order. Only evaluate GET inside a disposable isolated environment after the safety gates pass; record every draft artifact and verify cleanup on the exact WooCommerce version. Public docs reviewed here do not establish a current cleanup guarantee.
+- Checkout PUT mutates state and POST processes checkout/order/payment; neither is allowed in this proof. Do not submit Place Order, click payment controls, capture/void/refund payments, create labels/shipments, or test with live provider credentials.
+- Any cart/session mutation must run in a disposable isolated test session and be reviewed for plugin hooks, emails, stock, webhooks, analytics, subscriptions, fulfillment and persistent customer state.
+- If isolation, side-effect containment or draft cleanup is not demonstrated for an exact checkout/integration combination, mark it unsupported and disable automatic replay.
+- Completion evidence remains `not_attempted` until the safe-run spike proves a safe observation path and defines what “complete” means without processing an order.
 
-**Phase 6 proof criteria:** identify the exact endpoints/hooks; trace every persistent side effect; demonstrate prevention/containment in a disposable store; assert no real charge, live order, customer email, inventory mutation, webhook, analytics or fulfillment effect; clean up and verify residual state; repeat for each supported checkout mode and gateway class. Any failed assertion blocks that matrix entry.
+**Phase 6 proof criteria:** identify the exact endpoints/hooks; trace persistent side effects; demonstrate containment in a disposable store; assert no real charge, no non-draft order, no external email, inventory mutation, coupon counter, webhook, analytics or fulfillment effect; count and clean up any draft artifact; verify residual state; repeat per supported checkout mode and gateway class. Any failed assertion blocks that matrix entry. See [Phase 6 proof protocol](../validation/PREDEVELOPMENT-SAFE-CHECKOUT-PROOF.md).
 
 ## 9. Official technical sources checked 2026-11-06
 
