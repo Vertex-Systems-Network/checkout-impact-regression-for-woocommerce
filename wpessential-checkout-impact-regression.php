@@ -37,7 +37,7 @@ spl_autoload_register(
 		}
 
 		$relative_class = substr( $class, $length );
-		$file           = $base_dir . str_replace( '\\\\', '/', $relative_class ) . '.php';
+		$file           = $base_dir . str_replace( '\\', '/', $relative_class ) . '.php';
 
 		if ( is_readable( $file ) ) {
 			require_once $file;
@@ -48,7 +48,7 @@ spl_autoload_register(
 add_action(
 	'plugins_loaded',
 	static function () {
-		$admin_page = new \\WPEssential\\CheckoutImpactRegression\\Admin\\AdminPage();
+		$admin_page = new \WPEssential\CheckoutImpactRegression\Admin\AdminPage();
 		$admin_page->register_hooks();
 	},
 	20
