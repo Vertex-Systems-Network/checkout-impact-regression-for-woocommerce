@@ -39,9 +39,9 @@ This repository is in the **pre-development planning** stage. The plan below is 
 6. Read the [proposed architecture and data flow](docs/architecture/ARCHITECTURE.md) and [shipping/payment integration matrix](docs/architecture/INTEGRATION-MATRIX.md).
 7. Read the [scenario and comparison specification](docs/design/SCENARIO-AND-COMPARISON-SPEC.md) before changing scenario, baseline or diff semantics.
 8. Review the [admin UX/React specification](docs/design/ADMIN-UX-SPEC.md) and [interactive interface prototype](docs/design/admin-interface-prototype.html) for the planned screens and states.
-9. For Phase 6 checkout safety research and the runtime proof checklist, read [Pre-development safe checkout proof](docs/validation/PREDEVELOPMENT-SAFE-CHECKOUT-PROOF.md).
 9. Read the [requirements and compatibility plan](docs/requirements/REQUIREMENTS.md); planned targets are not tested compatibility claims.
-10. Update the phase status, progress bar, start date, and end date in this README when project progress changes. Keep detailed decisions and evidence in the development plan.
+10. For Phase 6 checkout safety research and the runtime proof checklist, read [Pre-development safe checkout proof](docs/validation/PREDEVELOPMENT-SAFE-CHECKOUT-PROOF.md).
+11. Update the phase status, progress bar, start date, and end date in this README when project progress changes. Keep detailed decisions and evidence in the development plan.
 
 ## Product principles
 
