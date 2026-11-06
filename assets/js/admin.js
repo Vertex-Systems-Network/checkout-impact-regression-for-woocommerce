@@ -85,8 +85,8 @@
 						id: 'wpecir-status-bootstrap',
 						eyebrow: 'Platform',
 						title: 'Admin shell',
-						body: 'The plugin source contains a permission-checked WordPress admin screen. Runtime activation has not been verified.',
-						status: 'Source added; not runtime-tested',
+						body: 'The plugin provides a capability-checked WordPress admin screen. Scenario storage and checkout behavior are not implemented.',
+						status: 'Admin shell available; features pending',
 						tone: 'neutral',
 					} ),
 					h( StatusCard, {
