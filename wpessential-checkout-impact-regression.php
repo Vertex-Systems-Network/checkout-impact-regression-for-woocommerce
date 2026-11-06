@@ -51,6 +51,7 @@ add_action(
 		\WPEssential\CheckoutImpactRegression\Storage\Schema::register_hooks();
 		\WPEssential\CheckoutImpactRegression\Privacy\PersonalData::register_hooks();
 		\WPEssential\CheckoutImpactRegression\Events\ChangeEventCollector::register_hooks();
+		add_action( 'rest_api_init', array( \WPEssential\CheckoutImpactRegression\Rest\ScenarioController::class, 'register_routes' ) );
 
 		$admin_page = new \WPEssential\CheckoutImpactRegression\Admin\AdminPage();
 		$admin_page->register_hooks();
