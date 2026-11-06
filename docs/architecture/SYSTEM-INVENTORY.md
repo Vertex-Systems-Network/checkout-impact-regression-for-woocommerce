@@ -1,8 +1,8 @@
 # Candidate system inventory
 
-**Status:** Phase 1 research artifact; boundaries are a proposed design, not approved implementation architecture.  
+**Status:** Phase 3 reconciled proposed design; not implementation-validated. The canonical data flow, decision records and option-to-owner crosswalk are in [Proposed architecture](ARCHITECTURE.md).  
 **Last reviewed:** 2026-11-06  
-**Options source:** [Options bank](../research/OPTIONS-BANK.md)
+**Options source:** [Options bank](../research/OPTIONS-BANK.md) · [Shipping/payment integration matrix](INTEGRATION-MATRIX.md)
 
 ## System map and ownership
 
