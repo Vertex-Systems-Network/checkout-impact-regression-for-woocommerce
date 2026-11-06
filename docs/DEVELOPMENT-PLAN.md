@@ -269,11 +269,15 @@ Dates remain TBD until the team estimates the work. Record actual start/end date
 
 ### Phase 6 — Pre-development technical proof
 
-**Status:** Not started
+**Status:** In progress (2026-11-06); safe-run protocol/research complete, runtime proof blocked.
 
-**Deliverables:** small technical spikes for the highest-risk WordPress/WooCommerce hooks, checkout modes, safe execution, normalization, and extension points; implementation-ready specifications.
+**Completed evidence:** [Pre-development safe checkout proof](validation/PREDEVELOPMENT-SAFE-CHECKOUT-PROOF.md) records official Store API/Blocks behavior, a side-effect containment protocol, a mode-by-mode probe matrix, evidence checklist, pass/fail criteria, and current blockers. WooCommerce checkout GET creates a `checkout-draft`; it is not read-only. PUT mutates checkout state and POST processes checkout/payment. Draft cleanup is not treated as guaranteed without exact-version runtime evidence.
 
-**Exit criteria:** architecture risks are validated or explicitly accepted; no unresolved blocker is hidden by assumptions; implementation backlog is sequenced.
+**Blocker:** No disposable isolated WooCommerce staging store or redacted runtime evidence is available in this session. Classic checkout, Checkout Blocks, draft cleanup, and side-effect containment have not been run. Phase 6 remains incomplete; automatic replay stays blocked for unproven combinations.
+
+**Deliverables:** small technical spikes for high-risk WordPress/WooCommerce hooks, checkout modes, safe execution, normalization, extension points, and implementation-ready specifications. Research and protocol artifacts may complete a task, but do not count as runtime validation.
+
+**Exit criteria:** architecture risks are validated or explicitly accepted with evidence; each proposed runtime mode has reproducible test results or is formally unsupported; no unresolved safety blocker is hidden by assumptions; implementation backlog is sequenced.
 
 ### Phase 7 — Plugin implementation and verification
 
@@ -315,7 +319,8 @@ Backlog items should be assigned to an assistant only when the task is bounded a
 | SCN-001 | 4 | P0 | Specify scenario inputs, versions and baseline context binding | REQ-001, ARCH-002 | Schema captures synthetic cart/destination/locale/currency/tax/checkout mode and validates immutable scenario/baseline rules | Complete (2026-11-06; scenario spec) |
 | SCN-002 | 4 | P0 | Define normalized observations, comparability and field diffs | SCN-001, ARCH-003 | Money, shipping, payment, coupon, tax and validation fields have normalization, context matching and explicit missing/unsupported states | Complete (2026-11-06; scenario spec; no runtime claim) |
 | SCN-003 | 4 | P0 | Specify impact report vectors and safe-run boundary | SCN-002, REQ-003 | Deterministic expected vectors cover region shipping, price shift, unchanged control, coupon, partial, unsupported and context mismatch; safe-run proof is assigned to SPIKE-001 | Complete (2026-11-06; design examples; replay untested) |
-| SPIKE-001 | 6 | P0 | Validate safe checkout replay for supported checkout modes | REQ-002, REQ-003, ARCH-001–003 | Evidence proves or rejects safe repeatable scenarios without real charges or unintended side effects | Not started |
+| SPIKE-001 | 6 | P0 | Validate safe checkout replay for supported checkout modes | REQ-002, REQ-003, ARCH-001–003 | Evidence proves or rejects safe repeatable scenarios without real charges or unintended side effects; checkout-draft creation and cleanup are explicitly measured | In progress (protocol complete; runtime blocked: isolated staging required) |
+| SPIKE-002 | 6 | P0 | Audit checkout endpoint and side-effect behavior by mode | SPIKE-001; disposable staging store | Classic and Blocks evidence records endpoint/hooks, order statuses, draft cleanup, gateway, email, stock, coupon, webhook, analytics and fulfillment deltas; any uncontained effect blocks support | In progress (protocol defined; runtime not run) |
 | UX-001 | 5 | P1 | Define admin information architecture and interactive scenario/report prototype | REQ-001, PLAN-004, SCN-001–003 | Prototype covers setup, market/cart, expected values, before/after impact, evidence, history and prototype-only safety blocks; React component/API ownership is documented | Complete (2026-11-06; design artifact only) |
 | UX-002 | 5 | P1 | Specify accessible interaction and async/error/unsupported states | UX-001, REQ-008 | Keyboard/focus, labels, announcements, contrast, responsive behavior and empty/loading/error/partial/blocked/unsupported states are explicitly designed | Complete (2026-11-06; not assistive-technology tested) |
 | REL-001 | 8 | P0 | Approve channel-specific free/paid boundary, licensing, naming and update ownership | Phase 7 release candidate; distribution research | Feature matrix provides useful non-trial free edition; separate marketplace submissions/update paths are compliant; price and vendor terms are reviewed | Not started |
