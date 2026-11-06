@@ -38,7 +38,7 @@ A cart/session identifier is not a side-effect firewall. A Cart API response by 
 - No order draft, cleanup, payment, email, inventory, coupon, webhook, shipping, or fulfillment side-effect behavior was measured.
 - No runtime compatibility claim is made for PHP, WordPress, WooCommerce, Classic, Blocks, HPOS, WPML/WCML, Polylang, gateways, or providers.
 
-The workspace has no local PHP, Docker, WP-CLI, or WordPress installation. No WooCommerce staging store was supplied. On 2026-11-06, a temporary WPRun sandbox booted WordPress 6.9.1 on PHP 8.4, but the Plugin Directory installer marked WooCommerce 11.2.2 incompatible. The local plugin ZIP could not be transferred through the browser file picker, so the plugin was not installed or activated. This is not plugin runtime evidence. A fresh cloud-browser WordPress Playground attempt showed “Checking your browser” before WordPress loaded; no verification was solved or bypassed.
+The workspace has no local PHP, Docker, WP-CLI, or WordPress installation. The user supplied the shared /el-test/ WordPress site and confirmed it is used to test multiple in-progress plugins. Site Health reports WordPress 7.1.4 and PHP 8.3.36; WPEssential's plugin panel reports WooCommerce 11.2.2 active. The user installed WPEssential Checkout Impact Regression v0.1.0; its plugin row was active and its React admin page rendered. This is bootstrap/admin smoke evidence only, not checkout safety or compatibility proof. No safe email/webhook sinks, side-effect snapshots, or reset procedure are recorded for the shared site. Current GitHub source v0.2.0 adds PSR-4 and storage-schema scaffolding but is not installed or PHP-linted. No checkout endpoint was invoked, no order/payment/shipping/coupon operation ran, and no checkout-side-effect proof was collected. A temporary WPRun environment previously booted WordPress 6.9.1 on PHP 8.4 but marked WooCommerce 11.2.2 incompatible. A separate WordPress Playground attempt stopped at browser verification before WordPress loaded. These facts preserve the Phase 6 no-go; no verification challenge was solved or bypassed.
 
 ## Reopen gate
 
@@ -52,4 +52,4 @@ Before enabling any excluded mode:
 
 ## Downstream consequence
 
-Phase 7 has started with only a read-only bootstrap/admin shell source slice. It has not been runtime-tested; no scenario data is stored and no checkout request is made. Implementation tasks that require automatic checkout capture/replay remain gated and must fail closed. No report may claim live checkout observation or compatibility.
+Phase 7 v0.1.0 bootstrap/admin shell passed a limited WordPress runtime smoke test. Current v0.2.0 PSR-4 and schema scaffold has not been installed or PHP-linted. No scenario data is stored and no checkout request is made. Implementation tasks that require automatic checkout capture/replay remain gated and must fail closed. No report may claim live checkout observation or compatibility.
