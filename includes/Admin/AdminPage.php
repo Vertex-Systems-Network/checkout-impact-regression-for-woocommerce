@@ -72,7 +72,7 @@ final class AdminPage {
 		wp_enqueue_script(
 			'wpecir-admin',
 			WPECIR_URL . 'assets/js/admin.js',
-			array( 'wp-element', 'wp-i18n' ),
+			array( 'wp-element', 'wp-i18n', 'wp-api-fetch' ),
 			WPECIR_VERSION,
 			true
 		);
@@ -82,6 +82,7 @@ final class AdminPage {
 			'WPECIRAdmin',
 			array(
 				'woocommerceActive' => class_exists( 'WooCommerce' ),
+				'restNonce'        => wp_create_nonce( 'wp_rest' ),
 			)
 		);
 	}
