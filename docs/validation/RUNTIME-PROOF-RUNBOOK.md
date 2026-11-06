@@ -24,7 +24,7 @@ Do not begin runtime proof until every item below is true. This is a provisionin
 
 If any gate fails, stop and record the matrix entry as **blocked**, not passed. Do not use a live store as a substitute.
 
-**Environment finding for this planning session:** workspace inspection found no PHP, Docker, WP-CLI, or WordPress project, and no disposable staging target was supplied. Therefore no executable runtime test can be run here. Phase 6 stays at 85%; this checklist does not count as runtime evidence.
+**Environment finding for this planning session:** workspace inspection found no PHP, Docker, WP-CLI, or WordPress project, and no disposable staging target was supplied. A fresh browser-based WordPress Playground attempt reached its preparation step but the Playground worker and OPFS storage worker failed to load; no site or test case started. No Playground MCP/runtime connector is available in this session. Therefore no executable runtime test can be run here. Phase 6 stays at 85%; this checklist does not count as runtime evidence.
 
 ## 1. Run identity
 
@@ -196,6 +196,7 @@ A PASS is limited to the exact recorded environment and test cases. It is not a 
 - Worksheet: prepared.
 - Staging environment: not provided.
 - Local PHP/WordPress/Docker runtime: unavailable in the current workspace.
+- Browser Playground: blocked by worker/storage-worker initialization failure on the fresh attempt; no checkout tests ran.
 - Browser Playground: did not launch because the site requested browser verification.
 - Checkout cases, side-effect audit and cleanup: not executed.
 - Phase 6: remains in progress; no runtime pass is claimed.
