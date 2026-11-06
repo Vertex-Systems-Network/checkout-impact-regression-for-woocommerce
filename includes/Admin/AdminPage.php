@@ -2,10 +2,10 @@
 /**
  * Read-only wp-admin shell for Checkout Impact.
  *
- * @package WPEssential\\CheckoutImpactRegression
+ * @package WPEssential\CheckoutImpactRegression
  */
 
-namespace WPEssential\\CheckoutImpactRegression\\Admin;
+namespace WPEssential\CheckoutImpactRegression\Admin;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
