@@ -18,7 +18,7 @@ This repository is in the **pre-development planning** stage. The plan below is 
 | Phase | Status | Progress | Start date | End date |
 |---|---|---:|---|---|
 | 0. Project brief and AI handoff foundation | Complete | ██████████ 100% | 2026-11-06 | 2026-11-06 |
-| 1. Market and competitor research | Not started | ░░░░░░░░░░ 0% | TBD | TBD |
+| 1. Market and competitor research | In progress | ████░░░░░░ 40% | 2026-11-06 | TBD |
 | 2. Requirements and compatibility matrix | Not started | ░░░░░░░░░░ 0% | TBD | TBD |
 | 3. Options bank and system architecture | Not started | ░░░░░░░░░░ 0% | TBD | TBD |
 | 4. Checkout scenario and comparison design | Not started | ░░░░░░░░░░ 0% | TBD | TBD |
@@ -27,13 +27,15 @@ This repository is in the **pre-development planning** stage. The plan below is 
 | 7. Plugin implementation and verification | Not started | ░░░░░░░░░░ 0% | TBD | TBD |
 | 8. Release readiness | Not started | ░░░░░░░░░░ 0% | TBD | TBD |
 
-**Overall planning progress: 5%** — project brief and AI handoff foundation are recorded; research and technical validation remain.
+**Overall planning progress: 16%** — unweighted average across the nine tracked phases (Phase 0 complete; Phase 1 at 40%). Competitor review is underway; broader market research and technical validation remain.
 
 ## Start here
 
 1. Read [AGENTS.md](AGENTS.md) before making project changes. It explains how AI coding tools should work in this repository.
 2. Read the [Development Plan](docs/DEVELOPMENT-PLAN.md) for scope, phases, requirements, research areas, and acceptance criteria.
-3. Update the phase status, progress bar, start date, and end date in this README when project progress changes. Keep detailed decisions and evidence in the development plan.
+3. Use [AI tool instruction loading](docs/AI-TOOL-RULES.md) to confirm the correct entry point for Cursor, Claude, Gemini, or ChatGPT.
+4. Check the [competitor research report](docs/research/COMPETITOR-RESEARCH.md) for dated findings and source links.
+5. Update the phase status, progress bar, start date, and end date in this README when project progress changes. Keep detailed decisions and evidence in the development plan.
 
 ## Product principles
 
