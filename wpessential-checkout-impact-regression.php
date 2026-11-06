@@ -49,6 +49,8 @@ add_action(
 	'plugins_loaded',
 	static function () {
 		\WPEssential\CheckoutImpactRegression\Storage\Schema::register_hooks();
+		\WPEssential\CheckoutImpactRegression\Privacy\PersonalData::register_hooks();
+		\WPEssential\CheckoutImpactRegression\Events\ChangeEventCollector::register_hooks();
 
 		$admin_page = new \WPEssential\CheckoutImpactRegression\Admin\AdminPage();
 		$admin_page->register_hooks();
