@@ -3,7 +3,7 @@
 **Phase:** 3 — Options bank and system architecture  
 **Status:** Design proposal complete for planning; no implementation has been validated.  
 **Date:** 2026-11-06  
-**Related:** [Options bank](../research/OPTIONS-BANK.md) · [System inventory](SYSTEM-INVENTORY.md) · [Requirements](../requirements/REQUIREMENTS.md) · [Integration matrix](INTEGRATION-MATRIX.md)
+**Related:** [Options bank](../research/OPTIONS-BANK.md) · [System inventory](SYSTEM-INVENTORY.md) · [Requirements](../requirements/REQUIREMENTS.md) · [Integration matrix](INTEGRATION-MATRIX.md) · [Scenario/comparison spec](../design/SCENARIO-AND-COMPARISON-SPEC.md)
 
 ## 1. Architecture goals
 
@@ -96,6 +96,8 @@ These are conceptual contracts. Phase 4 must define exact schema, field optional
 | ADR-007 | Background execution is required for scenario suites; queue technology is undecided. | Open | Compare Action Scheduler/WP-Cron and hosting constraints in a technical spike; ensure bounded retries, idempotency, cancellation and observability. |
 
 ## 6. Boundaries and known failure behavior
+
+- **Store API checkout is not a read-only probe.** WooCommerce documents that checkout GET creates a draft order and checkout POST processes an order/payment. Cart address, coupon and shipping-rate operations also mutate the cart/session. Follow the no-submit, isolated-session rules in the [scenario/comparison specification](../design/SCENARIO-AND-COMPARISON-SPEC.md); do not use checkout endpoints for passive observation.
 
 - Woo checkout rate/gateway unavailable: capture the absence only when the checkout mode/adapter is verified; otherwise unsupported.
 - Carrier API timeout or quote change: record as provider diagnostic evidence, not a confirmed customer-facing checkout regression.
