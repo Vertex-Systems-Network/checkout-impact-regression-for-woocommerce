@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Checkout Impact — Admin UI concept</title>
+<style>
+:root{--wp:#2271b1;--ink:#1d2327;--muted:#646970;--line:#dcdcde;--canvas:#f6f7f7;--surface:#fff;--soft:#f0f6fc;--red:#b32d2e;--red-bg:#fcf0f1;--amber:#996800;--amber-bg:#fcf9e8;--green:#008a20;--green-bg:#edfaef;--radius:10px;--shadow:0 1px 2px rgba(0,0,0,.05)}
+*{box-sizing:border-box}body{margin:0;background:var(--canvas);color:var(--ink);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select{font:inherit}button{cursor:pointer}.shell{min-height:100vh;display:grid;grid-template-columns:238px 1fr}.side{background:#1d2327;color:#f0f0f1;padding:22px 14px;display:flex;flex-direction:column;gap:25px}.brand{display:flex;align-items:center;gap:10px;padding:0 10px;font-weight:650;font-size:15px}.mark{width:30px;height:30px;border-radius:9px;background:#e8f2fa;color:var(--wp);display:grid;place-items:center;font-weight:800}.brand small{display:block;color:#a7aaad;font-size:11px;font-weight:450}.nav{display:grid;gap:4px}.nav button{background:none;border:0;color:#dcdcde;text-align:left;padding:10px 12px;border-radius:6px;display:flex;gap:12px;align-items:center}.nav button:hover,.nav button[aria-current=page]{background:#2c3338;color:#fff}.nav .ico{width:18px;text-align:center;color:#a7aaad}.side-foot{margin-top:auto;border-top:1px solid #3c434a;padding:14px 10px;color:#a7aaad;font-size:12px}.main{min-width:0}.top{height:60px;background:white;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 30px}.crumb{font-size:13px;color:var(--muted)}.pill{padding:4px 9px;border-radius:999px;background:var(--amber-bg);color:var(--amber);font-size:11px;font-weight:650}.content{max-width:1280px;padding:28px 32px 60px;margin:auto}.page-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:22px}.page-head h1{font-size:25px;letter-spacing:-.02em;margin:0 0 4px;line-height:1.25}.sub{color:var(--muted);margin:0}.actions{display:flex;gap:8px;align-items:center}.btn{border:1px solid #8c8f94;background:#fff;color:var(--ink);border-radius:5px;padding:8px 13px;font-weight:550}.btn:hover{background:#f6f7f7}.btn.primary{background:var(--wp);border-color:var(--wp);color:#fff}.btn.primary:hover{background:#135e96}.btn:focus-visible,.nav button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #72aee6;outline-offset:2px}.grid{display:grid;gap:16px}.stats{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:18px}.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}.stat{padding:17px 18px}.stat-label{font-size:12px;color:var(--muted);margin-bottom:8px}.stat-val{font-size:27px;line-height:1.1;font-weight:650;letter-spacing:-.03em}.stat-foot{font-size:12px;color:var(--muted);margin-top:7px}.red-text{color:var(--red)}.green-text{color:var(--green)}.cols{grid-template-columns:minmax(0,1.5fr) minmax(290px,.8fr);align-items:start}.card-head{padding:17px 18px;border-bottom:1px solid #f0f0f1;display:flex;justify-content:space-between;align-items:center;gap:12px}.card-head h2{font-size:15px;margin:0}.card-body{padding:0 18px 14px}.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;text-align:left}th{font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);font-weight:600;padding:12px 9px;border-bottom:1px solid var(--line);white-space:nowrap}td{padding:14px 9px;border-bottom:1px solid #f0f0f1;vertical-align:middle}tbody tr:last-child td{border-bottom:0}.scenario-name{font-weight:600}.muted{color:var(--muted);font-size:12px;margin-top:3px}.status{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:650;padding:4px 8px;border-radius:999px;white-space:nowrap}.status .dot{width:7px;height:7px;border-radius:50%;background:currentColor}.status.reg{color:var(--red);background:var(--red-bg)}.status.good{color:var(--green);background:var(--green-bg)}.status.warn{color:var(--amber);background:var(--amber-bg)}.link{color:var(--wp);font-weight:600;text-decoration:none}.link:hover{text-decoration:underline}.notice{padding:13px 15px;border-left:4px solid #dba617;background:var(--amber-bg);border-radius:4px;margin-bottom:18px}.notice strong{display:block;margin-bottom:2px}.change-list{display:grid}.change{padding:14px 0;border-bottom:1px solid #f0f0f1;display:grid;grid-template-columns:30px 1fr;gap:10px}.change:last-child{border:0}.icon{width:28px;height:28px;background:var(--soft);color:var(--wp);border-radius:8px;display:grid;place-items:center;font-weight:700}.change-title{font-weight:600}.change-meta{font-size:12px;color:var(--muted);margin-top:3px}.bar{height:6px;background:#e0e0e0;border-radius:20px;overflow:hidden;margin-top:11px}.bar span{display:block;width:67%;height:100%;background:var(--wp);border-radius:20px}.view{display:none}.view.active{display:block}.toolbar{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:14px}.search{width:min(300px,100%);padding:9px 11px;border:1px solid #8c8f94;border-radius:5px;background:#fff}.select{padding:9px 28px 9px 10px;border:1px solid #8c8f94;border-radius:5px;background:#fff;color:var(--ink)}.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.diff-card{padding:17px 18px}.diff-card h3{font-size:14px;margin:0 0 14px}.value-row{display:grid;grid-template-columns:1fr auto;gap:12px;padding:11px 0;border-top:1px solid #f0f0f1}.value-row .label{color:var(--muted)}.old{color:var(--muted);text-decoration:line-through}.newbad{color:var(--red);font-weight:700}.newgood{color:var(--green);font-weight:650}.section-title{margin:26px 0 12px;font-size:16px}.steps{display:flex;gap:8px;margin-bottom:18px}.step{flex:1;border-bottom:2px solid var(--line);padding:8px;color:var(--muted);font-size:12px}.step.current{color:var(--wp);border-color:var(--wp);font-weight:650}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}.field label{display:block;font-weight:600;margin-bottom:5px}.field input,.field select{width:100%;padding:9px 10px;border:1px solid #8c8f94;border-radius:5px;background:#fff}.field small{display:block;color:var(--muted);font-size:12px;margin-top:4px}.full{grid-column:1/-1}.callout{padding:12px 14px;background:var(--soft);border:1px solid #c5d9ed;border-radius:7px;color:#1d2327}.empty{padding:40px 20px;text-align:center;color:var(--muted)}.footer-note{font-size:12px;color:var(--muted);margin-top:12px}.toast{position:fixed;right:24px;bottom:24px;background:#1d2327;color:white;padding:12px 16px;border-radius:7px;box-shadow:0 4px 16px #0003;display:none}.toast.show{display:block}.back{margin-bottom:16px}.mini{font-size:11px;color:var(--muted)}@media(max-width:950px){.shell{grid-template-columns:70px 1fr}.side{padding:18px 9px}.brand{padding:0;justify-content:center}.brand-copy,.nav .text,.side-foot{display:none}.nav button{justify-content:center;padding:12px 4px}.nav .ico{font-size:18px}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.cols{grid-template-columns:1fr}.content{padding:24px 20px}}@media(max-width:620px){.shell{grid-template-columns:1fr}.side{position:sticky;top:0;z-index:2;flex-direction:row;align-items:center;padding:8px 12px;overflow-x:auto}.nav{display:flex}.nav button{padding:9px}.brand{display:none}.top{padding:0 16px;height:52px}.content{padding:20px 14px 40px}.page-head{display:block}.actions{margin-top:13px}.stats{gap:9px}.stat{padding:13px}.stat-val{font-size:22px}.toolbar{align-items:stretch;flex-direction:column}.form-grid,.detail-grid{grid-template-columns:1fr}.full{grid-column:auto}table{min-width:650px}}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="side" aria-label="Plugin navigation">
+    <div class="brand"><div class="mark" aria-hidden="true">W</div><div class="brand-copy">Checkout Impact<small>WPEssential</small></div></div>
+    <nav class="nav" aria-label="Main navigation">
+      <button data-view="overview" aria-current="page"><span class="ico" aria-hidden="true">◫</span><span class="text">Overview</span></button>
+      <button data-view="scenarios"><span class="ico" aria-hidden="true">▤</span><span class="text">Scenarios</span></button>
+      <button data-view="history"><span class="ico" aria-hidden="true">◷</span><span class="text">Runs &amp; history</span></button>
+      <button data-view="settings"><span class="ico" aria-hidden="true">⚙</span><span class="text">Settings</span></button>
+    </nav>
+    <div class="side-foot">Prototype data only<br>Nothing is connected to a store.</div>
+  </aside>
+  <main class="main">
+    <div class="top"><div class="crumb">WooCommerce <span aria-hidden="true">/</span> Checkout Impact</div><span class="pill">Concept prototype</span></div>
+    <div class="content">
+      <section id="overview" class="view active" aria-labelledby="overview-title">
+        <div class="page-head"><div><h1 id="overview-title">Checkout impact</h1><p class="sub">See what changed across your saved checkout scenarios.</p></div><div class="actions"><button class="btn" data-view="history">View run history</button><button class="btn primary" data-view="scenarios">Review scenarios</button></div></div>
+        <div class="notice" role="note"><strong>Replay is currently unavailable</strong>This prototype does not connect to WooCommerce. Automatic scenario runs stay disabled until safe execution is verified.</div>
+        <div class="grid stats">
+          <article class="card stat"><div class="stat-label">Scenarios monitored</div><div class="stat-val">12</div><div class="stat-foot">Across 5 regions</div></article>
+          <article class="card stat"><div class="stat-label">Changed since baseline</div><div class="stat-val red-text">2</div><div class="stat-foot">1 shipping · 1 coupon</div></article>
+          <article class="card stat"><div class="stat-label">Unchanged controls</div><div class="stat-val green-text">8</div><div class="stat-foot">Stable in last comparison</div></article>
+          <article class="card stat"><div class="stat-label">Need review</div><div class="stat-val">2</div><div class="stat-foot">1 incomplete · 1 unsupported</div></article>
+        </div>
+        <div class="grid cols">
+          <section class="card">
+            <div class="card-head"><h2>Recent scenario results</h2><a class="link" href="#" data-view="history">All runs</a></div>
+            <div class="table-wrap"><table><thead><tr><th>Scenario</th><th>Latest result</th><th>Compared</th><th></th></tr></thead><tbody>
+              <tr><td><div class="scenario-name">Germany · standard parcel</div><div class="muted">DE · Blocks · EUR</div></td><td><span class="status reg"><span class="dot"></span>Regression candidate</span><div class="muted">Expected shipping method missing</div></td><td>4 min ago</td><td><a class="link" href="#" data-view="report">Review</a></td></tr>
+              <tr><td><div class="scenario-name">UK · standard delivery</div><div class="muted">GB · Classic · GBP</div></td><td><span class="status reg"><span class="dot"></span>Regression candidate</span><div class="muted">Shipping cost changed</div></td><td>4 min ago</td><td><a class="link" href="#" data-view="report">Review</a></td></tr>
+              <tr><td><div class="scenario-name">US · control cart</div><div class="muted">US · Blocks · USD</div></td><td><span class="status good"><span class="dot"></span>Unchanged</span><div class="muted">All monitored fields matched</div></td><td>4 min ago</td><td><a class="link" href="#" data-view="report">Review</a></td></tr>
+              <tr><td><div class="scenario-name">WELCOME10 · clothing cart</div><div class="muted">US · Blocks · USD</div></td><td><span class="status warn"><span class="dot"></span>Inconclusive</span><div class="muted">Coupon field not captured</div></td><td>4 min ago</td><td><a class="link" href="#" data-view="report">Review</a></td></tr>
+            </tbody></table></div>
+          </section>
+          <aside class="card"><div class="card-head"><h2>Change context</h2><span class="mini">Correlation only</span></div><div class="card-body"><div class="change-list">
+            <div class="change"><div class="icon" aria-hidden="true">↻</div><div><div class="change-title">Shipping plugin updated</div><div class="change-meta">Version 2.1 → 2.2 · 4 minutes ago</div></div></div>
+            <div class="change"><div class="icon" aria-hidden="true">≡</div><div><div class="change-title">3 scenarios compared</div><div class="change-meta">2 changed · 1 unchanged</div></div></div>
+            <div class="change"><div class="icon" aria-hidden="true">!</div><div><div class="change-title">2 scenarios need review</div><div class="change-meta">One field was not observed</div></div></div>
+          </div><div class="muted">A nearby update is shown as context; it is not proof that the update caused a difference.</div><div class="bar" aria-label="Illustrative scenario coverage: 8 of 12"><span></span></div><div class="footer-note">8 of 12 scenarios have complete results</div></div></aside>
+        </div>
+      </section>
+
+      <section id="scenarios" class="view" aria-labelledby="scenarios-title">
+        <div class="page-head"><div><h1 id="scenarios-title">Scenarios</h1><p class="sub">Saved synthetic carts and market conditions used for comparisons.</p></div><div class="actions"><button class="btn primary" id="new-scenario">＋ New scenario</button></div></div>
+        <div class="callout" style="margin-bottom:15px"><strong>Before creating one:</strong> Use synthetic customer details. This prototype cannot run a checkout or save to a store.</div>
+        <div class="toolbar"><input class="search" type="search" aria-label="Search scenarios" placeholder="Search scenarios"><select class="select" aria-label="Filter by region"><option>All regions</option><option>Germany</option><option>United Kingdom</option><option>United States</option></select></div>
+        <section class="card"><div class="table-wrap"><table><thead><tr><th>Scenario</th><th>Cart</th><th>Market</th><th>Checkout</th><th>Baseline</th><th>Latest status</th><th></th></tr></thead><tbody>
+          <tr><td><div class="scenario-name">Germany · standard parcel</div><div class="muted">Shipping · updated 2 days ago</div></td><td>1 physical product</td><td>DE · EUR</td><td>Blocks</td><td>v3 · approved</td><td><span class="status reg"><span class="dot"></span>Changed</span></td><td><a class="link" href="#" data-view="report">Open</a></td></tr>
+          <tr><td><div class="scenario-name">UK · standard delivery</div><div class="muted">Shipping · updated 5 days ago</div></td><td>1 physical product</td><td>GB · GBP</td><td>Classic</td><td>v2 · approved</td><td><span class="status reg"><span class="dot"></span>Changed</span></td><td><a class="link" href="#" data-view="report">Open</a></td></tr>
+          <tr><td><div class="scenario-name">US · control cart</div><div class="muted">Control · updated 1 week ago</div></td><td>2 products</td><td>US · USD</td><td>Blocks</td><td>v1 · approved</td><td><span class="status good"><span class="dot"></span>Unchanged</span></td><td><a class="link" href="#" data-view="report">Open</a></td></tr>
+        </tbody></table></div></section>
+      </section>
+
+      <section id="wizard" class="view" aria-labelledby="wizard-title">
+        <button class="btn back" data-view="scenarios">← Back to scenarios</button>
+        <div class="page-head"><div><h1 id="wizard-title">Create a scenario</h1><p class="sub">Build a repeatable test profile without real customer data.</p></div><span class="pill">Step 1 of 4</span></div>
+        <div class="steps" aria-label="Scenario setup progress"><div class="step current">1 · Cart</div><div class="step">2 · Customer</div><div class="step">3 · Expectations</div><div class="step">4 · Review</div></div>
+        <section class="card"><div class="card-head"><h2>Scenario details</h2></div><div class="card-body" style="padding-top:18px">
+          <div class="form-grid">
+            <div class="field full"><label for="scenario-name">Scenario name</label><input id="scenario-name" value="Germany · standard parcel"><small>Use a name that makes the market and cart easy to recognize.</small></div>
+            <div class="field"><label for="product">Product</label><select id="product"><option>Everyday T-shirt · Large · Black</option><option>Gift card · Virtual</option></select></div>
+            <div class="field"><label for="quantity">Quantity</label><input id="quantity" type="number" min="1" value="1"></div>
+            <div class="field"><label for="country">Ship-to country</label><select id="country"><option>Germany (DE)</option><option>United Kingdom (GB)</option><option>United States (US)</option></select></div>
+            <div class="field"><label for="mode">Checkout experience</label><select id="mode"><option>Checkout Blocks</option><option>Classic checkout</option></select></div>
+            <div class="field full"><label for="postcode">Synthetic postcode (if needed)</label><input id="postcode" value="10115"><small>Use a non-customer test value. Some shipping rules require a postcode to resolve the same zone.</small></div>
+          </div>
+          <div class="callout" style="margin-top:18px">Payment data, card details and real shopper identities are not part of a scenario.</div>
+          <div class="actions" style="justify-content:flex-end;margin-top:20px"><button class="btn" data-view="scenarios">Cancel</button><button class="btn primary" id="wizard-next">Continue to expectations</button></div>
+        </div></section>
+      </section>
+
+      <section id="report" class="view" aria-labelledby="report-title">
+        <button class="btn back" data-view="overview">← Back to overview</button>
+        <div class="page-head"><div><h1 id="report-title">Germany · standard parcel</h1><p class="sub">Scenario v4 · baseline v3 approved · Blocks · EUR · run 1042</p></div><div class="actions"><span class="status reg"><span class="dot"></span>Regression candidate</span><button class="btn" id="report-review">Mark expected</button></div></div>
+        <div class="notice" role="note"><strong>Change context · not proven cause</strong>Shipping plugin updated 2.1 → 2.2 shortly before this run.</div>
+        <div class="grid detail-grid">
+          <article class="card diff-card"><h3>Shipping methods</h3><div class="value-row"><span class="label">Expected · baseline v3</span><span>Standard parcel · EUR 5.00</span></div><div class="value-row"><span class="label">Observed · run 1042</span><span class="newbad">Expected method missing</span></div><div class="value-row"><span class="label">Collection status</span><span>Complete · adapter supported</span></div></article>
+          <article class="card diff-card"><h3>Run context</h3><div class="value-row"><span class="label">Cart</span><span>1 physical product</span></div><div class="value-row"><span class="label">Destination</span><span>DE · synthetic postcode</span></div><div class="value-row"><span class="label">Captured</span><span>Today, 10:42 AM UTC</span></div></article>
+        </div>
+        <h2 class="section-title">Other scenarios in the same comparison</h2>
+        <section class="card"><div class="table-wrap"><table><thead><tr><th>Scenario</th><th>Field</th><th>Before</th><th>After</th><th>Status</th></tr></thead><tbody>
+          <tr><td>UK · standard delivery</td><td>Shipping cost</td><td>GBP 7.00</td><td class="newbad">GBP 12.00</td><td><span class="status reg"><span class="dot"></span>Changed</span></td></tr>
+          <tr><td>US · control cart</td><td>Monitored totals</td><td>USD 48.00</td><td class="newgood">USD 48.00</td><td><span class="status good"><span class="dot"></span>Unchanged</span></td></tr>
+          <tr><td>WELCOME10 · clothing cart</td><td>Coupon discount</td><td>USD 10.00</td><td>Not observed</td><td><span class="status warn"><span class="dot"></span>Inconclusive</span></td></tr>
+        </tbody></table></div></section>
+        <p class="footer-note">Values are illustrative prototype data. Missing observation is not reported as a missing checkout option.</p>
+      </section>
+
+      <section id="history" class="view" aria-labelledby="history-title">
+        <div class="page-head"><div><h1 id="history-title">Runs &amp; history</h1><p class="sub">Review comparisons, their triggers, and execution status.</p></div><button class="btn primary" id="show-run-note">Run a comparison</button></div>
+        <div class="callout" style="margin-bottom:16px">Automatic or manual replay is disabled here. A production run requires the Phase 6 safety gate to pass.</div>
+        <div class="toolbar"><input class="search" type="search" aria-label="Search run history" placeholder="Search scenarios or plugin"><select class="select" aria-label="Filter by run status"><option>All statuses</option><option>Complete</option><option>Partial</option><option>Blocked</option></select></div>
+        <section class="card"><div class="table-wrap"><table><thead><tr><th>Run</th><th>Trigger</th><th>Scenarios</th><th>Outcome</th><th>Started</th><th></th></tr></thead><tbody>
+          <tr><td><strong>#1042</strong><div class="muted">Runner profile · preview only</div></td><td>Plugin update context</td><td>12 attempted</td><td><span class="status warn"><span class="dot"></span>Prototype data</span></td><td>Today, 10:42 AM</td><td><a class="link" href="#" data-view="report">Details</a></td></tr>
+          <tr><td><strong>#1041</strong><div class="muted">No live execution</div></td><td>Manual preview</td><td>0 attempted</td><td><span class="status warn"><span class="dot"></span>Blocked</span></td><td>Yesterday</td><td><a class="link" href="#" id="blocked-details">Details</a></td></tr>
+        </tbody></table></div></section>
+      </section>
+
+      <section id="settings" class="view" aria-labelledby="settings-title">
+        <div class="page-head"><div><h1 id="settings-title">Settings</h1><p class="sub">Control permissions, evidence retention and supported capabilities.</p></div></div>
+        <div class="grid cols">
+          <section class="card"><div class="card-head"><h2>Safety &amp; execution</h2></div><div class="card-body" style="padding-top:15px"><div class="value-row"><span>Safe replay status</span><span class="status warn"><span class="dot"></span>Not verified</span></div><div class="value-row"><span>Live payment testing</span><span>Never allowed</span></div><div class="value-row"><span>Automatic runs</span><span>Disabled</span></div><div class="value-row"><span>Checkout modes</span><span>Not validated</span></div><p class="footer-note">This screen describes intended controls. No store settings are connected.</p></div></section>
+          <section class="card"><div class="card-head"><h2>Evidence &amp; access</h2></div><div class="card-body" style="padding-top:15px"><div class="value-row"><span>Personal data</span><span>Minimized by default</span></div><div class="value-row"><span>External transmission</span><span>Off by default</span></div><div class="value-row"><span>Baseline approval</span><span>Authorized user required</span></div><div class="value-row"><span>Retention duration</span><span>Release decision pending</span></div></div></section>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script>
+const nav=[...document.querySelectorAll("[data-view]")],views=[...document.querySelectorAll(".view")],toast=document.getElementById("toast");
+function show(name){views.forEach(v=>v.classList.toggle("active",v.id===name));nav.forEach(b=>{if(b.matches("nav button")){if(b.dataset.view===name)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")}});const target=document.getElementById(name+"-title");if(target)target.focus({preventScroll:true});window.scrollTo(0,0)}
+nav.forEach(b=>b.addEventListener("click",e=>{e.preventDefault();show(b.dataset.view)}));
+function note(text){toast.textContent=text;toast.classList.add("show");setTimeout(()=>toast.classList.remove("show"),3200)}
+document.getElementById("new-scenario").addEventListener("click",()=>show("wizard"));
+document.getElementById("wizard-next").addEventListener("click",()=>note("Prototype only: scenario setup is not connected to a store."));
+document.getElementById("report-review").addEventListener("click",()=>note("Prototype only: no baseline or review action was saved."));
+document.getElementById("show-run-note").addEventListener("click",()=>note("Run blocked: safe replay has not been verified."));
+document.getElementById("blocked-details").addEventListener("click",e=>{e.preventDefault();note("Run blocked before checkout: safety proof is pending.")});
+document.querySelectorAll("h1").forEach(h=>{h.tabIndex=-1});
+</script>
+</body>
+</html>
