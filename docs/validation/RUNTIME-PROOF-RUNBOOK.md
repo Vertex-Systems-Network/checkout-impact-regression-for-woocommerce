@@ -1,6 +1,6 @@
 # Phase 6 — Runtime proof runbook and evidence worksheet
 
-**Status:** Operator worksheet prepared; no runtime test has been run.  
+**Status:** Operator worksheet prepared; no runtime test has been run. Phase 6 is formally closed as a no-go for runtime support, not as a pass.  
 **Task:** SPIKE-008  
 **Date prepared:** 2026-11-06  
 **Use with:** [Safe checkout proof protocol](PREDEVELOPMENT-SAFE-CHECKOUT-PROOF.md), [adapter spike](STORE-API-OBSERVATION-ADAPTER-SPIKE.md), and [canonicalization spike](STORE-API-CANONICALIZATION-SPIKE.md).
@@ -24,7 +24,7 @@ Do not begin runtime proof until every item below is true. This is a provisionin
 
 If any gate fails, stop and record the matrix entry as **blocked**, not passed. Do not use a live store as a substitute.
 
-**Environment finding for this planning session:** workspace inspection found no PHP, Docker, WP-CLI, or WordPress project, and no disposable staging target was supplied. A fresh browser-based WordPress Playground attempt reached its preparation step but the Playground worker and OPFS storage worker failed to load; no site or test case started. No Playground MCP/runtime connector is available in this session. Therefore no executable runtime test can be run here. Phase 6 stays at 85%; this checklist does not count as runtime evidence.
+**Environment finding for this planning session:** workspace inspection found no PHP, Docker, WP-CLI, or WordPress project, and no disposable staging target was supplied. A fresh browser-based WordPress Playground attempt reached its preparation step but the Playground worker and OPFS storage worker failed to load; no site or test case started. No Playground MCP/runtime connector is available in this session. Therefore no executable runtime test ran here. Phase 6 is closed under the no-go/support-exclusion decision; this checklist does not count as runtime evidence or a pass.
 
 ## 1. Run identity
 
@@ -199,4 +199,4 @@ A PASS is limited to the exact recorded environment and test cases. It is not a 
 - Browser Playground: blocked by worker/storage-worker initialization failure on the fresh attempt; no checkout tests ran.
 - Browser Playground: did not launch because the site requested browser verification.
 - Checkout cases, side-effect audit and cleanup: not executed.
-- Phase 6: remains in progress; no runtime pass is claimed.
+- Phase 6: closed as an explicit no-go/support-exclusion decision; no runtime pass is claimed. Read [closure decision](PHASE-6-CLOSURE-DECISION.md).
