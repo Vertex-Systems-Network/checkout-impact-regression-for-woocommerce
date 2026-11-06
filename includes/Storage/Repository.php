@@ -537,7 +537,7 @@ final class Repository {
 	 * @param int $limit Maximum records to purge.
 	 * @return int|\WP_Error Number of removed runs.
 	 */
-	public function purge_expired_runs( $limit = 100 ) {
+	public function purge_expired_runs( $limit = 100, $system_generated = false ) {
 		global $wpdb;
 
 		if ( ! $this->can_manage() ) {
