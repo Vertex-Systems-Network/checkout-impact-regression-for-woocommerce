@@ -138,20 +138,20 @@ For each source, record the checked date, URL, evidence, verified features, unre
 
 ### Platform compatibility matrix
 
-Do not guess compatibility versions. In Phase 2, inspect current official requirements and test constraints, then set the minimum and tested matrix for:
+Do not guess compatibility versions. Phase 2 records a source-based proposed support floor and test strategy in [Requirements and compatibility plan](requirements/REQUIREMENTS.md). Planned targets are not tested compatibility claims. Before release, validate exact versions and update the tested matrix for:
 
 | Platform | Minimum supported version | Tested versions | Decision/status |
 |---|---|---|---|
-| PHP | TBD | TBD | Research required |
-| WordPress | TBD | TBD | Research required |
-| WooCommerce | TBD | TBD | Research required |
-| WPML | TBD / optional | TBD | Research required |
-| Polylang | TBD / optional | TBD | Research required |
-| MySQL/MariaDB | TBD | TBD | Research required |
-| Checkout experience | Classic / Blocks / both TBD | TBD | Research required |
-| HPOS | TBD | TBD | Research required |
+| PHP | 8.3+ proposed | Not tested | WooCommerce 10.8 server recommendation |
+| WordPress | 6.9+ proposed | Not tested | WooCommerce 10.8 minimum/recommendation |
+| WooCommerce | 10.8+ planning floor | Not tested | Exact release intersection required before claims |
+| WPML | Optional; WPML core + WCML required for Woo multilingual/multicurrency | Not tested | See requirements source register |
+| Polylang | Optional; Polylang/Pro + Polylang for WooCommerce required | Not tested | See requirements source register |
+| MySQL/MariaDB | MySQL 8.0+ / MariaDB 10.11+ proposed | Not tested | Stricter WordPress recommended DB floor |
+| Checkout experience | Classic and Blocks are separate targets | Not tested | No support declaration before mode-specific validation |
+| HPOS | Planned validation target | Not tested | Separate HPOS/legacy matrix required |
 
-The final matrix must state required extensions, unsupported combinations, and how the plugin behaves when a dependency is absent or out of range. Use official platform documentation as the compatibility source.
+Full source links, dependency behavior, unsupported-case handling and the verification strategy are in [Requirements and compatibility plan](requirements/REQUIREMENTS.md).
 
 ### Integrations
 
@@ -229,11 +229,13 @@ Dates remain TBD until the team estimates the work. Record actual start/end date
 
 ### Phase 2 — Requirements and compatibility matrix
 
-**Status:** Not started
+**Status:** Complete for planning deliverables; 2026-11-06.
 
-**Deliverables:** user journeys; functional/non-functional requirements; supported checkout flows; finalized PHP/WP/WooCommerce/WPML/Polylang matrix; security/privacy requirements; explicit exclusions.
+**Completed evidence:** [Requirements and compatibility plan](requirements/REQUIREMENTS.md) defines seven user journeys, prioritized functional and non-functional requirements with IDs, rationale/dependencies/acceptance criteria, privacy and safe-run gates, explicit exclusions, a source-linked proposed PHP/WordPress/WooCommerce/WPML/Polylang/database/checkout/HPOS matrix, dependency behavior, and a release verification strategy. Backlog REQ-001 through REQ-003 is complete for planning.
 
-**Exit criteria:** each requirement has an ID, rationale, priority, dependencies, and acceptance criteria; compatibility claims have official references and test strategy.
+**Compatibility boundary:** Proposed minimums are planning targets only. The plugin has not been implemented or tested. Classic checkout, Checkout Blocks, HPOS, multilingual integrations and exact version combinations must each pass the specified tests before any compatibility claim. Safe checkout replay remains a Phase 6 technical proof blocker.
+
+**Exit criteria met:** each requirement has an ID, rationale, priority, dependencies, and acceptance criteria; version claims cite official sources and are explicitly marked proposed/untested; the test strategy and unsupported-case behavior are defined.
 
 ### Phase 3 — Options bank and system architecture
 
@@ -294,9 +296,9 @@ Backlog items should be assigned to an assistant only when the task is bounded a
 | PLAN-003 | 1 | P1 | Identify adjacent WooCommerce checkout monitoring and testing tools | PLAN-001, PLAN-002 | Candidate list justified by relevance; no unsupported feature claims | Complete (2026-11-06; 10 products reviewed in public materials) |
 | PLAN-004 | 1 | P0 | Build the deduplicated feature/options bank | PLAN-001–003 | Each option has unique ID, user need, system owner, priority, dependencies, risk, and acceptance criteria; duplicate concepts are merged | Complete (2026-11-06; see OPTIONS-BANK.md) |
 | PLAN-005 | 1 | P0 | Build the system inventory and responsibility map | PLAN-004 | Each system has one owner responsibility, inputs/outputs, state ownership, failure modes, and named dependencies; overlap is resolved | Complete (2026-11-06; see SYSTEM-INVENTORY.md) |
-| REQ-001 | 2 | P0 | Define scenario personas and checkout journeys | PLAN-004 | Journeys cover region-specific shipping, payment availability, coupon behavior, unchanged control scenario, and inconclusive execution | Not started |
-| REQ-002 | 2 | P0 | Verify platform requirements and propose compatibility matrix | Official PHP/WP/WooCommerce/WPML/Polylang docs | Version ranges are sourced, testable, and clearly labeled proposed until accepted | Not started |
-| REQ-003 | 2 | P0 | Define privacy, permissions, retention, and safe test constraints | REQ-001 | Data inventory, access model, retention, redaction, and no-real-charge constraints have acceptance criteria | Not started |
+| REQ-001 | 2 | P0 | Define scenario personas and checkout journeys | PLAN-004 | Journeys cover region-specific shipping, payment availability, coupon behavior, unchanged control scenario, and inconclusive execution | Complete (2026-11-06; requirements/REQUIREMENTS.md) |
+| REQ-002 | 2 | P0 | Verify platform requirements and propose compatibility matrix | Official PHP/WP/WooCommerce/WPML/Polylang docs | Version ranges are sourced, testable, and clearly labeled proposed until accepted | Complete (2026-11-06; targets remain untested) |
+| REQ-003 | 2 | P0 | Define privacy, permissions, retention, and safe test constraints | REQ-001 | Data inventory, access model, retention, redaction, and no-real-charge constraints have acceptance criteria | Complete (2026-11-06; safe-run proof remains Phase 6) |
 | ARCH-001 | 3 | P0 | Map WooCommerce shipping/payment extension and carrier API options | REQ-002, PLAN-005 | Official docs and sandbox/API facts are recorded; region, credential, rate-limit, and dependency data included | Not started |
 | ARCH-002 | 3 | P0 | Propose end-to-end architecture and data flow | PLAN-004, PLAN-005, REQ-001–003 | Diagram covers change trigger through report, data stores, permissions, retries, redaction, and failure paths | Not started |
 | ARCH-003 | 3 | P0 | Define baseline, normalized result, and diff schemas | ARCH-002 | Schemas distinguish missing, changed, unchanged, unsupported, flaky, and inconclusive values with versioning rules | Not started |
