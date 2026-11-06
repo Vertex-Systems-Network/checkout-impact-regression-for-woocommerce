@@ -36,6 +36,10 @@ Adapters own capture mechanics only. The shared normalizer/comparator owns canon
 
 This sequence is a test candidate, not approved production behavior. Cart-token creation, session persistence, add-to-cart hooks, coupon handling, rate selection, gateway availability callbacks, and teardown all need runtime evidence.
 
+## Canonical data contract
+
+The [Store API canonicalization spike](STORE-API-CANONICALIZATION-SPIKE.md) defines exact money parsing, shipping/coupon identities, collection-state guards and NORM-01 through NORM-06. These tests are required before adapter behavior is accepted.
+
 ## Runtime proof cases added to SPIKE-001
 
 | Case | Scenario | Expected contract |
