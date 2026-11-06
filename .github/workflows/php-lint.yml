@@ -35,6 +35,9 @@ jobs:
             php -l "$file"
           done < <(find . -type f -name '*.php' -not -path './.git/*' -print0)
 
+      - name: Check admin JavaScript syntax
+        run: node --check assets/js/admin.js
+
       - name: Build installable plugin ZIP with Composer vendor files
         shell: bash
         run: |
