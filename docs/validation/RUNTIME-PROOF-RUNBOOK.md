@@ -119,6 +119,24 @@ Run each case once per checkout mode and environment matrix entry. Never click P
 
 For each case, record the WooCommerce version-specific checkout GET path. New-session and existing failed-payment/retry states must not be conflated. If the case unexpectedly reaches order/payment processing or invokes a non-isolated integration, stop immediately and fail that matrix entry.
 
+## 6. Before/after impact vector execution matrix
+
+These cases translate design vectors V-01–V-07 from the [scenario and comparison specification](../design/SCENARIO-AND-COMPARISON-SPEC.md) into operator evidence. They validate expected interpretation; they do not mean the product runner exists or has produced these results. Record the same exact environment fingerprint and side-effect snapshots for baseline and current observations.
+
+| Case | Baseline → current setup | Required observations | Expected classification | Safety / stop condition |
+|---|---|---|---|---|
+| V-01 Germany shipping disappearance | DE/EUR physical cart with a known rate → same cart, destination, currency and checkout mode after the controlled shipping configuration change | Complete rate collection; stable method/instance/rate IDs; package fingerprint; tax and currency context | Regression candidate only when a completed supported capture omits the baseline method | If rate collection is incomplete or service fails, mark inconclusive; never call it a missing method |
+| V-02 UK shipping price change | GB/GBP same package and method at GBP 7.00 → GBP 12.00 | Exact amount, currency/scale, rate identity, tax inclusion and package context | Regression candidate; primary delta GBP 5.00 | If identity, package, tax mode or currency differs, mark context mismatch |
+| V-03 US unchanged control | US/USD baseline with expected method and totals → same scenario after the same controlled change window | All asserted fields captured completely in both runs | Unchanged only when every monitored field compares equal | Missing fields or unsupported capture cannot count as unchanged |
+| V-04 Coupon discount change | Eligible USD 100.00 subtotal with coupon WELCOME10 at 10% → same context with observed USD 5.00 discount | Coupon eligibility, type, amount, tax, subtotal, fees, shipping and total | Regression candidate if coupon effect changes in a complete comparable capture | Do not infer coupon regression from total alone |
+| V-05 Partial collection | Supported baseline includes shipping and payment observations → current run has complete shipping data but payment adapter returns a controlled timeout | Per-field collection state and timeout evidence | Partial run; payment is inconclusive/collection error | Do not claim a gateway is unavailable from timeout |
+| V-06 Unsupported checkout | Classic baseline → current environment uses an unvalidated third-party checkout mode | Capability/mode detection and supported adapter list | Blocked or partial; checkout mode unsupported | Do not issue a green result or attempt an alternate checkout submission |
+| V-07 Context mismatch | GBP/tax-inclusive approved baseline → EUR or tax-exclusive current capture | Currency, precision, tax-display mode and environment fingerprints | Inconclusive/context mismatch; no arithmetic comparison | Never convert or normalize across currencies to force a match |
+
+For V-05, use a controlled test harness or isolated fault injection only after the adapter exists; do not impair a real payment gateway. For V-01/V-02/V-04, use reversible test configuration changes in the disposable store and snapshot/restore between cases. Do not run extension updates that trigger external services unless those services are disabled or safely stubbed.
+
+For every vector, preserve a per-field expected/current table, evidence reference, exact change event, repeatability result, and after-state cleanup audit. The resulting operator evidence can validate WooCommerce observations and safety; validating the product’s regression classification still requires an implemented runner and diff engine in Phase 7.
+
 ## 6. Repeatability
 
 | Check | First observation | Repeat observation | Match? | Notes |
