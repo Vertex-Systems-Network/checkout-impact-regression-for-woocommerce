@@ -287,9 +287,13 @@ Dates remain TBD until the team estimates the work. Record actual start/end date
 
 **Status:** Not started
 
-**Deliverables:** release package, upgrade/uninstall behavior, support docs, final compatibility statement, known limitations, release checklist.
+**Target channels:** submit the free edition to the WordPress.org Plugin Directory and the paid edition to the WooCommerce.com Marketplace, subject to both review processes and vendor approval. No applications or submissions have been made.
 
-**Exit criteria:** install/update/uninstall and rollback scenarios are reviewed; final quality and compatibility evidence is complete; final-release decision explicitly addresses whether any CLI is appropriate.
+**Deliverables:** release packages and separate channel/update ownership; approved free/paid feature matrix; WordPress.org plugin readme and submission ZIP; Woo vendor application and paid product submission; license and pricing decisions; QIT/compatibility/security/accessibility evidence; upgrade/uninstall/rollback behavior; support/privacy docs; final compatibility statement; known limitations; release checklist.
+
+**Compliance boundary:** the WordPress.org edition must provide meaningful independent free functionality and must not be trialware or install/update the paid package from an external server. Woo Marketplace's current freemium process requires separate free and paid submissions. Resolve the package identity, paid add-on, update and pricing model with both marketplaces before freezing release packaging. Verify requirements again at submission time.
+
+**Exit criteria:** install/update/uninstall and rollback scenarios pass; current requirements for both channels are met; all marketplace test/review evidence is complete; official approvals and launch onboarding are recorded; known limits and support terms are published; final-release decision explicitly addresses whether any CLI is appropriate. Detailed gates are in [Distribution and Marketplace Submission Plan](release/DISTRIBUTION-PLAN.md).
 
 ## 9. AI-ready backlog
 
@@ -314,6 +318,10 @@ Backlog items should be assigned to an assistant only when the task is bounded a
 | SPIKE-001 | 6 | P0 | Validate safe checkout replay for supported checkout modes | REQ-002, REQ-003, ARCH-001–003 | Evidence proves or rejects safe repeatable scenarios without real charges or unintended side effects | Not started |
 | UX-001 | 5 | P1 | Define admin information architecture and interactive scenario/report prototype | REQ-001, PLAN-004, SCN-001–003 | Prototype covers setup, market/cart, expected values, before/after impact, evidence, history and prototype-only safety blocks; React component/API ownership is documented | Complete (2026-11-06; design artifact only) |
 | UX-002 | 5 | P1 | Specify accessible interaction and async/error/unsupported states | UX-001, REQ-008 | Keyboard/focus, labels, announcements, contrast, responsive behavior and empty/loading/error/partial/blocked/unsupported states are explicitly designed | Complete (2026-11-06; not assistive-technology tested) |
+| REL-001 | 8 | P0 | Approve channel-specific free/paid boundary, licensing, naming and update ownership | Phase 7 release candidate; distribution research | Feature matrix provides useful non-trial free edition; separate marketplace submissions/update paths are compliant; price and vendor terms are reviewed | Not started |
+| REL-002 | 8 | P0 | Prepare and submit the free WordPress.org edition | REL-001; Phase 7 quality evidence | Complete production ZIP, GPL-compatible file inventory, readme/changelog/source link and privacy/support info pass current directory review | Not started |
+| REL-003 | 8 | P0 | Apply for Woo Marketplace vendor status and submit paid edition | REL-001; Phase 7 quality evidence | Vendor approval, separate paid submission, current QIT/compatibility/UX evidence, demo/test instructions and review approval are recorded | Not started |
+| REL-004 | 8 | P0 | Finalize dual-channel packaging, updates and commercial operations | REL-001–003 | Free-to-paid install/upgrade/rollback behavior, update ownership, price parity, renewal/support and distribution checks are documented and verified | Not started |
 
 ### Task handoff format
 
@@ -342,6 +350,8 @@ When asking ChatGPT, Cursor, Claude, Gemini, or another assistant to work, provi
 - **D-008:** Evaluate shipping company APIs and payment integrations through an evidence-based compatibility and safety matrix.
 - **D-009:** Competitor review shows that checkout testing, update awareness, and diagnostics already exist in the market. The product's multi-scenario before/after value-diff positioning is a hypothesis to validate, not a verified exclusive capability.
 - **D-010:** Keep `AGENTS.md` canonical and provide tool-specific entry points. ChatGPT's general GitHub-connected chat is treated as manual-read unless the session demonstrably loads the repository rules.
+- **D-011:** Target a free edition on WordPress.org and a paid edition on the WooCommerce.com Marketplace; marketplace submissions and vendor approval remain future release gates.
+- **D-012:** Keep channel-specific packages and update ownership explicit. The WordPress.org edition must not behave as trialware or download/install the paid package from an external server; validate the free/paid split with both marketplaces before release.
 
 ### Open questions for discovery
 
@@ -356,6 +366,7 @@ When asking ChatGPT, Cursor, Claude, Gemini, or another assistant to work, provi
 - Which shipping providers have official APIs and test environments that can be used safely?
 - What requirements differ when WPML or Polylang changes language, currency, or localized checkout presentation?
 - Which license and pricing packaging decisions belong to this add-on versus WPEssential, and do hosted runner costs support the proposed $119/year paid tier?
+- Will both marketplaces approve the proposed free WordPress.org / paid WooCommerce.com presentation, package identity, paid add-on and update ownership?
 
 ## 11. Change control
 
