@@ -129,3 +129,26 @@ The initial two-product scan was expanded to direct checkout testers, checkout d
 - [Sentrix — WordPress.org](https://wordpress.org/plugins/sentrix-by-ilabs/)
 - [WRN Store Monitor Lite — WordPress.org](https://wordpress.org/plugins/wrn-store-monitor-lite/)
 - [CheckOO — WordPress.org](https://wordpress.org/plugins/checkoo/)
+
+
+## Pricing snapshot (public pages, 2026-11-06)
+
+These are public list-page observations, not direct quotes. Prices/promotions may change. The products sell hosted test infrastructure and/or broader monitoring, so these prices are **not directly comparable** to a WPEssential plugin add-on.
+
+| Product | Public price/plan information seen | Comparison note |
+|---|---|---|
+| Cart Lookout | The WordPress.org listing describes a free local checkout-health screen and says the hosted service requires an account. A public price was not confirmed from the official product materials reviewed. | Do not infer the hosted service is free or set our price against aggregator listings. |
+| ShopMonitor | Official page displayed $29/$59/$99 monthly list tiers; a 50% launch promotion was shown, with annual examples $139.50/$279.50/$469.50. It also displayed 3 months free, 250/1,000/3,000 tests monthly and 30/60/90 days of history by tier. | Prices and launch offers may change. Tier includes remote test runs, storage, alerts, and agency features. |
+| CheckView | Official page displayed $35 Essentials (forms/custom tests; WooCommerce excluded), $70 Plus with WooCommerce, and $110 Advanced; annual figures $359.88/$719.88/$1,079.88. Run/history limits differ by tier. | WooCommerce-capable listed tier starts at $70/month; this sells hosted test capacity, not a comparable plugin-only entitlement. |
+| UptimeStore | Public landing page displayed starting at $19/month and tiers, but currently described monitoring features focus on Shopify; its WordPress.org listing describes a WooCommerce connector. | Platform/product-scope mismatch needs vendor clarification; omit from direct WooCommerce pricing comparison. |
+
+### Implication for the proposed Free / $119 per year
+
+Keep $119/year as a **pricing hypothesis**, not a recommendation. If the add-on needs hosted browsers, storage, notifications, or recurring runs, compute runner/support costs and specify a fair test allowance before pricing. If it is a standalone local add-on, value and support expectations differ. Validate target buyer willingness, expected run volume, implementation/service costs, and Free-to-paid boundaries before finalizing tiers.
+
+Sources checked:
+
+- [ShopMonitor pricing](https://shopmonitor.io/)
+- [CheckView pricing](https://checkview.io/pricing/)
+- [Cart Lookout — WordPress.org](https://wordpress.org/plugins/cartlookout/)
+- [UptimeStore](https://www.uptimestore.io/) and [WordPress.org listing](https://wordpress.org/plugins/uptimestore/)
