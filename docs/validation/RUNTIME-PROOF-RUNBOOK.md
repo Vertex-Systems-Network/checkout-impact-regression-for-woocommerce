@@ -196,7 +196,8 @@ A PASS is limited to the exact recorded environment and test cases. It is not a 
 - Worksheet: prepared.
 - Temporary WordPress admin runtime: WPRun WordPress 6.9.1 / PHP 8.4 booted.
 - WooCommerce: not installed; the installer marked the available 11.2.2 release incompatible with WordPress 6.9.1.
-- Plugin ZIP: packaged locally, but the browser file picker did not expose a usable local-file transfer, so installation and activation were not attempted/completed.
+- Plugin ZIP: present locally in the workspace, but the browser file picker did not expose a usable local-file transfer, so remote installation/activation did not complete.
+- Local runtime: PHP, WordPress, WP-CLI, Docker, database binaries and cached install packages are absent. An apt package-index attempt failed in the managed environment before dependencies could be acquired.
 - Plugin activation, admin UI behavior, capability cases, checkout cases, side-effect audit and cleanup: not executed.
 - Browser Playground: blocked at browser verification before WordPress loaded.
 - Phase 6: closed as an explicit no-go/support-exclusion decision; no runtime pass is claimed. Read [closure decision](PHASE-6-CLOSURE-DECISION.md).
