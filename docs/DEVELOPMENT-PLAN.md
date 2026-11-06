@@ -239,11 +239,13 @@ Dates remain TBD until the team estimates the work. Record actual start/end date
 
 ### Phase 3 — Options bank and system architecture
 
-**Status:** Not started
+**Status:** Complete for planning deliverables; 2026-11-06.
 
-**Deliverables:** deduplicated options bank; system inventory; domain model; data-flow diagrams; architecture decision records; shipping/payment integration matrix.
+**Completed evidence:** The [options bank](research/OPTIONS-BANK.md) now uses a single SYS owner ID for every candidate; OI-16 is explicitly deferred with no owner. The [system inventory](architecture/SYSTEM-INVENTORY.md) remains the component responsibility map. [Proposed architecture](architecture/ARCHITECTURE.md) adds the option-to-owner crosswalk, two data-flow diagrams, conceptual domain records, boundaries, failure behavior, proposed decision records and a validation plan. The [shipping/payment integration matrix](architecture/INTEGRATION-MATRIX.md) records official API capabilities, authentication/onboarding, test environments, constraints and priority for WooCommerce's native interfaces and candidate carriers/gateways. ARCH-001 through ARCH-003 are complete for planning.
 
-**Exit criteria:** every accepted option maps to exactly one owning system; data inputs, storage, permissions, retention, events, and failure modes are defined; critical unknowns have a validation plan.
+**Limits:** This is a source-linked desk study and architecture proposal. No carrier/gateway integration or checkout replay has been implemented or tested. Rate limits, regional eligibility and sandbox fidelity remain provider-specific where the official sources do not settle them. Safe execution remains a Phase 6 proof gate.
+
+**Exit criteria met:** accepted/candidate options have one accountable owner; data inputs, conceptual state, permissions, retention, events and failures are mapped; integration facts cite official sources; critical unknowns have explicit validation tasks.
 
 ### Phase 4 — Checkout scenario and comparison design
 
@@ -299,9 +301,9 @@ Backlog items should be assigned to an assistant only when the task is bounded a
 | REQ-001 | 2 | P0 | Define scenario personas and checkout journeys | PLAN-004 | Journeys cover region-specific shipping, payment availability, coupon behavior, unchanged control scenario, and inconclusive execution | Complete (2026-11-06; requirements/REQUIREMENTS.md) |
 | REQ-002 | 2 | P0 | Verify platform requirements and propose compatibility matrix | Official PHP/WP/WooCommerce/WPML/Polylang docs | Version ranges are sourced, testable, and clearly labeled proposed until accepted | Complete (2026-11-06; targets remain untested) |
 | REQ-003 | 2 | P0 | Define privacy, permissions, retention, and safe test constraints | REQ-001 | Data inventory, access model, retention, redaction, and no-real-charge constraints have acceptance criteria | Complete (2026-11-06; safe-run proof remains Phase 6) |
-| ARCH-001 | 3 | P0 | Map WooCommerce shipping/payment extension and carrier API options | REQ-002, PLAN-005 | Official docs and sandbox/API facts are recorded; region, credential, rate-limit, and dependency data included | Not started |
-| ARCH-002 | 3 | P0 | Propose end-to-end architecture and data flow | PLAN-004, PLAN-005, REQ-001–003 | Diagram covers change trigger through report, data stores, permissions, retries, redaction, and failure paths | Not started |
-| ARCH-003 | 3 | P0 | Define baseline, normalized result, and diff schemas | ARCH-002 | Schemas distinguish missing, changed, unchanged, unsupported, flaky, and inconclusive values with versioning rules | Not started |
+| ARCH-001 | 3 | P0 | Map WooCommerce shipping/payment extension and carrier API options | REQ-002, PLAN-005 | Official docs and sandbox/API facts are recorded; region, credential, rate-limit, and dependency data included | Complete (2026-11-06; integration matrix; provider support untested) |
+| ARCH-002 | 3 | P0 | Propose end-to-end architecture and data flow | PLAN-004, PLAN-005, REQ-001–003 | Diagram covers change trigger through report, data stores, permissions, retries, redaction, and failure paths | Complete (2026-11-06; proposed architecture; technical proof pending) |
+| ARCH-003 | 3 | P0 | Define baseline, normalized result, and diff schemas | ARCH-002 | Schemas distinguish missing, changed, unchanged, unsupported, flaky, and inconclusive values with versioning rules | Complete (2026-11-06; conceptual contracts; Phase 4 schema design pending) |
 | SPIKE-001 | 6 | P0 | Validate safe checkout replay for supported checkout modes | REQ-002, REQ-003, ARCH-001–003 | Evidence proves or rejects safe repeatable scenarios without real charges or unintended side effects | Not started |
 | UX-001 | 5 | P1 | Prototype scenario builder and impact report in React | REQ-001, PLAN-004 | Prototype covers setup, before/after values, affected scenario, evidence, and accessible states | Not started |
 
