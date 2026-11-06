@@ -75,7 +75,7 @@ final class Repository {
 	 * @return bool
 	 */
 	private function contains_sensitive_key( $value ) {
-		$blocked = '/(?:email|phone|mobile|first.?name|last.?name|address.?[12]|street|card|password|secret|token|api.?key|credential)/i';
+		$blocked = '/(?:email|phone|mobile|username|first.?name|last.?name|address.?[12]|street|card|password|secret|token|api.?key|credential)/i';
 
 		foreach ( $value as $key => $item ) {
 			if ( is_string( $key ) && preg_match( $blocked, $key ) ) {
@@ -126,7 +126,7 @@ final class Repository {
 		}
 
 		$title = sanitize_text_field( $title );
-		if ( '' === $title || strlen( $title ) > 191 ) {
+		if ( '' === $title || strlen( $title ) > 191 || is_email( $title ) ) {
 			return new \WP_Error( 'wpecir_invalid_title', 'Scenario title is required and must be 191 characters or fewer.' );
 		}
 
