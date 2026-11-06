@@ -112,7 +112,7 @@ Each observation is typed and independent. A run is not one boolean.
 | Validation | stable field/error code, severity, checkout mode, collection status | Compare stable machine codes where exposed; redact entered field values and personal data. Human-facing message text is evidence, not stable identity. |
 | Completion | `not_attempted` by default; future supported result only after safety proof | No order submission is part of this design's default observation. Do not claim checkout completion from cart totals/payment-method visibility. |
 
-WooCommerce's Store API distinguishes cart operations from checkout order processing. The cart API documents state changes for customer address, coupons and shipping-rate selection; these are session/cart mutations and may invoke extension behavior. More critically, the checkout data GET creates a draft order, and POST processes the order/payment. Therefore the runner must not call Store API checkout GET/PUT/POST as a read-only probe. A future runner may use mutating cart operations only inside a proven isolated test session and must account for hooks/side effects; until Phase 6 proves this, execution remains blocked.
+WooCommerce's Store API distinguishes cart operations from checkout order processing. Cart POST operations for customer address, coupons and shipping-rate selection mutate cart/session state and may invoke extension behavior. The published Checkout API reference describes GET as returning a draft order, but WooCommerce 10.9 release notes and current source indicate persisted draft creation is deferred for fresh sessions, with a separate retry path; the reference appears stale for that behavior. The proposed WooCommerce 10.8+ floor therefore requires exact-version validation. Treat checkout GET as stateful, not read-only, until that validation; PUT mutates checkout/session state and POST processes checkout/order/payment. A runner may use cart operations only inside a proven isolated test session and must account for hooks/side effects; until Phase 6 proves this, execution remains blocked.
 
 ### Money representation
 
@@ -222,7 +222,9 @@ This phase finalizes the **design** but cannot prove safe replay without a techn
 ## 9. Official technical sources checked 2026-11-06
 
 - [WooCommerce Store API Cart](https://developer.woocommerce.com/docs/apis/store-api/resources-endpoints/cart/) — cart, coupon, address and shipping-rate operations.
-- [WooCommerce Store API Checkout](https://developer.woocommerce.com/docs/apis/store-api/resources-endpoints/checkout/) — checkout GET draft-order creation and POST order/payment processing.
+- [WooCommerce Store API Checkout](https://developer.woocommerce.com/docs/apis/store-api/resources-endpoints/checkout/) — reference for checkout GET/PUT/POST; draft persistence description conflicts with newer WooCommerce 10.9 release notes/source for fresh sessions.
+- [WooCommerce 10.9 release notes](https://developer.woocommerce.com/2026/06/23/woocommerce-10-9/) — persisted draft creation is deferred later for new sessions.
+- [WooCommerce Checkout route source](https://github.com/woocommerce/woocommerce/blob/trunk/plugins/woocommerce/src/StoreApi/Routes/V1/Checkout.php) — fresh-session no-order response and order retry path in current source.
 - [WooCommerce client/server data flow](https://developer.woocommerce.com/docs/block-development/reference/overview-of-data-flow/) — server is source of truth for cart totals, shipping rates and coupons.
 - [WooCommerce payment method integration for Checkout Blocks](https://developer.woocommerce.com/docs/block-development/extensible-blocks/cart-and-checkout-blocks/checkout-payment-methods/payment-method-integration/) — block gateway availability interface.
 - [WooCommerce price formatting code reference](https://woocommerce.github.io/code-reference/files/woocommerce-includes-wc-formatting-functions.html) — price precision and decimal handling.
