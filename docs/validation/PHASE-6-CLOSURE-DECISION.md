@@ -38,7 +38,7 @@ A cart/session identifier is not a side-effect firewall. A Cart API response by 
 - No order draft, cleanup, payment, email, inventory, coupon, webhook, shipping, or fulfillment side-effect behavior was measured.
 - No runtime compatibility claim is made for PHP, WordPress, WooCommerce, Classic, Blocks, HPOS, WPML/WCML, Polylang, gateways, or providers.
 
-The workspace has no PHP, Docker, WP-CLI, or WordPress installation. No disposable staging store was supplied. A prior Playground attempt remained at browser verification; a fresh Blueprint attempt reached preparation but failed because the Playground worker and OPFS storage worker did not load. No Playground runtime MCP connector is available in this session.
+The workspace has no PHP, Docker, WP-CLI, or WordPress installation. No disposable staging store was supplied. A prior Playground attempt remained at browser verification; a fresh Blueprint attempt reached preparation but failed because the Playground worker and OPFS storage worker did not load. On 2026-11-06, a fresh cloud-browser Playground attempt showed “Checking your browser” after one retry, before WordPress loaded; no verification was solved or bypassed. No Playground runtime MCP connector is available in this session.
 
 ## Reopen gate
 
