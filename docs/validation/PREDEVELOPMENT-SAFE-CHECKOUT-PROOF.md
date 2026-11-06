@@ -1,6 +1,6 @@
 # Phase 6 — Safe checkout proof protocol
 
-**Status:** Protocol defined; runtime proof blocked pending an isolated WooCommerce staging store.  
+**Status:** Protocol defined; Phase 6 closed as no-go for runtime support. No checkout test ran and no runtime pass is claimed.  
 **Date:** 2026-11-06  
 **Evidence class:** Official documentation review and test-plan design only. No plugin code or checkout scenario has been executed.
 
@@ -105,6 +105,6 @@ The checkout API reference and newer release/source behavior disagree about whet
 
 The [Store API observation adapter spike](STORE-API-OBSERVATION-ADAPTER-SPIKE.md) defines the cart-versus-payment capture boundary and adds CART-01 through CART-06 runtime cases. Those cases are required inputs to SPIKE-001; they have not been executed. Use the [runtime proof runbook](RUNTIME-PROOF-RUNBOOK.md) to record environment, preflight, results, side-effect deltas, cleanup and sign-off.
 
-## Next action
+## Phase 6 closure and future reopening
 
-Provide access to a disposable staging clone or have a store operator execute this protocol and share redacted evidence. Then complete SPIKE-001 by recording exact pass/fail results per supported mode and gateway/extension class. Until then, automatic checkout replay remains blocked; product behavior must not be represented as runtime-validated.
+Phase 6 is closed under the [no-go/support-exclusion decision](PHASE-6-CLOSURE-DECISION.md): no automatic checkout replay mode is approved. This is a planning closure, not runtime proof. To support any excluded mode in a later release, provision the isolated environment in the [runtime proof runbook](RUNTIME-PROOF-RUNBOOK.md), execute the exact mode/version matrix, record side-effect and cleanup evidence, and reopen Phase 6 for that entry. Until then, product behavior must not be represented as runtime-validated.
