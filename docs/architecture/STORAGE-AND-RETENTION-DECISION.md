@@ -1,13 +1,13 @@
 # Proposed storage and retention decision
 
-**Status:** Proposed for review; not implementation authorization.  
+**Status:** Accepted for planning; runtime implementation remains gated.  
 **Date:** 2026-11-06  
-**Owner:** Product/engineering  
+**Owner:** Product/engineering (planning authorization recorded)  
 **Related:** [Architecture](ARCHITECTURE.md), [Requirements](../requirements/REQUIREMENTS.md), [Phase 6 closure](../validation/PHASE-6-CLOSURE-DECISION.md)
 
 ## Recommendation
 
-Use versioned, per-site custom database tables for scenario versions, approved baseline versions, change events, run records, normalized observations, and findings. Keep small configuration values in non-autoloaded WordPress options. Do not store growing run history or serialized scenario suites in autoloaded options.
+Use versioned, per-site custom database tables for scenario versions, approved baseline versions, change events, run records, normalized observations, and findings. Keep small configuration values in non-autoloaded WordPress options. Do not store growing run history or serialized scenario suites in autoloaded options. This choice is accepted for planning; it does not authorize skipping the runtime proof gates below.
 
 This recommendation is based on the product's related versioned records, indexed history queries, retention cleanup, and explicit access/deletion lifecycle. WordPress guidance says to prefer post meta where practical; the project must therefore document why the relational history and lifecycle are not practical as post meta before accepting this choice. If the implementation cannot justify that boundary, reconsider private custom post types plus metadata.
 
@@ -24,13 +24,12 @@ Use `$wpdb->prefix` for site-scoped table names and WordPress-supported schema v
 
 ## Acceptance gates before implementation
 
-1. Product owner accepts or changes the table-vs-post-meta, retention, multisite, and uninstall proposals.
-2. Exact supported WordPress/database versions are chosen from the compatibility plan.
-3. Disposable runtime migration evidence covers fresh install, repeat activation, upgrade from prior schema, failed/partial migration recovery, per-site prefixing, uninstall preserve/delete, bounded retention cleanup, and privacy export/erasure.
-4. Security review confirms prepared queries, capability checks, nonces on mutations, output escaping, least-privilege table access, and no secrets/PII in logs.
-5. Performance evidence bounds indexes, query patterns, cleanup batch size, and storage growth.
+1. Exact supported WordPress/database versions are chosen from the compatibility plan.
+2. Disposable runtime migration evidence covers fresh install, repeat activation, upgrade from prior schema, failed/partial migration recovery, per-site prefixing, uninstall preserve/delete, bounded retention cleanup, and privacy export/erasure.
+3. Security review confirms prepared queries, capability checks, nonces on mutations, output escaping, least-privilege table access, and no secrets/PII in logs.
+4. Performance evidence bounds indexes, query patterns, cleanup batch size, and storage growth.
 
-Until these gates pass, no storage tables or scenario data are implemented. This is a design recommendation and does not lift the Phase 6 runtime block.
+Until these gates pass, no storage tables or scenario data are implemented. This is an accepted planning decision and does not lift the Phase 6 runtime block.
 
 ## Primary references
 
