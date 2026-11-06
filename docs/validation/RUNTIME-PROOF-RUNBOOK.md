@@ -195,6 +195,8 @@ A PASS is limited to the exact recorded environment and test cases. It is not a 
 
 - Worksheet: prepared.
 - User-provided WordPress test site: admin access is now available after the user logged in; exact displayed version is WordPress 7.1.4.
+- Site Health reports PHP 8.3.36 and environment type `production`; this conflicts with the intended disposable-test use, so no plugin installation was performed pending confirmation of the target's staging/disposable status.
+- Installed Plugins reports that no plugins are currently available; WooCommerce is not installed.
 - WooCommerce: no WooCommerce admin menu is present, so this target currently provides no WooCommerce test context.
 - Plugin ZIP: local archive is valid, but the WordPress upload input cannot select the local file with available browser controls. The plugin has not been uploaded or activated.
 - Local runtime: PHP, WordPress, WP-CLI, Docker, database binaries and cached install packages are absent. An apt package-index attempt failed in the managed environment before dependencies could be acquired.
