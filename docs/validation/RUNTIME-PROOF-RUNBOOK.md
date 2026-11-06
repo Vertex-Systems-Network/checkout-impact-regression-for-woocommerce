@@ -24,7 +24,7 @@ Do not begin runtime proof until every item below is true. This is a provisionin
 
 If any gate fails, stop and record the matrix entry as **blocked**, not passed. Do not use a live store as a substitute.
 
-**Environment finding for this planning session:** workspace inspection found no PHP, Docker, WP-CLI, or WordPress project, and no disposable staging target was supplied. A fresh browser-based WordPress Playground attempt reached its preparation step but the Playground worker and OPFS storage worker failed to load; no site or test case started. No Playground MCP/runtime connector is available in this session. Therefore no executable runtime test ran here. Phase 6 is closed under the no-go/support-exclusion decision; this checklist does not count as runtime evidence or a pass.
+**Environment finding for this planning session:** the workspace has no local PHP, Docker, WP-CLI, or WordPress project, and no WooCommerce staging store was supplied. A temporary WPRun sandbox booted WordPress 6.9.1 on PHP 8.4, but its installer marked WooCommerce 11.2.2 incompatible. The local plugin ZIP could not be transferred through the browser file picker, so plugin installation/activation and all test cases remain unexecuted. This admin boot is not runtime evidence for the plugin. A separate WordPress Playground attempt stopped at browser verification before WordPress loaded. Phase 6 remains closed under the no-go/support-exclusion decision; this checklist does not count as a runtime pass.
 
 ## 1. Run identity
 
