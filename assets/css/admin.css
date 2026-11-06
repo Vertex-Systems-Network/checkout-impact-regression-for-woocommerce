@@ -1,0 +1,219 @@
+.wpecir-admin-wrap {
+	max-width: 1280px;
+}
+
+.wpecir-app {
+	--wpecir-ink: #1d2327;
+	--wpecir-muted: #646970;
+	--wpecir-border: #dcdcde;
+	--wpecir-surface: #fff;
+	--wpecir-subtle: #f6f7f7;
+	--wpecir-accent: #2271b1;
+	--wpecir-warning: #996800;
+	color: var(--wpecir-ink);
+	margin: 24px 18px 40px 0;
+}
+
+.wpecir-header {
+	align-items: flex-start;
+	display: flex;
+	gap: 24px;
+	justify-content: space-between;
+	margin-bottom: 28px;
+}
+
+.wpecir-header h1 {
+	font-size: clamp(28px, 3vw, 36px);
+	font-weight: 650;
+	letter-spacing: -0.035em;
+	line-height: 1.15;
+	margin: 5px 0 10px;
+}
+
+.wpecir-eyebrow,
+.wpecir-card__eyebrow {
+	color: var(--wpecir-muted);
+	font-size: 12px;
+	font-weight: 650;
+	letter-spacing: 0.08em;
+	margin: 0;
+	text-transform: uppercase;
+}
+
+.wpecir-intro {
+	color: var(--wpecir-muted);
+	font-size: 15px;
+	margin: 0;
+	max-width: 700px;
+}
+
+.wpecir-phase-badge,
+.wpecir-status {
+	border: 1px solid var(--wpecir-border);
+	border-radius: 999px;
+	display: inline-flex;
+	font-size: 12px;
+	font-weight: 600;
+	line-height: 1.4;
+	padding: 6px 11px;
+	white-space: nowrap;
+}
+
+.wpecir-phase-badge {
+	background: #f0f6fc;
+	border-color: #c5d9ed;
+	color: #135e96;
+	margin-top: 5px;
+}
+
+.wpecir-notice {
+	align-items: flex-start;
+	border: 1px solid;
+	border-left-width: 4px;
+	border-radius: 4px;
+	display: flex;
+	gap: 13px;
+	margin: 0 0 30px;
+	padding: 18px 20px;
+}
+
+.wpecir-notice--warning {
+	background: #fcf9e8;
+	border-color: #dba617;
+	color: #3c434a;
+}
+
+.wpecir-notice .dashicons {
+	color: var(--wpecir-warning);
+	margin-top: 2px;
+}
+
+.wpecir-notice h2 {
+	font-size: 16px;
+	margin: 0 0 5px;
+}
+
+.wpecir-notice p {
+	line-height: 1.55;
+	margin: 0;
+	max-width: 850px;
+}
+
+.wpecir-section {
+	margin-top: 30px;
+}
+
+.wpecir-section > h2,
+.wpecir-next-step h2 {
+	font-size: 18px;
+	font-weight: 600;
+	margin: 0 0 14px;
+}
+
+.wpecir-card-grid {
+	display: grid;
+	gap: 16px;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.wpecir-card {
+	background: var(--wpecir-surface);
+	border: 1px solid var(--wpecir-border);
+	border-radius: 6px;
+	box-shadow: 0 1px 2px rgb(0 0 0 / 4%);
+	min-height: 190px;
+	padding: 20px;
+}
+
+.wpecir-card h2 {
+	font-size: 17px;
+	font-weight: 600;
+	margin: 10px 0 8px;
+}
+
+.wpecir-card__body {
+	color: var(--wpecir-muted);
+	line-height: 1.55;
+	margin: 0 0 18px;
+	max-width: 360px;
+}
+
+.wpecir-status--neutral {
+	background: #f0f6fc;
+	border-color: #c5d9ed;
+	color: #135e96;
+}
+
+.wpecir-status--muted {
+	background: var(--wpecir-subtle);
+	color: var(--wpecir-muted);
+}
+
+.wpecir-status--warning {
+	background: #fcf9e8;
+	border-color: #ead18b;
+	color: #785900;
+}
+
+.wpecir-next-step {
+	align-items: flex-start;
+	background: var(--wpecir-surface);
+	border: 1px solid var(--wpecir-border);
+	border-radius: 6px;
+	display: flex;
+	gap: 16px;
+	margin-top: 24px;
+	max-width: 820px;
+	padding: 20px;
+}
+
+.wpecir-next-step__number {
+	align-items: center;
+	background: #f0f6fc;
+	border-radius: 50%;
+	color: var(--wpecir-accent);
+	display: flex;
+	flex: 0 0 38px;
+	font-size: 13px;
+	font-weight: 700;
+	height: 38px;
+	justify-content: center;
+}
+
+.wpecir-next-step p {
+	color: var(--wpecir-muted);
+	line-height: 1.55;
+	margin: 0;
+	max-width: 680px;
+}
+
+@media (max-width: 782px) {
+	.wpecir-admin-wrap {
+		margin-right: 10px;
+	}
+
+	.wpecir-header {
+		display: block;
+	}
+
+	.wpecir-phase-badge {
+		margin-top: 14px;
+	}
+
+	.wpecir-card-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.wpecir-card {
+		min-height: unset;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.wpecir-app *,
+	.wpecir-app *::before,
+	.wpecir-app *::after {
+		scroll-behavior: auto !important;
+		transition-duration: 0.01ms !important;
+	}
+}
