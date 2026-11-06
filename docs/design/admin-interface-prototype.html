@@ -66,7 +66,7 @@
         <button class="btn back" data-view="scenarios">← Back to scenarios</button>
         <div class="page-head"><div><h1 id="wizard-title">Create a scenario</h1><p class="sub">Build a repeatable profile using synthetic cart and market inputs.</p></div><span class="pill" id="wizard-step-label">Step 1 of 4</span></div>
         <div class="steps" aria-label="Scenario setup progress"><div class="step current" data-step-label="1" aria-current="step">1 · Cart</div><div class="step" data-step-label="2">2 · Customer &amp; checkout</div><div class="step" data-step-label="3">3 · Expected behavior</div><div class="step" data-step-label="4">4 · Review</div></div>
-        <section class="card"><div class="card-head"><h2 id="wizard-card-title">Scenario details</h2></div><div class="card-body" style="padding-top:18px">
+        <section class="card"><div class="card-head"><h2 id="wizard-card-title" tabindex="-1">Scenario details</h2></div><div class="card-body" style="padding-top:18px">
           <div data-wizard-step="1">
             <div class="form-grid">
               <div class="field full"><label for="scenario-name">Scenario name</label><input id="scenario-name" value="Germany · standard parcel"><small>Use a name that makes the market and cart easy to recognize.</small></div>
@@ -159,6 +159,12 @@ function renderWizard(){
   document.getElementById("wizard-card-title").textContent=wizardTitles[wizardIndex-1];
   document.getElementById("wizard-back").hidden=wizardIndex===1;
   document.getElementById("wizard-next").textContent=wizardIndex===4?"Save draft scenario":"Continue";
+  if(wizardIndex===4){
+    document.getElementById("review-name").textContent=document.getElementById("scenario-name").value;
+    document.getElementById("review-product").textContent=document.getElementById("product").selectedOptions[0].text+" × "+document.getElementById("quantity").value;
+    document.getElementById("review-country").textContent=document.getElementById("country").selectedOptions[0].text+" · "+document.getElementById("postcode").value;
+    document.getElementById("review-mode").textContent=document.getElementById("mode").selectedOptions[0].text;
+  }
 }
 document.getElementById("wizard-back").addEventListener("click",()=>{if(wizardIndex>1){wizardIndex--;renderWizard();document.getElementById("wizard-card-title").focus()}});
 document.getElementById("wizard-next").addEventListener("click",()=>{
