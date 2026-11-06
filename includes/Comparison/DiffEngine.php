@@ -25,7 +25,7 @@ final class DiffEngine {
 	 * @return array|\WP_Error
 	 */
 	public static function compare( $baseline, $current, $baseline_context, $current_context ) {
-		if ( ! is_array( $baseline ) || ! is_array( $current ) ) {
+		if ( ! is_array( $baseline ) || ! is_array( $current ) || ! preg_match( '/^[a-f0-9]{64}$/', (string) $baseline_context ) || ! preg_match( '/^[a-f0-9]{64}$/', (string) $current_context ) ) {
 			return new \WP_Error( 'wpecir_invalid_diff_input', 'Baseline and current observations must be field maps.' );
 		}
 		$fields = array_unique( array_merge( array_keys( $baseline ), array_keys( $current ) ) );
