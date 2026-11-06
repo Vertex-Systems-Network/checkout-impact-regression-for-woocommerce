@@ -1,6 +1,6 @@
 # Storage and retention decision
 
-**Status:** Accepted for planning; implementation and compatibility claims remain gated on exact-version runtime evidence.  
+**Status:** Accepted design; v0.2.0 schema scaffold is present in source, but runtime migration, record access, privacy/retention behavior, and compatibility remain unverified.  
 **Date:** 2026-11-06  
 **Owner:** Product/engineering (planning authorization recorded)  
 **Related:** [Architecture](ARCHITECTURE.md), [Requirements](../requirements/REQUIREMENTS.md), [Phase 6 closure](../validation/PHASE-6-CLOSURE-DECISION.md)
@@ -23,14 +23,14 @@ Use `$wpdb->prefix` for site-scoped table names and WordPress-supported schema v
 - Register WordPress privacy exporter/eraser support for any personal data that could enter supported fields despite the synthetic-data default; redact before export and honor deletion requests.
 - The first implementation stores no payment or carrier API credentials. If a later release adds provider credentials, require a separate secret-storage decision; do not assume database storage is encrypted by the plugin.
 
-## Acceptance gates before implementation
+## Acceptance gates before storage is usable or supported
 
 1. Exact supported WordPress/database versions are chosen from the compatibility plan.
 2. Disposable runtime migration evidence covers fresh install, repeat activation, upgrade from prior schema, failed/partial migration recovery, per-site prefixing, uninstall preserve/delete, bounded retention cleanup, and privacy export/erasure.
 3. Security review confirms prepared queries, capability checks, nonces on mutations, output escaping, least-privilege table access, and no secrets/PII in logs.
 4. Performance evidence bounds indexes, query patterns, cleanup batch size, and storage growth.
 
-Until these gates pass, no storage tables or scenario data are implemented. This is an accepted planning decision and does not lift the Phase 6 runtime block.
+A v0.2.0 source scaffold now declares the planned per-site tables and guarded schema-version migration because implementation work has started. The schema has not been applied on the test site, no scenario record API or UI exists, and no scenario data is currently stored. Do not treat the scaffold as supported storage or enable record writes until all gates above pass. This does not lift the Phase 6 checkout runtime block.
 
 ## Primary references
 
