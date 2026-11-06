@@ -259,11 +259,13 @@ Dates remain TBD until the team estimates the work. Record actual start/end date
 
 ### Phase 5 — UX and React-based admin interface
 
-**Status:** Not started
+**Status:** Complete for UX/prototype deliverables; 2026-11-06.
 
-**Deliverables:** information architecture; polished admin flows; design system; accessible components; prototype for scenario setup, comparison review, and history.
+**Completed evidence:** [Admin UX and React interface specification](design/ADMIN-UX-SPEC.md) defines information architecture, first-use/scenario/baseline/report/history/settings journeys, screen hierarchy, WordPress React component map, server/client responsibility boundary, visual language, responsive behavior and loading/empty/error/partial/unsupported/blocked states. The [interactive admin concept prototype](design/admin-interface-prototype.html) provides Overview, Scenario list, a four-step scenario builder, impact detail, Runs & history, and Settings screens with fictional data and prototype-only actions.
 
-**Exit criteria:** users can understand and act on a scenario difference without interpreting raw logs; keyboard/accessibility and empty/error/loading states are designed.
+**React boundary:** The HTML prototype is a visual/interaction review artifact, not product code. The production interface remains React within wp-admin using WordPress runtime/components; PHP remains authoritative for permissions and comparison behavior. Accessibility criteria are designed but have not been tested with assistive technology. Runtime React implementation and verification remain Phase 7.
+
+**Exit criteria met for design:** users can understand an impact difference through expected/current values and evidence without reading raw logs; keyboard, responsive, loading/empty/error/unsupported states and component ownership are specified. No screen implies safe checkout replay or live payment.
 
 ### Phase 6 — Pre-development technical proof
 
@@ -310,7 +312,8 @@ Backlog items should be assigned to an assistant only when the task is bounded a
 | SCN-002 | 4 | P0 | Define normalized observations, comparability and field diffs | SCN-001, ARCH-003 | Money, shipping, payment, coupon, tax and validation fields have normalization, context matching and explicit missing/unsupported states | Complete (2026-11-06; scenario spec; no runtime claim) |
 | SCN-003 | 4 | P0 | Specify impact report vectors and safe-run boundary | SCN-002, REQ-003 | Deterministic expected vectors cover region shipping, price shift, unchanged control, coupon, partial, unsupported and context mismatch; safe-run proof is assigned to SPIKE-001 | Complete (2026-11-06; design examples; replay untested) |
 | SPIKE-001 | 6 | P0 | Validate safe checkout replay for supported checkout modes | REQ-002, REQ-003, ARCH-001–003 | Evidence proves or rejects safe repeatable scenarios without real charges or unintended side effects | Not started |
-| UX-001 | 5 | P1 | Prototype scenario builder and impact report in React | REQ-001, PLAN-004 | Prototype covers setup, before/after values, affected scenario, evidence, and accessible states | Not started |
+| UX-001 | 5 | P1 | Define admin information architecture and interactive scenario/report prototype | REQ-001, PLAN-004, SCN-001–003 | Prototype covers setup, market/cart, expected values, before/after impact, evidence, history and prototype-only safety blocks; React component/API ownership is documented | Complete (2026-11-06; design artifact only) |
+| UX-002 | 5 | P1 | Specify accessible interaction and async/error/unsupported states | UX-001, REQ-008 | Keyboard/focus, labels, announcements, contrast, responsive behavior and empty/loading/error/partial/blocked/unsupported states are explicitly designed | Complete (2026-11-06; not assistive-technology tested) |
 
 ### Task handoff format
 
