@@ -217,9 +217,11 @@ Dates remain TBD until the team estimates the work. Record actual start/end date
 
 ### Phase 1 — Market and competitor research
 
-**Status:** Not started
+**Status:** In progress (40%); started 2026-11-06. End date: TBD.
 
-**Deliverables:** dated competitor matrix; verified research notes; checkout monitoring landscape; initial differentiation and risks.
+**Completed evidence:** First-pass, source-linked review of Cart Lookout and ShopMonitor is recorded in [Competitor research](research/COMPETITOR-RESEARCH.md). PLAN-001 and PLAN-002 are complete. Public materials show both offer scheduled browser checkout tests and diagnostics; Cart Lookout additionally documents recent update/change evidence, and ShopMonitor documents AI-assisted flow setup and step replay.
+
+**Remaining:** Review adjacent products, validate the candidate before/after scenario-diff distinction with demos/vendor answers and target users, and complete the market matrix/options bank.
 
 **Exit criteria:** Cart Lookout, ShopMonitor, and relevant alternatives are reviewed from authoritative materials; every claimed capability has a source; gaps and uncertainty are explicit.
 
@@ -285,8 +287,8 @@ Backlog items should be assigned to an assistant only when the task is bounded a
 
 | ID | Phase | Priority | Task | Dependencies | Acceptance criteria | Status |
 |---|---:|---|---|---|---|---|
-| PLAN-001 | 1 | P0 | Review Cart Lookout from official WordPress.org materials | None | Dated notes distinguish verified behavior, unknowns, and source links; findings added to competitor matrix | Not started |
-| PLAN-002 | 1 | P0 | Review ShopMonitor from official vendor materials | None | Dated notes capture verified features, supported platform, limitations, and source links | Not started |
+| PLAN-001 | 1 | P0 | Review Cart Lookout from official WordPress.org materials | None | Dated notes distinguish verified behavior, unknowns, and source links; findings added to competitor matrix | Complete (2026-11-06; see competitor research report) |
+| PLAN-002 | 1 | P0 | Review ShopMonitor from official vendor materials | None | Dated notes capture verified features, supported platform, limitations, and source links | Complete (2026-11-06; first-pass public materials reviewed) |
 | PLAN-003 | 1 | P1 | Identify adjacent WooCommerce checkout monitoring and testing tools | PLAN-001, PLAN-002 | Candidate list justified by relevance; no unsupported feature claims | Not started |
 | PLAN-004 | 1 | P0 | Build the deduplicated feature/options bank | PLAN-001–003 | Each option has unique ID, user need, system owner, priority, dependencies, risk, and acceptance criteria; duplicate concepts are merged | Not started |
 | PLAN-005 | 1 | P0 | Build the system inventory and responsibility map | PLAN-004 | Each system has one owner responsibility, inputs/outputs, state ownership, failure modes, and named dependencies; overlap is resolved | Not started |
@@ -324,9 +326,12 @@ When asking ChatGPT, Cursor, Claude, Gemini, or another assistant to work, provi
 - **D-006:** README is the phase/status/progress/date tracker; this document contains detailed scope and backlog.
 - **D-007:** Research Cart Lookout and ShopMonitor as initial competitors; verify current behavior before making claims.
 - **D-008:** Evaluate shipping company APIs and payment integrations through an evidence-based compatibility and safety matrix.
+- **D-009:** Competitor review shows that checkout testing, update awareness, and diagnostics already exist in the market. The product's multi-scenario before/after value-diff positioning is a hypothesis to validate, not a verified exclusive capability.
+- **D-010:** Keep `AGENTS.md` canonical and provide tool-specific entry points. ChatGPT's general GitHub-connected chat is treated as manual-read unless the session demonstrably loads the repository rules.
 
 ### Open questions for discovery
 
+- Do any researched products already offer explicit multi-scenario baseline value diffs, even if not documented on their public pages?
 - Which change types can be detected reliably across plugin updates, WooCommerce settings, and third-party extension settings?
 - How can a scenario execute safely for classic checkout and Checkout Blocks without a real payment, customer email, order, or inventory mutation?
 - Which state should be normalized and compared, and how should expected changes be approved?
