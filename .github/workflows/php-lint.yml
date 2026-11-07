@@ -27,8 +27,8 @@ jobs:
         id: plugin
         shell: bash
         run: |
-          version="$(sed -n 's/^ \* Version: *//p' wpessential-checkout-impact-regression.php | head -n 1 | tr -d '\r')"
-          if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+([-.][0-9A-Za-z.-]+)?$ ]]; then
+          version="$(sed -n 's/^ \* Version: *//p' wpessential-checkout-impact-regression.php | head -n 1 | tr -d '\\r')"
+          if [[ ! "$version" =~ ^[0-9]+\\.[0-9]+\\.[0-9]+([-.][0-9A-Za-z.-]+)?$ ]]; then
             echo "Could not read a valid plugin version from the main plugin header."
             exit 1
           fi
