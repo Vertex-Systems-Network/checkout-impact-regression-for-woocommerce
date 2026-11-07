@@ -62,18 +62,21 @@ final class AdminPage {
 			return;
 		}
 
+		$css_path = WPECIR_PATH . 'assets/css/admin.css';
+		$js_path  = WPECIR_PATH . 'assets/js/admin.js';
+
 		wp_enqueue_style(
 			'wpecir-admin',
 			WPECIR_URL . 'assets/css/admin.css',
 			array(),
-			WPECIR_VERSION
+			is_readable( $css_path ) ? (string) filemtime( $css_path ) : WPECIR_VERSION
 		);
 
 		wp_enqueue_script(
 			'wpecir-admin',
 			WPECIR_URL . 'assets/js/admin.js',
 			array( 'wp-element', 'wp-i18n', 'wp-api-fetch' ),
-			WPECIR_VERSION,
+			is_readable( $js_path ) ? (string) filemtime( $js_path ) : WPECIR_VERSION,
 			true
 		);
 
