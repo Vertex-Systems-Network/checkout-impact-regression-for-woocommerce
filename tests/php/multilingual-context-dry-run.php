@@ -5,7 +5,7 @@
  * This proves only the fail-closed fingerprint/comparator contract. It does not
  * exercise WPML, WCML, Polylang, WooCommerce checkout, or runtime integrations.
  *
- * @package WPEssential\\CheckoutImpactRegression
+ * @package WPEssential\CheckoutImpactRegression
  */
 
 define( 'ABSPATH', __DIR__ . '/' );
@@ -19,13 +19,13 @@ class WP_Error {
 function is_wp_error( $value ) { return $value instanceof WP_Error; }
 function absint( $value ) { return abs( (int) $value ); }
 function sanitize_text_field( $value ) { return trim( strip_tags( (string) $value ) ); }
-function sanitize_key( $value ) { return preg_replace( '/[^a-z0-9_\\-]/', '', strtolower( (string) $value ) ); }
+function sanitize_key( $value ) { return preg_replace( '/[^a-z0-9_-]/', '', strtolower( (string) $value ) ); }
 function wp_json_encode( $value, $flags = 0 ) { return json_encode( $value, $flags ); }
 
 require dirname( __DIR__, 2 ) . '/vendor/autoload.php';
 
-use WPEssential\\CheckoutImpactRegression\\Comparison\\DiffEngine;
-use WPEssential\\CheckoutImpactRegression\\Comparison\\Normalizer;
+use WPEssential\CheckoutImpactRegression\Comparison\DiffEngine;
+use WPEssential\CheckoutImpactRegression\Comparison\Normalizer;
 
 function dry_run_check( $condition, $message ) {
 	if ( ! $condition ) {
@@ -87,4 +87,4 @@ dry_run_check( is_array( $eur ) && '725' === $eur['minor_units'], 'EUR decimal a
 dry_run_check( is_array( $jpy ) && '725' === $jpy['minor_units'], 'zero-decimal JPY amount uses zero-place exact minor units' );
 dry_run_check( is_wp_error( Normalizer::money( '7.25', 'JPY', 0 ) ), 'fractional amount is rejected at zero-decimal currency precision' );
 
-echo "Multilingual/currency context contract dry-run passed (synthetic only; no plugin integration or checkout executed).\\n";
+echo "Multilingual/currency context contract dry-run passed (synthetic only; no plugin integration or checkout executed).\n";
