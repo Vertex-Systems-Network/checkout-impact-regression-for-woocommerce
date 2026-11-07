@@ -1,8 +1,8 @@
 <?php
 /**
- * Tests the REST scenario payload contract without a WordPress installation.
+ * Tests the REST scenario payload and authorization contracts without WordPress.
  *
- * @package WPEssential\CheckoutImpactRegression
+ * @package WPEssential\\CheckoutImpactRegression
  */
 
 define( 'ABSPATH', __DIR__ . '/' );
@@ -13,14 +13,16 @@ class WP_Error {
 	public function get_error_code() { return $this->code; }
 }
 
+$GLOBALS['wpecir_test_capabilities'] = array();
 function is_wp_error( $value ) { return $value instanceof WP_Error; }
 function absint( $value ) { return abs( (int) $value ); }
 function sanitize_text_field( $value ) { return trim( strip_tags( (string) $value ) ); }
 function __( $value, $domain = null ) { return $value; }
+function current_user_can( $capability ) { return in_array( $capability, $GLOBALS['wpecir_test_capabilities'], true ); }
 
 require dirname( __DIR__, 2 ) . '/vendor/autoload.php';
 
-use WPEssential\CheckoutImpactRegression\Rest\ScenarioController;
+use WPEssential\\CheckoutImpactRegression\\Rest\\ScenarioController;
 
 function check_contract( $condition, $message ) {
 	if ( ! $condition ) {
@@ -49,4 +51,14 @@ check_contract( is_wp_error( $validate->invoke( null, 'Excess precision scenario
 check_contract( is_wp_error( $validate->invoke( null, 'Negative scenario', $input, array( 'coupon_discount' => '-1.00', 'coupon_code' => 'WELCOME10' ) ) ), 'negative expectations are rejected' );
 check_contract( is_wp_error( $validate->invoke( null, 'Coupon-less scenario', $input, array( 'coupon_discount' => '1.00' ) ) ), 'coupon discount requires its coupon code' );
 
-echo "Scenario payload contract checks passed.\n";
+$GLOBALS['wpecir_test_capabilities'] = array();
+$permission = ScenarioController::permissions_check();
+check_contract( is_wp_error( $permission ) && 'wpecir_forbidden' === $permission->get_error_code(), 'users without store-management capabilities are denied' );
+
+$GLOBALS['wpecir_test_capabilities'] = array( 'manage_woocommerce' );
+check_contract( true === ScenarioController::permissions_check(), 'WooCommerce managers can access scenario endpoints' );
+
+$GLOBALS['wpecir_test_capabilities'] = array( 'manage_options' );
+check_contract( true === ScenarioController::permissions_check(), 'WordPress administrators can access scenario endpoints' );
+
+echo "Scenario payload and authorization contract checks passed.\\n";
