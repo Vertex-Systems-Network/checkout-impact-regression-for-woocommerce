@@ -4,7 +4,7 @@
  *
  * Route registration only; no HTTP request, option write, or checkout call.
  *
- * @package WPEssential\\CheckoutImpactRegression
+ * @package WPEssential\CheckoutImpactRegression
  */
 
 define( 'ABSPATH', __DIR__ . '/fixtures/' );
@@ -22,7 +22,7 @@ function register_rest_route( $namespace, $route, $args ) {
 
 require dirname( __DIR__, 2 ) . '/vendor/autoload.php';
 
-use WPEssential\\CheckoutImpactRegression\\Rest\\ScenarioController;
+use WPEssential\CheckoutImpactRegression\Rest\ScenarioController;
 
 function route_check( $condition, $message ) {
 	if ( ! $condition ) {
