@@ -88,6 +88,27 @@ $expected_tables = array(
 	'wp_wpecir_observations',
 	'wp_wpecir_findings',
 );
+$required_index_fragments = array(
+	'UNIQUE KEY slug (slug)',
+	'UNIQUE KEY scenario_version (scenario_id,version)',
+	'UNIQUE KEY scenario_revision (scenario_id,revision)',
+	'UNIQUE KEY event_key (event_key)',
+	'KEY expires_at (expires_at)',
+	'KEY run_field (run_id,field_key)',
+	'KEY classification (classification)',
+	'KEY severity (severity)',
+);
+foreach ( $required_index_fragments as $fragment ) {
+	$found = false;
+	foreach ( $GLOBALS['wpecir_schema_queries'] as $query ) {
+		if ( false !== strpos( $query, $fragment ) ) {
+			$found = true;
+			break;
+		}
+	}
+	schema_check( $found, 'critical schema key exists: ' . $fragment );
+}
+
 foreach ( $expected_tables as $table ) {
 	$found = false;
 	foreach ( $GLOBALS['wpecir_schema_queries'] as $query ) {
@@ -112,4 +133,4 @@ $queries_before_noop = count( $GLOBALS['wpecir_schema_queries'] );
 schema_check( true === Schema::maybe_upgrade(), 'matching schema version is a no-op' );
 schema_check( $queries_before_noop === count( $GLOBALS['wpecir_schema_queries'] ), 'matching schema version does not rerun dbDelta' );
 
-echo "Schema installation contract checks passed (mock database only; no live tables changed).\n";
+echo "Schema installation and critical index contracts passed (mock database only; no live tables changed).\n";
