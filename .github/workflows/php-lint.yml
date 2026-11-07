@@ -65,6 +65,7 @@ jobs:
           php tests/php/retention-purge-contract.php
           php tests/php/rest-route-contract.php
           php tests/php/retention-scheduler-contract.php
+          php tests/php/baseline-approval-contract.php
 
       - name: Build and verify installable plugin ZIP
         shell: bash
