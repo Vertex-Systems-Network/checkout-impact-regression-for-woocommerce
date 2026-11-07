@@ -51,8 +51,10 @@ jobs:
       - name: Check admin JavaScript syntax
         run: node --check assets/js/admin.js
 
-      - name: Run pure normalization and diff checks
-        run: php tests/php/normalizer-diff.php
+      - name: Run pure normalization, diff and scenario contract checks
+        run: |
+          php tests/php/normalizer-diff.php
+          php tests/php/scenario-contract.php
 
       - name: Build and verify installable plugin ZIP
         shell: bash
