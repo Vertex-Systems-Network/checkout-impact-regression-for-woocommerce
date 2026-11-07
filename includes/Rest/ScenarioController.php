@@ -142,8 +142,8 @@ final class ScenarioController {
 			if ( ! in_array( $key, $allowed, true ) ) {
 				return new \WP_Error( 'wpecir_invalid_expectation', __( 'An expected field is not supported by this scenario builder version.', 'wpessential-checkout-impact-regression' ), array( 'status' => 400 ) );
 			}
-			if ( in_array( $key, array( 'shipping_cost', 'coupon_discount' ), true ) && ( ! is_numeric( $value ) || (float) $value < 0 ) ) {
-				return new \WP_Error( 'wpecir_invalid_expectation_value', __( 'Expected monetary values must be non-negative numbers.', 'wpessential-checkout-impact-regression' ), array( 'status' => 400 ) );
+			if ( in_array( $key, array( 'shipping_cost', 'coupon_discount' ), true ) && ! self::is_valid_expected_amount( $value ) ) {
+				return new \WP_Error( 'wpecir_invalid_expectation_value', __( 'Expected monetary values must be exact non-negative decimals with at most 6 fractional digits.', 'wpessential-checkout-impact-regression' ), array( 'status' => 400 ) );
 			}
 		}
 		if ( isset( $expectation['coupon_discount'] ) && empty( $expectation['coupon_code'] ) ) {
@@ -151,6 +151,20 @@ final class ScenarioController {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Validate exact, non-negative decimal strings without float conversion.
+	 *
+	 * @param mixed $value Monetary input.
+	 * @return bool
+	 */
+	private static function is_valid_expected_amount( $value ) {
+		if ( ! is_string( $value ) && ! is_int( $value ) ) {
+			return false;
+		}
+
+		return 1 === preg_match( '/^(0|[1-9][0-9]{0,15})(?:\.[0-9]{1,6})?$/', (string) $value );
 	}
 
 	/**
