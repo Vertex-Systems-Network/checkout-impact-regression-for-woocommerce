@@ -67,7 +67,7 @@ $GLOBALS['wpdb'] = new WPECIR_Baseline_Test_WPDB();
 
 require dirname( __DIR__, 2 ) . '/vendor/autoload.php';
 
-use WPEssential\\CheckoutImpactRegression\\Storage\\Repository;
+use WPEssential\CheckoutImpactRegression\Storage\Repository;
 
 function baseline_check( $condition, $message ) {
 	if ( ! $condition ) {
