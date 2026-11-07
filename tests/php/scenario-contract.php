@@ -16,6 +16,7 @@ class WP_Error {
 function is_wp_error( $value ) { return $value instanceof WP_Error; }
 function absint( $value ) { return abs( (int) $value ); }
 function sanitize_text_field( $value ) { return trim( strip_tags( (string) $value ) ); }
+function __( $value, $domain = null ) { return $value; }
 
 require dirname( __DIR__, 2 ) . '/vendor/autoload.php';
 
