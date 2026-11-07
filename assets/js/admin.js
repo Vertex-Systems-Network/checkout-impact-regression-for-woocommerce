@@ -48,6 +48,7 @@
 		const [ saving, setSaving ] = wp.element.useState( false );
 		const [ notice, setNotice ] = wp.element.useState( '' );
 		const [ error, setError ] = wp.element.useState( '' );
+		const [ editingId, setEditingId ] = wp.element.useState( null );
 
 		const refresh = function () {
 			setLoading( true );
@@ -58,6 +59,46 @@
 		};
 
 		wp.element.useEffect( function () { refresh(); }, [] );
+
+		const resetForm = function () {
+			setEditingId( null );
+			setTitle( '' );
+			setCountry( 'DE' );
+			setProductId( '' );
+			setQuantity( '1' );
+			setCurrency( 'EUR' );
+			setShippingMethod( '' );
+			setShippingCost( '' );
+			setCoupon( '' );
+			setExpectedDiscount( '' );
+		};
+
+		const editScenario = function ( id ) {
+			setError( '' );
+			setNotice( '' );
+			wp.apiFetch( { path: '/wpecir/v1/scenarios/' + id } )
+				.then( function ( scenario ) {
+					const version = scenario.latest_version;
+					if ( ! version || ! version.input || ! version.expectation ) {
+						throw new Error( text( 'The latest scenario version could not be loaded.' ) );
+					}
+					const input = version.input;
+					const expected = version.expectation;
+					const item = input.cart && input.cart.items && input.cart.items[ 0 ] ? input.cart.items[ 0 ] : {};
+					setEditingId( Number( scenario.id ) );
+					setTitle( scenario.title || '' );
+					setCountry( input.market && input.market.country ? input.market.country : 'DE' );
+					setProductId( item.product_id ? String( item.product_id ) : '' );
+					setQuantity( item.quantity ? String( item.quantity ) : '1' );
+					setCurrency( input.currency || 'EUR' );
+					setShippingMethod( expected.shipping_method || '' );
+					setShippingCost( expected.shipping_cost !== undefined ? String( expected.shipping_cost ) : '' );
+					setCoupon( expected.coupon_code || '' );
+					setExpectedDiscount( expected.coupon_discount !== undefined ? String( expected.coupon_discount ) : '' );
+					setNotice( text( 'Editing creates a new immutable scenario version.' ) );
+				} )
+				.catch( function ( requestError ) { setError( requestError.message || text( 'Could not load this scenario.' ) ); } );
+		};
 
 		const saveScenario = function ( event ) {
 			event.preventDefault();
@@ -97,13 +138,14 @@
 				currency: currency.trim().toUpperCase(),
 			};
 			wp.apiFetch( {
-				path: '/wpecir/v1/scenarios',
-				method: 'POST',
+				path: editingId ? '/wpecir/v1/scenarios/' + editingId : '/wpecir/v1/scenarios',
+				method: editingId ? 'PUT' : 'POST',
 				data: { title: title.trim(), input: input, expectation: expected },
 			} )
 				.then( function () {
-					setTitle( '' );
-					setNotice( text( 'Scenario saved. Checkout execution is still disabled.' ) );
+					const wasEditing = Boolean( editingId );
+					resetForm();
+					setNotice( wasEditing ? text( 'New scenario version saved. Checkout execution is still disabled.' ) : text( 'Scenario saved. Checkout execution is still disabled.' ) );
 					return refresh();
 				} )
 				.catch( function ( requestError ) { setError( requestError.message || text( 'Could not save this scenario.' ) ); } )
@@ -144,7 +186,7 @@
 			notice ? h( 'div', { className: 'notice notice-success inline', role: 'status', 'aria-live': 'polite' }, h( 'p', null, notice ) ) : null,
 			h( 'div', { className: 'wpecir-workspace' },
 				h( 'section', { className: 'wpecir-panel', 'aria-labelledby': 'wpecir-builder-title' },
-					h( 'div', { className: 'wpecir-panel__heading' }, h( 'p', { className: 'wpecir-card__eyebrow' }, text( 'Scenario setup' ) ), h( 'h2', { id: 'wpecir-builder-title' }, text( 'Create a synthetic scenario' ) ), h( 'p', null, text( 'Use test product IDs and non-customer data. Saving does not visit checkout.' ) ) ),
+					h( 'div', { className: 'wpecir-panel__heading' }, h( 'p', { className: 'wpecir-card__eyebrow' }, text( 'Scenario setup' ) ), h( 'h2', { id: 'wpecir-builder-title' }, editingId ? text( 'Edit a synthetic scenario' ) : text( 'Create a synthetic scenario' ) ), h( 'p', null, text( 'Use test product IDs and non-customer data. Saving does not visit checkout.' ) ) ),
 					h( 'form', { className: 'wpecir-form', onSubmit: saveScenario },
 						h( Field, { id: 'wpecir-title', label: text( 'Scenario name' ), value: title, onChange: setTitle, required: true, maxLength: 191 } ),
 						h( 'div', { className: 'wpecir-form-grid' },
@@ -157,7 +199,8 @@
 						h( Field, { id: 'wpecir-coupon', label: text( 'Coupon code (optional)' ), value: coupon, onChange: setCoupon, maxLength: 100 } ),
 							h( Field, { id: 'wpecir-discount', label: text( 'Expected coupon discount (optional)' ), type: 'number', value: expectedDiscount, onChange: setExpectedDiscount, min: 0 } )
 						),
-						h( 'button', { className: 'button button-primary', type: 'submit', disabled: saving || ! isWooCommerceActive }, saving ? text( 'Saving…' ) : text( 'Save scenario' ) )
+						h( 'button', { className: 'button button-primary', type: 'submit', disabled: saving || ! isWooCommerceActive }, saving ? text( 'Saving…' ) : editingId ? text( 'Save new version' ) : text( 'Save scenario' ) ),
+						editingId ? h( 'button', { className: 'button', type: 'button', onClick: resetForm, disabled: saving }, text( 'Cancel edit' ) ) : null
 					)
 				),
 				h( 'section', { className: 'wpecir-panel', 'aria-labelledby': 'wpecir-list-title' },
@@ -165,7 +208,10 @@
 					loading ? h( 'p', { role: 'status' }, text( 'Loading saved scenarios…' ) ) : scenarios.length ? h( 'ul', { className: 'wpecir-scenario-list' }, scenarios.map( function ( scenario ) {
 						return h( 'li', { className: 'wpecir-scenario-row', key: scenario.id },
 							h( 'div', null, h( 'h3', null, scenario.title ), h( 'p', null, text( 'Updated ' ) + scenario.updated_at + ' · ' + text( 'Status: ' ) + scenario.status ) ),
-							h( 'button', { type: 'button', className: 'button button-link-delete', onClick: function () { removeScenario( scenario.id ); } }, text( 'Delete' ) )
+							h( 'div', { className: 'wpecir-scenario-actions' },
+								h( 'button', { type: 'button', className: 'button', onClick: function () { editScenario( scenario.id ); } }, text( 'Edit' ) ),
+								h( 'button', { type: 'button', className: 'button button-link-delete', onClick: function () { removeScenario( scenario.id ); } }, text( 'Delete' ) )
+							)
 						);
 					} ) ) : h( 'p', { className: 'wpecir-empty' }, text( 'No scenarios saved yet. Create one using synthetic values above.' ) )
 				)
