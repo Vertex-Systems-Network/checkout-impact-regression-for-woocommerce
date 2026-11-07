@@ -281,7 +281,7 @@ Dates remain TBD until the team estimates the work. Record actual start/end date
 
 ### Phase 7 — Plugin implementation and verification
 
-**Status:** In progress (started 2026-11-06). Composer PSR-4, current PHP/JavaScript syntax, pure comparison/scenario contracts and installable artifact packaging pass CI. The shared `/el-test/` site has runtime smoke evidence for the installed v0.2.0 scenario CRUD/version flow; v0.2.1 remains a candidate package and has not been installed there. Runtime migration, privacy, reports, adapters and compatibility/accessibility verification remain open.
+**Status:** In progress (started 2026-11-06). Composer PSR-4, current PHP/JavaScript syntax, pure comparison/scenario contracts and installable artifact packaging pass CI. The shared `/el-test/` site has runtime smoke evidence for the installed v0.2.0 scenario CRUD/version flow; v0.2.1 has now been installed there; a synthetic GB/GBP `7.25` shipping expectation saved and loaded back exactly, then deleted. Runtime migration, privacy, reports, adapters and compatibility/accessibility verification remain open.
 
 **Completed evidence:** Workflow run #107 passed on 2026-11-07 (commit `a2c9087460b1039eea3470c5257bbf6c7520b601`): strict Composer validation, optimized PSR-4 autoload generation, PHP lint, JavaScript syntax, normalizer/diff/scenario contract tests, scenario REST capability allow/deny contract checks, ZIP integrity and artifact upload. Artifact `13575111534` contains v0.2.1 and expires 2026-12-07. Earlier staging smoke evidence applies to the installed v0.2.0 build on `/el-test/` (WordPress 7.1.4 / PHP 8.3.36 / WooCommerce 11.2.2); it does not verify current v0.2.1 source or schema migration.
 
