@@ -50,6 +50,8 @@
 		const [ notice, setNotice ] = wp.element.useState( '' );
 		const [ error, setError ] = wp.element.useState( '' );
 		const [ editingId, setEditingId ] = wp.element.useState( null );
+		const [ historyScenarioId, setHistoryScenarioId ] = wp.element.useState( null );
+		const [ scenarioHistory, setScenarioHistory ] = wp.element.useState( [] );
 
 		const refresh = function () {
 			setLoading( true );
@@ -99,6 +101,20 @@
 					setNotice( text( 'Editing creates a new immutable scenario version.' ) );
 				} )
 				.catch( function ( requestError ) { setError( requestError.message || text( 'Could not load this scenario.' ) ); } );
+		};
+
+		const toggleHistory = function ( id ) {
+			if ( Number( historyScenarioId ) === Number( id ) ) {
+				setHistoryScenarioId( null );
+				setScenarioHistory( [] );
+				return;
+			}
+			setHistoryScenarioId( Number( id ) );
+			setScenarioHistory( [] );
+			setError( '' );
+			wp.apiFetch( { path: '/wpecir/v1/scenarios/' + id + '/versions' } )
+				.then( function ( rows ) { setScenarioHistory( Array.isArray( rows ) ? rows : [] ); } )
+				.catch( function ( requestError ) { setError( requestError.message || text( 'Could not load scenario history.' ) ); } );
 		};
 
 		const saveScenario = function ( event ) {
@@ -212,8 +228,17 @@
 							h( 'div', null, h( 'h3', null, scenario.title ), h( 'p', null, text( 'Updated ' ) + scenario.updated_at + ' · ' + text( 'Status: ' ) + scenario.status ) ),
 							h( 'div', { className: 'wpecir-scenario-actions' },
 								h( 'button', { type: 'button', className: 'button', onClick: function () { editScenario( scenario.id ); } }, text( 'Edit' ) ),
+								h( 'button', { type: 'button', className: 'button', 'aria-expanded': Number( historyScenarioId ) === Number( scenario.id ), onClick: function () { toggleHistory( scenario.id ); } }, Number( historyScenarioId ) === Number( scenario.id ) ? text( 'Hide history' ) : text( 'View history' ) ),
 								h( 'button', { type: 'button', className: 'button button-link-delete', onClick: function () { removeScenario( scenario.id ); } }, text( 'Delete' ) )
-							)
+							),
+							Number( historyScenarioId ) === Number( scenario.id ) ? h( 'div', { className: 'wpecir-version-history', 'aria-live': 'polite' },
+								h( 'h4', null, text( 'Saved versions' ) ),
+								scenarioHistory.length ? h( 'ol', null, scenarioHistory.map( function ( version ) {
+									const expectation = version.expectation || {};
+									const summary = [ expectation.shipping_method, expectation.shipping_cost !== undefined ? text( 'Shipping: ' ) + expectation.shipping_cost : '', expectation.coupon_code ? text( 'Coupon: ' ) + expectation.coupon_code : '', expectation.coupon_discount !== undefined ? text( 'Discount: ' ) + expectation.coupon_discount : '' ].filter( Boolean ).join( ' · ' );
+									return h( 'li', { key: version.id }, h( 'strong', null, text( 'Version ' ) + version.version ), ' · ' + version.created_at, summary ? h( 'p', null, summary ) : null );
+								} ) ) : h( 'p', null, text( 'No saved versions were returned.' ) )
+							) : null
 						);
 					} ) ) : h( 'p', { className: 'wpecir-empty' }, text( 'No scenarios saved yet. Create one using synthetic values above.' ) )
 				)
