@@ -49,19 +49,19 @@ final class ScenarioController {
 			'/scenarios/(?P<id>\\d+)',
 			array(
 				array(
-					'method'              => \\WP_REST_Server::READABLE,
+					'method'              => \WP_REST_Server::READABLE,
 					'callback'            => array( __CLASS__, 'get_scenario' ),
 					'permission_callback' => array( __CLASS__, 'permissions_check' ),
 					'args'                => array( 'id' => array( 'sanitize_callback' => 'absint' ) ),
 				),
 				array(
-					'method'              => \\WP_REST_Server::EDITABLE,
+					'method'              => \WP_REST_Server::EDITABLE,
 					'callback'            => array( __CLASS__, 'update_scenario' ),
 					'permission_callback' => array( __CLASS__, 'permissions_check' ),
 					'args'                => array( 'id' => array( 'sanitize_callback' => 'absint' ) ),
 				),
 				array(
-					'method'              => \\WP_REST_Server::DELETABLE,
+					'method'              => \WP_REST_Server::DELETABLE,
 					'callback'            => array( __CLASS__, 'delete_scenario' ),
 					'permission_callback' => array( __CLASS__, 'permissions_check' ),
 					'args'                => array( 'id' => array( 'sanitize_callback' => 'absint' ) ),
@@ -156,8 +156,8 @@ final class ScenarioController {
 	/**
 	 * Return one scenario with its latest immutable version.
 	 *
-	 * @param \\WP_REST_Request $request Request.
-	 * @return array|\\WP_Error
+	 * @param \WP_REST_Request $request Request.
+	 * @return array|\WP_Error
 	 */
 	public static function get_scenario( $request ) {
 		$result = ( new Repository() )->get_scenario( $request->get_param( 'id' ) );
@@ -167,15 +167,15 @@ final class ScenarioController {
 	/**
 	 * Append a new immutable version to an existing scenario.
 	 *
-	 * @param \\WP_REST_Request $request Request.
-	 * @return array|\\WP_Error
+	 * @param \WP_REST_Request $request Request.
+	 * @return array|\WP_Error
 	 */
 	public static function update_scenario( $request ) {
 		$title       = $request->get_param( 'title' );
 		$input       = $request->get_param( 'input' );
 		$expectation = $request->get_param( 'expectation' );
 		if ( ! is_array( $input ) || ! is_array( $expectation ) ) {
-			return new \\WP_Error( 'wpecir_invalid_scenario', __( 'Scenario inputs and expectations must be structured values.', 'wpessential-checkout-impact-regression' ), array( 'status' => 400 ) );
+			return new \WP_Error( 'wpecir_invalid_scenario', __( 'Scenario inputs and expectations must be structured values.', 'wpessential-checkout-impact-regression' ), array( 'status' => 400 ) );
 		}
 
 		$validation = self::validate_scenario( $title, $input, $expectation );
