@@ -2,7 +2,7 @@
 /**
  * Plugin Name: WPEssential Checkout Impact Regression
  * Description: Development scaffold for future checkout scenario comparisons; automatic checkout requests are disabled.
- * Version: 0.2.0
+ * Version: 0.2.1
  * Text Domain: wpessential-checkout-impact-regression
  */
 
@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'WPECIR_VERSION', '0.2.0' );
+define( 'WPECIR_VERSION', '0.2.1' );
 define( 'WPECIR_FILE', __FILE__ );
 define( 'WPECIR_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WPECIR_URL', plugin_dir_url( __FILE__ ) );
