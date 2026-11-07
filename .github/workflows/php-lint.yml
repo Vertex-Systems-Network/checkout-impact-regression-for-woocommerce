@@ -62,6 +62,7 @@ jobs:
           php tests/php/change-event-contract.php
           php tests/php/uninstall-contract.php preserve
           php tests/php/uninstall-contract.php erase
+          php tests/php/retention-purge-contract.php
 
       - name: Build and verify installable plugin ZIP
         shell: bash
