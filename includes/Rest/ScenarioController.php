@@ -127,20 +127,27 @@ final class ScenarioController {
 	 * @return true|\WP_Error
 	 */
 	private static function validate_scenario( $title, $input, $expectation ) {
-		$country  = isset( $input['market']['country'] ) ? strtoupper( sanitize_text_field( $input['market']['country'] ) ) : '';
-		$currency = isset( $input['currency'] ) ? strtoupper( sanitize_text_field( $input['currency'] ) ) : '';
-		$items    = isset( $input['cart']['items'] ) ? $input['cart']['items'] : array();
+		$market  = isset( $input['market'] ) && is_array( $input['market'] ) ? $input['market'] : array();
+		$country = isset( $market['country'] ) && is_string( $market['country'] ) ? strtoupper( sanitize_text_field( $market['country'] ) ) : '';
+		$currency= isset( $input['currency'] ) && is_string( $input['currency'] ) ? strtoupper( sanitize_text_field( $input['currency'] ) ) : '';
+		$cart    = isset( $input['cart'] ) && is_array( $input['cart'] ) ? $input['cart'] : array();
+		$items   = isset( $cart['items'] ) ? $cart['items'] : array();
 		if ( ! is_string( $title ) || '' === trim( $title ) || ! preg_match( '/^[A-Z]{2}$/', $country ) || ! preg_match( '/^[A-Z]{3}$/', $currency ) || ! is_array( $items ) || 1 !== count( $items ) ) {
 			return new \WP_Error( 'wpecir_invalid_scenario', __( 'Enter a name, two-letter country, three-letter currency, and one synthetic cart item.', 'wpessential-checkout-impact-regression' ), array( 'status' => 400 ) );
 		}
+
 		$item = reset( $items );
-		if ( ! is_array( $item ) || empty( $item['product_id'] ) || absint( $item['product_id'] ) < 1 || empty( $item['quantity'] ) || absint( $item['quantity'] ) < 1 || absint( $item['quantity'] ) > 100 ) {
+		if ( ! is_array( $item ) || ! self::is_positive_integer( isset( $item['product_id'] ) ? $item['product_id'] : null ) || ! self::is_positive_integer( isset( $item['quantity'] ) ? $item['quantity'] : null ) || absint( $item['quantity'] ) > 100 ) {
 			return new \WP_Error( 'wpecir_invalid_cart_item', __( 'Use a valid test product ID and a quantity from 1 to 100.', 'wpessential-checkout-impact-regression' ), array( 'status' => 400 ) );
 		}
+
 		$allowed = array( 'shipping_method', 'shipping_cost', 'coupon_code', 'coupon_discount' );
 		foreach ( $expectation as $key => $value ) {
 			if ( ! in_array( $key, $allowed, true ) ) {
 				return new \WP_Error( 'wpecir_invalid_expectation', __( 'An expected field is not supported by this scenario builder version.', 'wpessential-checkout-impact-regression' ), array( 'status' => 400 ) );
+			}
+			if ( in_array( $key, array( 'shipping_method', 'coupon_code' ), true ) && ( ! is_string( $value ) || '' === trim( $value ) ) ) {
+				return new \WP_Error( 'wpecir_invalid_expectation_value', __( 'Expected method and coupon values must be non-empty text.', 'wpessential-checkout-impact-regression' ), array( 'status' => 400 ) );
 			}
 			if ( in_array( $key, array( 'shipping_cost', 'coupon_discount' ), true ) && ! self::is_valid_expected_amount( $value ) ) {
 				return new \WP_Error( 'wpecir_invalid_expectation_value', __( 'Expected monetary values must be exact non-negative decimals with at most 6 fractional digits.', 'wpessential-checkout-impact-regression' ), array( 'status' => 400 ) );
@@ -151,6 +158,24 @@ final class ScenarioController {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Validate a positive integer without coercing arrays, floats, or booleans.
+	 *
+	 * @param mixed $value Candidate integer.
+	 * @return bool
+	 */
+	private static function is_positive_integer( $value ) {
+		if ( is_int( $value ) ) {
+			return $value > 0;
+		}
+
+		if ( ! is_string( $value ) || ! preg_match( '/^[1-9][0-9]*$/', $value ) ) {
+			return false;
+		}
+
+		return false !== filter_var( $value, FILTER_VALIDATE_INT, array( 'options' => array( 'min_range' => 1 ) ) );
 	}
 
 	/**
