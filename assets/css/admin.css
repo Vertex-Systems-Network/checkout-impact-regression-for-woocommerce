@@ -324,3 +324,19 @@
 		padding: 16px;
 	}
 }
+
+.wpecir-scenario-actions {
+	display: flex;
+	flex: 0 0 auto;
+	gap: 8px;
+}
+
+@media (max-width: 782px) {
+	.wpecir-scenario-row {
+		align-items: flex-start;
+	}
+
+	.wpecir-scenario-actions {
+		flex-direction: column;
+	}
+}
