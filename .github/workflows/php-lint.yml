@@ -59,6 +59,7 @@ jobs:
           php tests/php/privacy-contract.php
           php tests/php/payload-privacy-contract.php
           php tests/php/schema-contract.php
+          php tests/php/change-event-contract.php
 
       - name: Build and verify installable plugin ZIP
         shell: bash
