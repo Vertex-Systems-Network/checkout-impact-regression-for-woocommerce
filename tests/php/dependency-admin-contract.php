@@ -61,7 +61,7 @@ dependency_check( false !== strpos( $output, 'notice-error' ) && false !== strpo
 // Load the real Composer PSR-4 loader and exercise the admin capability fallback.
 require dirname( __DIR__, 2 ) . '/vendor/autoload.php';
 
-$admin = new \\WPEssential\\CheckoutImpactRegression\\Admin\\AdminPage();
+$admin = new \WPEssential\CheckoutImpactRegression\Admin\AdminPage();
 $admin->register_hooks();
 $admin->register_menu();
 $menu = end( $GLOBALS['wpecir_dependency_menus'] );
@@ -74,7 +74,7 @@ dependency_check( false !== strpos( $page, 'aria-live="polite"' ) && false !== s
 
 $admin->enqueue_assets( 'toplevel_page_unrelated' );
 dependency_check( empty( $GLOBALS['wpecir_dependency_styles'] ) && empty( $GLOBALS['wpecir_dependency_scripts'] ), 'plugin assets are not enqueued on unrelated admin pages' );
-$admin->enqueue_assets( 'toplevel_page_' . \\WPEssential\\CheckoutImpactRegression\\Admin\\AdminPage::PAGE_SLUG );
+$admin->enqueue_assets( 'toplevel_page_' . \WPEssential\CheckoutImpactRegression\Admin\AdminPage::PAGE_SLUG );
 dependency_check( 1 === count( $GLOBALS['wpecir_dependency_styles'] ) && 1 === count( $GLOBALS['wpecir_dependency_scripts'] ), 'plugin assets are enqueued on the plugin page' );
 $localized = end( $GLOBALS['wpecir_dependency_localized'] );
 dependency_check( false === $localized[2]['woocommerceActive'], 'admin bootstrap explicitly reports missing WooCommerce' );
