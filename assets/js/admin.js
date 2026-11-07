@@ -24,6 +24,7 @@
 				required: Boolean( props.required ),
 				min: props.min,
 				maxLength: props.maxLength,
+				step: props.step,
 				onChange: function ( event ) { props.onChange( event.target.value ); },
 				'aria-describedby': props.help ? props.id + '-help' : undefined,
 				id: props.id,
@@ -107,28 +108,29 @@
 			setNotice( '' );
 
 			const expected = {};
+			const isValidMoney = function ( value ) {
+				return /^(0|[1-9][0-9]{0,15})(?:\.[0-9]{1,6})?$/.test( String( value ).trim() );
+			};
 			if ( shippingMethod.trim() ) {
 				expected.shipping_method = shippingMethod.trim();
 			}
 			if ( shippingCost !== '' ) {
-				const amount = Number( shippingCost );
-				if ( ! Number.isFinite( amount ) || amount < 0 ) {
+				if ( ! isValidMoney( shippingCost ) ) {
 					setError( text( 'Enter a valid non-negative shipping amount.' ) );
 					setSaving( false );
 					return;
 				}
-				expected.shipping_cost = amount;
+				expected.shipping_cost = shippingCost.trim();
 			}
 			if ( coupon.trim() ) {
 				expected.coupon_code = coupon.trim();
 				if ( expectedDiscount !== '' ) {
-					const discount = Number( expectedDiscount );
-					if ( ! Number.isFinite( discount ) || discount < 0 ) {
+					if ( ! isValidMoney( expectedDiscount ) ) {
 						setError( text( 'Enter a valid non-negative coupon discount.' ) );
 						setSaving( false );
 						return;
 					}
-					expected.coupon_discount = discount;
+					expected.coupon_discount = expectedDiscount.trim();
 				}
 			}
 
@@ -195,9 +197,9 @@
 							h( Field, { id: 'wpecir-product', label: text( 'Test product ID' ), type: 'number', value: productId, onChange: setProductId, required: true, min: 1 } ),
 							h( Field, { id: 'wpecir-quantity', label: text( 'Quantity' ), type: 'number', value: quantity, onChange: setQuantity, required: true, min: 1 } ),
 							h( Field, { id: 'wpecir-shipping-method', label: text( 'Expected shipping method (optional)' ), value: shippingMethod, onChange: setShippingMethod, maxLength: 100 } ),
-							h( Field, { id: 'wpecir-shipping-cost', label: text( 'Expected shipping cost (optional)' ), type: 'number', value: shippingCost, onChange: setShippingCost, min: 0 } ),
+							h( Field, { id: 'wpecir-shipping-cost', label: text( 'Expected shipping cost (optional)' ), type: 'number', step: 'any', value: shippingCost, onChange: setShippingCost, min: 0 } ),
 						h( Field, { id: 'wpecir-coupon', label: text( 'Coupon code (optional)' ), value: coupon, onChange: setCoupon, maxLength: 100 } ),
-							h( Field, { id: 'wpecir-discount', label: text( 'Expected coupon discount (optional)' ), type: 'number', value: expectedDiscount, onChange: setExpectedDiscount, min: 0 } )
+							h( Field, { id: 'wpecir-discount', label: text( 'Expected coupon discount (optional)' ), type: 'number', step: 'any', value: expectedDiscount, onChange: setExpectedDiscount, min: 0 } )
 						),
 						h( 'button', { className: 'button button-primary', type: 'submit', disabled: saving || ! isWooCommerceActive }, saving ? text( 'Saving…' ) : editingId ? text( 'Save new version' ) : text( 'Save scenario' ) ),
 						editingId ? h( 'button', { className: 'button', type: 'button', onClick: resetForm, disabled: saving }, text( 'Cancel edit' ) ) : null
