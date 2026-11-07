@@ -2,7 +2,7 @@
 /**
  * Tests the REST scenario payload and authorization contracts without WordPress.
  *
- * @package WPEssential\\CheckoutImpactRegression
+ * @package WPEssential\CheckoutImpactRegression
  */
 
 define( 'ABSPATH', __DIR__ . '/' );
@@ -22,7 +22,7 @@ function current_user_can( $capability ) { return in_array( $capability, $GLOBAL
 
 require dirname( __DIR__, 2 ) . '/vendor/autoload.php';
 
-use WPEssential\\CheckoutImpactRegression\\Rest\\ScenarioController;
+use WPEssential\CheckoutImpactRegression\Rest\ScenarioController;
 
 function check_contract( $condition, $message ) {
 	if ( ! $condition ) {
@@ -61,4 +61,4 @@ check_contract( true === ScenarioController::permissions_check(), 'WooCommerce m
 $GLOBALS['wpecir_test_capabilities'] = array( 'manage_options' );
 check_contract( true === ScenarioController::permissions_check(), 'WordPress administrators can access scenario endpoints' );
 
-echo "Scenario payload and authorization contract checks passed.\\n";
+echo "Scenario payload and authorization contract checks passed.\n";
