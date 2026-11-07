@@ -290,6 +290,7 @@
 
 .wpecir-scenario-row {
 	align-items: flex-start;
+	flex-wrap: wrap;
 	border-top: 1px solid var(--wpecir-border);
 	display: flex;
 	gap: 12px;
@@ -323,6 +324,33 @@
 	.wpecir-panel {
 		padding: 16px;
 	}
+}
+
+
+.wpecir-version-history {
+	background: var(--wpecir-subtle);
+	border: 1px solid var(--wpecir-border);
+	border-radius: 4px;
+	flex-basis: 100%;
+	padding: 12px 14px;
+}
+
+.wpecir-version-history h4 {
+	font-size: 13px;
+	margin: 0 0 8px;
+}
+
+.wpecir-version-history ol {
+	margin: 0;
+	padding-left: 22px;
+}
+
+.wpecir-version-history li + li {
+	margin-top: 8px;
+}
+
+.wpecir-version-history p {
+	margin-top: 3px;
 }
 
 .wpecir-scenario-actions {
