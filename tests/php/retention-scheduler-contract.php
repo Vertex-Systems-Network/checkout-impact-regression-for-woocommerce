@@ -4,7 +4,7 @@
  *
  * WordPress Cron functions are in-memory doubles; no real cron event is scheduled.
  *
- * @package WPEssential\\CheckoutImpactRegression
+ * @package WPEssential\CheckoutImpactRegression
  */
 
 define( 'ABSPATH', __DIR__ . '/fixtures/' );
@@ -41,7 +41,7 @@ function wp_unschedule_event( $timestamp, $hook ) {
 
 require dirname( __DIR__, 2 ) . '/vendor/autoload.php';
 
-use WPEssential\\CheckoutImpactRegression\\Storage\\RetentionScheduler;
+use WPEssential\CheckoutImpactRegression\Storage\RetentionScheduler;
 
 function cron_check( $condition, $message ) {
 	if ( ! $condition ) {
