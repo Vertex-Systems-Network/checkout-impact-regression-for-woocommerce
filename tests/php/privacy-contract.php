@@ -95,8 +95,9 @@ privacy_check( 'wp_wpecir_scenarios' === $GLOBALS['wpdb']->updates[0]['table'], 
 privacy_check( 'wp_wpecir_scenario_versions' === $GLOBALS['wpdb']->updates[1]['table'], 'version table is updated' );
 privacy_check( 'wp_wpecir_baselines' === $GLOBALS['wpdb']->updates[2]['table'], 'baseline table is updated' );
 foreach ( $GLOBALS['wpdb']->updates as $update ) {
-	privacy_check( 0 === $update['data']['created_by'] || 0 === $update['data']['approved_by'], 'eraser anonymizes the author/approver ID' );
-	privacy_check( 37 === $update['where']['created_by'] || 37 === $update['where']['approved_by'], 'eraser scopes update to the resolved user ID' );
+	$id_key = isset( $update['data']['created_by'] ) ? 'created_by' : 'approved_by';
+	privacy_check( 0 === $update['data'][ $id_key ], 'eraser anonymizes the author/approver ID' );
+	privacy_check( 37 === $update['where'][ $id_key ], 'eraser scopes update to the resolved user ID' );
 }
 privacy_check( false === $erase['items_removed'] && true === $erase['items_retained'] && true === $erase['done'], 'eraser reports anonymization with history retention, not deletion' );
 
