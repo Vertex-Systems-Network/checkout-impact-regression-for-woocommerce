@@ -46,12 +46,26 @@ final class ScenarioController {
 		);
 		register_rest_route(
 			self::REST_NAMESPACE,
-			'/scenarios/(?P<id>\d+)',
+			'/scenarios/(?P<id>\\d+)',
 			array(
-				'method'             => \WP_REST_Server::DELETABLE,
-				'callback'           => array( __CLASS__, 'delete_scenario' ),
-				'permission_callback'=> array( __CLASS__, 'permissions_check' ),
-				'args'               => array( 'id' => array( 'sanitize_callback' => 'absint' ) ),
+				array(
+					'method'              => \\WP_REST_Server::READABLE,
+					'callback'            => array( __CLASS__, 'get_scenario' ),
+					'permission_callback' => array( __CLASS__, 'permissions_check' ),
+					'args'                => array( 'id' => array( 'sanitize_callback' => 'absint' ) ),
+				),
+				array(
+					'method'              => \\WP_REST_Server::EDITABLE,
+					'callback'            => array( __CLASS__, 'update_scenario' ),
+					'permission_callback' => array( __CLASS__, 'permissions_check' ),
+					'args'                => array( 'id' => array( 'sanitize_callback' => 'absint' ) ),
+				),
+				array(
+					'method'              => \\WP_REST_Server::DELETABLE,
+					'callback'            => array( __CLASS__, 'delete_scenario' ),
+					'permission_callback' => array( __CLASS__, 'permissions_check' ),
+					'args'                => array( 'id' => array( 'sanitize_callback' => 'absint' ) ),
+				),
 			)
 		);
 	}
@@ -137,6 +151,40 @@ final class ScenarioController {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Return one scenario with its latest immutable version.
+	 *
+	 * @param \\WP_REST_Request $request Request.
+	 * @return array|\\WP_Error
+	 */
+	public static function get_scenario( $request ) {
+		$result = ( new Repository() )->get_scenario( $request->get_param( 'id' ) );
+		return is_wp_error( $result ) ? $result : rest_ensure_response( $result );
+	}
+
+	/**
+	 * Append a new immutable version to an existing scenario.
+	 *
+	 * @param \\WP_REST_Request $request Request.
+	 * @return array|\\WP_Error
+	 */
+	public static function update_scenario( $request ) {
+		$title       = $request->get_param( 'title' );
+		$input       = $request->get_param( 'input' );
+		$expectation = $request->get_param( 'expectation' );
+		if ( ! is_array( $input ) || ! is_array( $expectation ) ) {
+			return new \\WP_Error( 'wpecir_invalid_scenario', __( 'Scenario inputs and expectations must be structured values.', 'wpessential-checkout-impact-regression' ), array( 'status' => 400 ) );
+		}
+
+		$validation = self::validate_scenario( $title, $input, $expectation );
+		if ( is_wp_error( $validation ) ) {
+			return $validation;
+		}
+
+		$result = ( new Repository() )->add_scenario_version( $request->get_param( 'id' ), $input, $expectation, $title );
+		return is_wp_error( $result ) ? $result : rest_ensure_response( $result );
 	}
 
 	/**
