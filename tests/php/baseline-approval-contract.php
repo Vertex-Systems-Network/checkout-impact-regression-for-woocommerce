@@ -37,6 +37,7 @@ class WPECIR_Baseline_Test_WPDB {
 	public $inserts = array();
 	public $queries = 0;
 	public $insert_result = 1;
+	public $rows = array();
 
 	public function prepare( $query, ...$args ) {
 		$this->prepared[] = array( $query, $args );
@@ -46,6 +47,11 @@ class WPECIR_Baseline_Test_WPDB {
 	public function get_row( $prepared ) {
 		$this->queries++;
 		return $this->version_row;
+	}
+
+	public function get_results( $prepared, $output = null ) {
+		$this->queries++;
+		return $this->rows;
 	}
 
 	public function get_var( $prepared ) {
@@ -88,8 +94,26 @@ $result = $repository->approve_baseline( 11, 22, $observation, $context );
 baseline_check( is_wp_error( $result ) && 'wpecir_forbidden' === $result->get_error_code(), 'unauthorized baseline approval is denied' );
 baseline_check( 0 === $GLOBALS['wpdb']->queries && empty( $GLOBALS['wpdb']->inserts ), 'unauthorized approval performs no database query or write' );
 
+$result = $repository->list_baselines( 11 );
+baseline_check( is_wp_error( $result ) && 'wpecir_forbidden' === $result->get_error_code(), 'unauthorized baseline history is denied' );
+baseline_check( 0 === $GLOBALS['wpdb']->queries && empty( $GLOBALS['wpdb']->inserts ), 'unauthorized history performs no database query or write' );
+
 // Authorized approval still requires a version belonging to the selected scenario.
 $GLOBALS['wpecir_baseline_capabilities'] = array( 'manage_woocommerce' );
+$GLOBALS['wpdb']->rows = array(
+	array( 'id' => 9, 'revision' => 2, 'observation_json' => '{"shipping":{"cost":"6.00"}}' ),
+	array( 'id' => 8, 'revision' => 1, 'observation_json' => '{"shipping":{"cost":"5.00"}}' ),
+);
+$writes_before_history = count( $GLOBALS['wpdb']->inserts );
+$history = $repository->list_baselines( 11 );
+baseline_check( is_array( $history ) && 2 === count( $history ), 'authorized user can read baseline revisions' );
+baseline_check( 2 === $history[0]['revision'] && 1 === $history[1]['revision'], 'history preserves newest-first revision order' );
+baseline_check( array( 'shipping' => array( 'cost' => '6.00' ) ) === $history[0]['observation'], 'stored observation JSON is decoded for the report view' );
+baseline_check( ! isset( $history[0]['observation_json'] ), 'raw storage JSON is not exposed in the returned record' );
+baseline_check( $writes_before_history === count( $GLOBALS['wpdb']->inserts ), 'reading baseline history performs no database write' );
+$history_query = end( $GLOBALS['wpdb']->prepared );
+baseline_check( false !== strpos( $history_query[0], 'FROM wp_wpecir_baselines' ) && false !== strpos( $history_query[0], 'ORDER BY revision DESC' ), 'history query is scoped to the plugin baseline table and ordered by revision' );
+baseline_check( array( 11 ) === $history_query[1], 'history query is scoped to the requested scenario ID' );
 $GLOBALS['wpdb']->version_row = null;
 $result = $repository->approve_baseline( 11, 22, $observation, $context );
 baseline_check( is_wp_error( $result ) && 'wpecir_version_not_found' === $result->get_error_code(), 'approval rejects a version that is not linked to the scenario' );
