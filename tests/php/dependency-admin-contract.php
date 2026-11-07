@@ -22,6 +22,7 @@ function plugin_dir_url( $file ) { return 'https://example.test/plugins/wpecir/'
 function add_action( $hook, $callback ) { $GLOBALS['wpecir_dependency_hooks'][ $hook ][] = $callback; }
 function __( $message, $domain = '' ) { return $message; }
 function esc_html( $value ) { return htmlspecialchars( $value, ENT_QUOTES, 'UTF-8' ); }
+function esc_html__( $value, $domain = '' ) { return esc_html( $value ); }
 function current_user_can( $capability ) { return in_array( $capability, $GLOBALS['wpecir_dependency_capabilities'], true ); }
 function register_activation_hook( $file, $callback ) { $GLOBALS['wpecir_dependency_activation_hooks'][] = array( 'activation', $file, $callback ); }
 function register_deactivation_hook( $file, $callback ) { $GLOBALS['wpecir_dependency_activation_hooks'][] = array( 'deactivation', $file, $callback ); }
