@@ -30,7 +30,7 @@ final class ScenarioController {
 			'/scenarios',
 			array(
 				array(
-					'method'             => \WP_REST_Server::READABLE,
+					'methods'             => \WP_REST_Server::READABLE,
 					'callback'           => array( __CLASS__, 'list_scenarios' ),
 					'permission_callback'=> array( __CLASS__, 'permissions_check' ),
 					'args'               => array(
@@ -38,7 +38,7 @@ final class ScenarioController {
 					),
 				),
 				array(
-					'method'             => \WP_REST_Server::CREATABLE,
+					'methods'             => \WP_REST_Server::CREATABLE,
 					'callback'           => array( __CLASS__, 'create_scenario' ),
 					'permission_callback'=> array( __CLASS__, 'permissions_check' ),
 				),
@@ -49,19 +49,19 @@ final class ScenarioController {
 			'/scenarios/(?P<id>\\d+)',
 			array(
 				array(
-					'method'              => \WP_REST_Server::READABLE,
+					'methods'              => \WP_REST_Server::READABLE,
 					'callback'            => array( __CLASS__, 'get_scenario' ),
 					'permission_callback' => array( __CLASS__, 'permissions_check' ),
 					'args'                => array( 'id' => array( 'sanitize_callback' => 'absint' ) ),
 				),
 				array(
-					'method'              => \WP_REST_Server::EDITABLE,
+					'methods'              => \WP_REST_Server::EDITABLE,
 					'callback'            => array( __CLASS__, 'update_scenario' ),
 					'permission_callback' => array( __CLASS__, 'permissions_check' ),
 					'args'                => array( 'id' => array( 'sanitize_callback' => 'absint' ) ),
 				),
 				array(
-					'method'              => \WP_REST_Server::DELETABLE,
+					'methods'              => \WP_REST_Server::DELETABLE,
 					'callback'            => array( __CLASS__, 'delete_scenario' ),
 					'permission_callback' => array( __CLASS__, 'permissions_check' ),
 					'args'                => array( 'id' => array( 'sanitize_callback' => 'absint' ) ),
