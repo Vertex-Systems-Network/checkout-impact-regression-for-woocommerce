@@ -1,15 +1,16 @@
-name: PHP lint
+name: Plugin CI and installable build
 
 on:
   push:
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  php-lint:
-    name: Composer autoload and PHP syntax
+  build:
+    name: Validate, test and package plugin
     runs-on: ubuntu-latest
     steps:
       - name: Check out source
@@ -22,6 +23,18 @@ jobs:
           tools: composer:v2
           coverage: none
 
+      - name: Read and validate plugin version
+        id: plugin
+        shell: bash
+        run: |
+          version="$(sed -n 's/^ \* Version: *//p' wpessential-checkout-impact-regression.php | head -n 1 | tr -d '\r')"
+          if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+([-.][0-9A-Za-z.-]+)?$ ]]; then
+            echo "Could not read a valid plugin version from the main plugin header."
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "Building plugin version $version"
+
       - name: Validate Composer configuration
         run: composer validate --strict
 
@@ -33,7 +46,7 @@ jobs:
         run: |
           while IFS= read -r -d '' file; do
             php -l "$file"
-          done < <(find . -type f -name '*.php' -not -path './.git/*' -print0)
+          done < <(find . -type f -name '*.php' -not -path './.git/*' -not -path './dist/*' -print0)
 
       - name: Check admin JavaScript syntax
         run: node --check assets/js/admin.js
@@ -41,21 +54,41 @@ jobs:
       - name: Run pure normalization and diff checks
         run: php tests/php/normalizer-diff.php
 
-      - name: Build installable plugin ZIP with Composer vendor files
+      - name: Build and verify installable plugin ZIP
         shell: bash
+        env:
+          PLUGIN_VERSION: ${{ steps.plugin.outputs.version }}
         run: |
-          package_dir="dist/wpessential-checkout-impact-regression"
+          slug="wpessential-checkout-impact-regression"
+          package_dir="dist/$slug"
+          zip_path="dist/$slug-${PLUGIN_VERSION}.zip"
+
+          rm -rf "$package_dir"
           mkdir -p "$package_dir"
           cp -R wpessential-checkout-impact-regression.php uninstall.php assets includes vendor "$package_dir/"
+
+          test -f "$package_dir/vendor/autoload.php"
+          test -f "$package_dir/wpessential-checkout-impact-regression.php"
+
           (
             cd dist
-            zip -qr wpessential-checkout-impact-regression-0.2.0.zip wpessential-checkout-impact-regression
-            unzip -t wpessential-checkout-impact-regression-0.2.0.zip
+            zip -qr "$(basename "$zip_path")" "$slug"
+            unzip -t "$(basename "$zip_path")"
+            unzip -Z1 "$(basename "$zip_path")" | grep -qx "$slug/wpessential-checkout-impact-regression.php"
+            unzip -Z1 "$(basename "$zip_path")" | grep -qx "$slug/vendor/autoload.php"
+            sha256sum "$(basename "$zip_path")" > "$(basename "$zip_path").sha256"
           )
 
-      - name: Upload installable plugin ZIP
+          rm -rf "$package_dir"
+          echo "Install this ZIP from WordPress Admin → Plugins → Add Plugin → Upload Plugin."
+          ls -lh "$zip_path" "$zip_path.sha256"
+
+      - name: Upload downloadable install package
         uses: actions/upload-artifact@v4
         with:
-          name: wpessential-checkout-impact-regression-0.2.0
-          path: dist/wpessential-checkout-impact-regression-0.2.0.zip
+          name: installable-plugin-v${{ steps.plugin.outputs.version }}
+          path: |
+            dist/wpessential-checkout-impact-regression-${{ steps.plugin.outputs.version }}.zip
+            dist/wpessential-checkout-impact-regression-${{ steps.plugin.outputs.version }}.zip.sha256
           if-no-files-found: error
+          retention-days: 30
