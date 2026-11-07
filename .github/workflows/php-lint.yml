@@ -64,6 +64,7 @@ jobs:
           php tests/php/uninstall-contract.php erase
           php tests/php/retention-purge-contract.php
           php tests/php/rest-route-contract.php
+          php tests/php/retention-scheduler-contract.php
 
       - name: Build and verify installable plugin ZIP
         shell: bash
