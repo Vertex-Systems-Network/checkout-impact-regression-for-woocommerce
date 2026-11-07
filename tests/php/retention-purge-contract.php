@@ -4,7 +4,7 @@
  *
  * Uses a synthetic wpdb double; no WordPress database is touched.
  *
- * @package WPEssential\\CheckoutImpactRegression
+ * @package WPEssential\CheckoutImpactRegression
  */
 
 define( 'ABSPATH', __DIR__ . '/fixtures/' );
@@ -44,7 +44,7 @@ $GLOBALS['wpdb'] = new WPECIR_Retention_Test_WPDB();
 
 require dirname( __DIR__, 2 ) . '/vendor/autoload.php';
 
-use WPEssential\\CheckoutImpactRegression\\Storage\\Repository;
+use WPEssential\CheckoutImpactRegression\Storage\Repository;
 
 function retention_check( $condition, $message ) {
 	if ( ! $condition ) {
