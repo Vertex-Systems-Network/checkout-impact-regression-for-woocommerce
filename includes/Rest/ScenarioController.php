@@ -68,6 +68,18 @@ final class ScenarioController {
 				),
 			)
 		);
+		register_rest_route(
+			self::REST_NAMESPACE,
+			'/scenarios/(?P<id>\\d+)/versions',
+			array(
+				array(
+					'methods'              => \WP_REST_Server::READABLE,
+					'callback'            => array( __CLASS__, 'list_scenario_versions' ),
+					'permission_callback' => array( __CLASS__, 'permissions_check' ),
+					'args'                 => array( 'id' => array( 'sanitize_callback' => 'absint' ) ),
+				),
+			)
+		);
 	}
 
 	/**
@@ -190,6 +202,17 @@ final class ScenarioController {
 		}
 
 		return 1 === preg_match( '/^(0|[1-9][0-9]{0,15})(?:\.[0-9]{1,6})?$/', (string) $value );
+	}
+
+	/**
+	 * Return immutable version history for one scenario.
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return array|\WP_Error
+	 */
+	public static function list_scenario_versions( $request ) {
+		$versions = ( new Repository() )->list_scenario_versions( $request->get_param( 'id' ) );
+		return is_wp_error( $versions ) ? $versions : rest_ensure_response( $versions );
 	}
 
 	/**
