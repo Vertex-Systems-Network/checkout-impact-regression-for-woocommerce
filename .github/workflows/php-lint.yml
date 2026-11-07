@@ -58,6 +58,7 @@ jobs:
           php tests/php/multilingual-context-dry-run.php
           php tests/php/privacy-contract.php
           php tests/php/payload-privacy-contract.php
+          php tests/php/schema-contract.php
 
       - name: Build and verify installable plugin ZIP
         shell: bash
