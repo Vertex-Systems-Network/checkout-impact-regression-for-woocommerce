@@ -33,10 +33,12 @@ function route_check( $condition, $message ) {
 
 ScenarioController::register_routes();
 $routes = $GLOBALS['wpecir_registered_routes'];
-route_check( 2 === count( $routes ), 'only scenario collection and item routes are registered' );
+route_check( 3 === count( $routes ), 'only scenario collection, item, and history routes are registered' );
 route_check( 'wpecir/v1' === $routes[0][0] && '/scenarios' === $routes[0][1], 'scenario collection route uses the expected namespace and path' );
 route_check( 'wpecir/v1' === $routes[1][0] && '/scenarios/(?P<id>\\d+)' === $routes[1][1], 'scenario item route uses an integer identifier pattern' );
 route_check( 2 === count( $routes[0][2] ) && 3 === count( $routes[1][2] ), 'collection exposes read/create and item exposes read/update/delete only' );
+route_check( 'wpecir/v1' === $routes[2][0] && false !== strpos( $routes[2][1], '/scenarios/(?P<id>' ) && false !== strpos( $routes[2][1], '/versions' ), 'version history is scoped to a scenario item' );
+route_check( 1 === count( $routes[2][2] ) && 'GET' === $routes[2][2][0]['methods'], 'version history exposes read-only access' );
 
 foreach ( $routes as $route ) {
 	foreach ( $route[2] as $endpoint ) {
