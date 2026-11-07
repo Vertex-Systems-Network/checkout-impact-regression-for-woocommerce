@@ -8,6 +8,7 @@
 
 | Task | Status | Evidence and limit |
 |---|---|---|
+| Downloadable build pipeline (BUILD-001) | Complete; CI verified | Workflow run #84 passed on commit `7b862d7e3ee904e259cee3ef4f21d0a1d06cdcdd`. It supports push, pull request and manual `workflow_dispatch`, derives version `0.2.0` from the plugin header, generates optimized Composer PSR-4 files, lints/tests, checks the install ZIP and expected paths, creates a SHA-256 file, and uploaded artifact `13574267676` (`installable-plugin-v0.2.0`, 33,457 bytes; expires 2026-12-07). Download from [workflow run #84](https://github.com/Vertex-Systems-Network/wpessential-checkout-impact-regression/actions/runs/42372770294). |
 | Composer PSR-4 and bootstrap (IMPL-001) | CI pass; admin runtime update pass; broader runtime pending | Workflow run #77 passed on commit `69e6ee6d5daaf396c4bd4e7d2844bb7afcdba700`: Composer validation, optimized PSR-4 generation, PHP lint, JavaScript syntax, pure comparison checks, ZIP integrity and artifact creation. Artifact `13558177915` expires 2027-02-05. Updated v0.2.0 ZIP installed successfully over the current plugin on `/el-test/`. This does not establish the full PHP/WP compatibility or failure-path matrix. |
 | Scenario and baseline repository (IMPL-002) | Scenario/version persistence partially verified; migration and other records pending | UI/API created a synthetic scenario and the edit form fetched its stored values; saving a changed expectation produced the success notice “New scenario version saved.” This confirms scenario persistence and a version-save path, but database migration/schema version was not independently inspected. The test record’s cleanup could not be confirmed, so assume it remains in shared staging. Baseline/run/event persistence remains unverified. |
 | Change-context collector (IMPL-003) | Implemented in source; runtime pending | Bootstrap registers plugin-upgrade and option add/update/delete hooks. WooCommerce settings and filtered option names are tracked; identity/secret fields are redacted and only a SHA-256 projection is stored. Events are correlation context, not proof of checkout impact. Hook coverage, bulk updates and dedupe remain unverified. |
@@ -20,6 +21,10 @@
 | Compatibility/security/performance/accessibility matrix (IMPL-011) | Pending | No current-source WordPress/WooCommerce runtime or supported-version matrix was tested. CI `node --check` is syntax-only evidence. |
 
 ## Workflow, package and runtime evidence
+
+The versioned package workflow can be run manually from GitHub Actions or runs automatically on push/PR. Successful run #84 built v0.2.0 and uploaded artifact `13574267676` (33,457 bytes; expires 2026-12-07). The artifact contains the installable ZIP and checksum file; the inner plugin ZIP is uploaded from WordPress Admin. Workflow URL: https://github.com/Vertex-Systems-Network/wpessential-checkout-impact-regression/actions/runs/42372770294.
+
+
 
 Workflow run #77 passed against commit `69e6ee6d5daaf396c4bd4e7d2844bb7afcdba700`; artifact `13558177915` (`wpessential-checkout-impact-regression-0.2.0`) expires 2027-02-05. It includes Composer validation, optimized PSR-4 generation, PHP syntax lint, JavaScript syntax, pure normalizer/diff checks, ZIP integrity and artifact upload.
 
