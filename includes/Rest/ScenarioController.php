@@ -85,7 +85,7 @@ final class ScenarioController {
 			'/scenarios/(?P<id>\\d+)/baselines',
 			array(
 				array(
-					'methods'             => \\WP_REST_Server::READABLE,
+					'methods'             => \WP_REST_Server::READABLE,
 					'callback'            => array( __CLASS__, 'list_scenario_baselines' ),
 					'permission_callback' => array( __CLASS__, 'permissions_check' ),
 					'args'                => array( 'id' => array( 'sanitize_callback' => 'absint' ) ),
@@ -231,8 +231,8 @@ final class ScenarioController {
 	/**
 	 * Return approved baseline revisions for one scenario without mutation.
 	 *
-	 * @param \\WP_REST_Request $request Request.
-	 * @return array|\\WP_Error
+	 * @param \WP_REST_Request $request Request.
+	 * @return array|\WP_Error
 	 */
 	public static function list_scenario_baselines( $request ) {
 		$baselines = ( new Repository() )->list_baselines( $request->get_param( 'id' ) );
