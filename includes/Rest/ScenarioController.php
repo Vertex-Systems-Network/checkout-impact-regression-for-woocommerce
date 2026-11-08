@@ -80,6 +80,18 @@ final class ScenarioController {
 				),
 			)
 		);
+		register_rest_route(
+			self::REST_NAMESPACE,
+			'/scenarios/(?P<id>\\d+)/baselines',
+			array(
+				array(
+					'methods'             => \\WP_REST_Server::READABLE,
+					'callback'            => array( __CLASS__, 'list_scenario_baselines' ),
+					'permission_callback' => array( __CLASS__, 'permissions_check' ),
+					'args'                => array( 'id' => array( 'sanitize_callback' => 'absint' ) ),
+				),
+			)
+		);
 	}
 
 	/**
@@ -213,6 +225,18 @@ final class ScenarioController {
 	public static function list_scenario_versions( $request ) {
 		$versions = ( new Repository() )->list_scenario_versions( $request->get_param( 'id' ) );
 		return is_wp_error( $versions ) ? $versions : rest_ensure_response( $versions );
+	}
+
+
+	/**
+	 * Return approved baseline revisions for one scenario without mutation.
+	 *
+	 * @param \\WP_REST_Request $request Request.
+	 * @return array|\\WP_Error
+	 */
+	public static function list_scenario_baselines( $request ) {
+		$baselines = ( new Repository() )->list_baselines( $request->get_param( 'id' ) );
+		return is_wp_error( $baselines ) ? $baselines : rest_ensure_response( $baselines );
 	}
 
 	/**
