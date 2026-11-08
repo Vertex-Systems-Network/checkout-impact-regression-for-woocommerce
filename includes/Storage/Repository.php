@@ -536,13 +536,13 @@ final class Repository {
 	 * List a bounded set of privacy-safe plugin and settings change events.
 	 *
 	 * @param int $limit Maximum records to return.
-	 * @return array|\\WP_Error
+	 * @return array|\WP_Error
 	 */
 	public function list_change_events( $limit = 50 ) {
 		global $wpdb;
 
 		if ( ! $this->can_manage() ) {
-			return new \\WP_Error( 'wpecir_forbidden', 'You are not allowed to view change events.' );
+			return new \WP_Error( 'wpecir_forbidden', 'You are not allowed to view change events.' );
 		}
 
 		$limit = max( 1, min( 100, absint( $limit ) ) );
