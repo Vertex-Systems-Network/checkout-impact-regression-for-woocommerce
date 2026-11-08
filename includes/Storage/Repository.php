@@ -531,6 +531,29 @@ final class Repository {
 		return (int) $wpdb->insert_id;
 	}
 
+
+	/**
+	 * List a bounded set of privacy-safe plugin and settings change events.
+	 *
+	 * @param int $limit Maximum records to return.
+	 * @return array|\\WP_Error
+	 */
+	public function list_change_events( $limit = 50 ) {
+		global $wpdb;
+
+		if ( ! $this->can_manage() ) {
+			return new \\WP_Error( 'wpecir_forbidden', 'You are not allowed to view change events.' );
+		}
+
+		$limit = max( 1, min( 100, absint( $limit ) ) );
+		$table = $this->table( 'change_events' );
+
+		return $wpdb->get_results(
+			'SELECT id, source, object_type, object_fingerprint, context_fingerprint, occurred_at, created_at FROM ' . $table . ' ORDER BY occurred_at DESC, id DESC LIMIT ' . $limit,
+			ARRAY_A
+		);
+	}
+
 	/**
 	 * Purge a bounded batch of expired run records and their child rows.
 	 *
