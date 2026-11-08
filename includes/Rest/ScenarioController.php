@@ -92,6 +92,18 @@ final class ScenarioController {
 				),
 			)
 		);
+		register_rest_route(
+			self::REST_NAMESPACE,
+			'/change-events',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::READABLE,
+					'callback'            => array( __CLASS__, 'list_change_events' ),
+					'permission_callback' => array( __CLASS__, 'permissions_check' ),
+					'args'                => array( 'per_page' => array( 'default' => 50, 'sanitize_callback' => 'absint' ) ),
+				),
+			)
+		);
 	}
 
 	/**
@@ -237,6 +249,18 @@ final class ScenarioController {
 	public static function list_scenario_baselines( $request ) {
 		$baselines = ( new Repository() )->list_baselines( $request->get_param( 'id' ) );
 		return is_wp_error( $baselines ) ? $baselines : rest_ensure_response( $baselines );
+	}
+
+
+	/**
+	 * Return a bounded, privacy-safe change-event history.
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return array|\WP_Error
+	 */
+	public static function list_change_events( $request ) {
+		$events = ( new Repository() )->list_change_events( $request->get_param( 'per_page' ) );
+		return is_wp_error( $events ) ? $events : rest_ensure_response( $events );
 	}
 
 	/**
