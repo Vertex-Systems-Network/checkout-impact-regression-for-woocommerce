@@ -54,6 +54,8 @@
 		const [ scenarioHistory, setScenarioHistory ] = wp.element.useState( [] );
 		const [ baselineHistoryScenarioId, setBaselineHistoryScenarioId ] = wp.element.useState( null );
 		const [ baselineHistory, setBaselineHistory ] = wp.element.useState( [] );
+		const [ changeEvents, setChangeEvents ] = wp.element.useState( [] );
+		const [ eventsLoading, setEventsLoading ] = wp.element.useState( true );
 
 		const refresh = function () {
 			setLoading( true );
@@ -63,7 +65,16 @@
 				.finally( function () { setLoading( false ); } );
 		};
 
-		wp.element.useEffect( function () { refresh(); }, [] );
+
+		const refreshEvents = function () {
+			setEventsLoading( true );
+			return wp.apiFetch( { path: '/wpecir/v1/change-events?per_page=50' } )
+				.then( function ( rows ) { setChangeEvents( Array.isArray( rows ) ? rows : [] ); } )
+				.catch( function ( requestError ) { setError( requestError.message || text( 'Could not load detected change events.' ) ); } )
+				.finally( function () { setEventsLoading( false ); } );
+		};
+
+		wp.element.useEffect( function () { refresh(); refreshEvents(); }, [] );
 
 		const resetForm = function () {
 			setEditingId( null );
@@ -219,6 +230,28 @@
 			! isWooCommerceActive ? h( 'div', { className: 'notice notice-error inline' }, h( 'p', null, text( 'WooCommerce is not active. Activate WooCommerce to continue with WooCommerce-specific development.' ) ) ) : null,
 			error ? h( 'div', { className: 'notice notice-error inline', role: 'alert' }, h( 'p', null, error ) ) : null,
 			notice ? h( 'div', { className: 'notice notice-success inline', role: 'status', 'aria-live': 'polite' }, h( 'p', null, notice ) ) : null,
+
+			h( 'section', { className: 'wpecir-panel wpecir-events-panel', 'aria-labelledby': 'wpecir-events-title' },
+				h( 'div', { className: 'wpecir-panel__heading wpecir-panel__heading--row' },
+					h( 'div', null,
+						h( 'p', { className: 'wpecir-card__eyebrow' }, text( 'Change context' ) ),
+						h( 'h2', { id: 'wpecir-events-title' }, text( 'Detected plugin and settings changes' ) ),
+						h( 'p', null, text( 'Redacted change fingerprints provide context only; they do not confirm checkout impact.' ) )
+					),
+					h( 'button', { type: 'button', className: 'button', onClick: refreshEvents, disabled: eventsLoading }, eventsLoading ? text( 'Loading…' ) : text( 'Refresh events' ) )
+				),
+				eventsLoading ? h( 'p', { role: 'status' }, text( 'Loading change events…' ) ) : changeEvents.length ? h( 'ol', { className: 'wpecir-scenario-list' }, changeEvents.map( function ( event ) {
+					const sourceLabels = { plugin_update: text( 'Plugin update' ), woocommerce_setting: text( 'WooCommerce setting' ), plugin_setting: text( 'Plugin setting' ), manual: text( 'Manual event' ) };
+					return h( 'li', { className: 'wpecir-scenario-row', key: event.id },
+						h( 'div', null,
+							h( 'h3', null, sourceLabels[ event.source ] || event.source ),
+							h( 'p', null, event.object_type + ' · ' + event.occurred_at ),
+							event.context_fingerprint ? h( 'small', null, text( 'Context fingerprint: ' ) + event.context_fingerprint.slice( 0, 12 ) + '…' ) : null
+						)
+					);
+				} ) ) : h( 'p', { className: 'wpecir-empty' }, text( 'No supported plugin or WooCommerce settings changes have been recorded yet.' ) )
+			),
+
 			h( 'div', { className: 'wpecir-workspace' },
 				h( 'section', { className: 'wpecir-panel', 'aria-labelledby': 'wpecir-builder-title' },
 					h( 'div', { className: 'wpecir-panel__heading' }, h( 'p', { className: 'wpecir-card__eyebrow' }, text( 'Scenario setup' ) ), h( 'h2', { id: 'wpecir-builder-title' }, editingId ? text( 'Edit a synthetic scenario' ) : text( 'Create a synthetic scenario' ) ), h( 'p', null, text( 'Use test product IDs and non-customer data. Saving does not visit checkout.' ) ) ),
