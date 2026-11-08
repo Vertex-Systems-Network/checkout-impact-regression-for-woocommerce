@@ -9,6 +9,12 @@
  */
 
 define( 'ABSPATH', __DIR__ . '/' );
+define( 'ARRAY_A', 'ARRAY_A' );
+$GLOBALS['wpecir_event_capabilities'] = array();
+function current_user_can( $capability ) { return in_array( $capability, $GLOBALS['wpecir_event_capabilities'], true ); }
+function absint( $value ) { return abs( (int) $value ); }
+class WP_Error { private $code; public function __construct( $code ) { $this->code = $code; } public function get_error_code() { return $this->code; } }
+function is_wp_error( $value ) { return $value instanceof WP_Error; }
 
 function add_action( $hook, $callback, $priority = 10, $accepted_args = 1 ) {
 	$GLOBALS['wpecir_event_hooks'][ $hook ] = array( $callback, $priority, $accepted_args );
@@ -25,6 +31,8 @@ class WPECIR_Event_Test_WPDB {
 	public $insert_id = 100;
 	public $inserts = array();
 	public $events = array();
+	public $queries = array();
+	public $history_rows = array();
 
 	public function prepare( $query, ...$args ) {
 		foreach ( $args as $arg ) {
@@ -41,6 +49,8 @@ class WPECIR_Event_Test_WPDB {
 		return null;
 	}
 
+	public function get_results( $query, $output = null ) { $this->queries[] = $query; return $this->history_rows; }
+
 	public function insert( $table, $data, $formats = null ) {
 		$this->inserts[] = array( 'table' => $table, 'data' => $data );
 		$this->events[ $data['event_key'] ] = ++$this->insert_id;
@@ -55,6 +65,7 @@ $GLOBALS['wpdb'] = new WPECIR_Event_Test_WPDB();
 require dirname( __DIR__, 2 ) . '/vendor/autoload.php';
 
 use WPEssential\CheckoutImpactRegression\Events\ChangeEventCollector;
+use WPEssential\CheckoutImpactRegression\Storage\Repository;
 
 function event_check( $condition, $message ) {
 	if ( ! $condition ) {
@@ -106,4 +117,18 @@ for ( $index = 0; $index < 140; ++$index ) {
 ChangeEventCollector::capture_updated_option( 'woocommerce_flat_rate_settings', array(), $large_settings );
 event_check( 3 === count( $GLOBALS['wpdb']->inserts ), 'oversized redacted projections are ignored' );
 
-echo "Change-event redaction/scope/idempotency checks passed (synthetic fixtures only; no live settings read).\n";
+$repository = new Repository();
+$denied_events = $repository->list_change_events( 50 );
+event_check( is_wp_error( $denied_events ) && 'wpecir_forbidden' === $denied_events->get_error_code(), 'unauthorized event history is denied' );
+event_check( empty( $GLOBALS['wpdb']->queries ), 'unauthorized event history does not query the database' );
+$GLOBALS['wpecir_event_capabilities'] = array( 'manage_woocommerce' );
+$GLOBALS['wpdb']->history_rows = array(
+	array( 'id' => 4, 'source' => 'woocommerce_setting', 'object_type' => 'woocommerce_flat_rate_settings', 'object_fingerprint' => str_repeat( 'a', 64 ), 'context_fingerprint' => str_repeat( 'b', 64 ), 'occurred_at' => '2026-11-07 12:00:00', 'created_at' => '2026-11-07 12:00:00' ),
+);
+$event_history = $repository->list_change_events( 999 );
+event_check( is_array( $event_history ) && 1 === count( $event_history ), 'authorized user can read privacy-safe event history' );
+event_check( 1 === count( $GLOBALS['wpdb']->queries ), 'authorized event history issues one read query' );
+event_check( false !== strpos( $GLOBALS['wpdb']->queries[0], 'ORDER BY occurred_at DESC, id DESC LIMIT 100' ), 'event history is newest-first and clamps oversized page requests to 100' );
+event_check( false === strpos( $GLOBALS['wpdb']->queries[0], 'event_key' ), 'event history query omits the idempotency key' );
+
+echo "Change-event redaction/scope/idempotency/history checks passed (synthetic fixtures only; no live settings read).\n";
