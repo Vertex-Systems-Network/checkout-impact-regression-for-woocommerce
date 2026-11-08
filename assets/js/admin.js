@@ -52,6 +52,8 @@
 		const [ editingId, setEditingId ] = wp.element.useState( null );
 		const [ historyScenarioId, setHistoryScenarioId ] = wp.element.useState( null );
 		const [ scenarioHistory, setScenarioHistory ] = wp.element.useState( [] );
+		const [ baselineHistoryScenarioId, setBaselineHistoryScenarioId ] = wp.element.useState( null );
+		const [ baselineHistory, setBaselineHistory ] = wp.element.useState( [] );
 
 		const refresh = function () {
 			setLoading( true );
@@ -115,6 +117,21 @@
 			wp.apiFetch( { path: '/wpecir/v1/scenarios/' + id + '/versions' } )
 				.then( function ( rows ) { setScenarioHistory( Array.isArray( rows ) ? rows : [] ); } )
 				.catch( function ( requestError ) { setError( requestError.message || text( 'Could not load scenario history.' ) ); } );
+		};
+
+
+		const toggleBaselineHistory = function ( id ) {
+			if ( Number( baselineHistoryScenarioId ) === Number( id ) ) {
+				setBaselineHistoryScenarioId( null );
+				setBaselineHistory( [] );
+				return;
+			}
+			setBaselineHistoryScenarioId( Number( id ) );
+			setBaselineHistory( [] );
+			setError( '' );
+			wp.apiFetch( { path: '/wpecir/v1/scenarios/' + id + '/baselines' } )
+				.then( function ( rows ) { setBaselineHistory( Array.isArray( rows ) ? rows : [] ); } )
+				.catch( function ( requestError ) { setError( requestError.message || text( 'Could not load approved baseline history.' ) ); } );
 		};
 
 		const saveScenario = function ( event ) {
@@ -229,6 +246,7 @@
 							h( 'div', { className: 'wpecir-scenario-actions' },
 								h( 'button', { type: 'button', className: 'button', onClick: function () { editScenario( scenario.id ); } }, text( 'Edit' ) ),
 								h( 'button', { type: 'button', className: 'button', 'aria-expanded': Number( historyScenarioId ) === Number( scenario.id ), onClick: function () { toggleHistory( scenario.id ); } }, Number( historyScenarioId ) === Number( scenario.id ) ? text( 'Hide history' ) : text( 'View history' ) ),
+								h( 'button', { type: 'button', className: 'button', 'aria-expanded': Number( baselineHistoryScenarioId ) === Number( scenario.id ), onClick: function () { toggleBaselineHistory( scenario.id ); } }, Number( baselineHistoryScenarioId ) === Number( scenario.id ) ? text( 'Hide baselines' ) : text( 'View baselines' ) ),
 								h( 'button', { type: 'button', className: 'button button-link-delete', onClick: function () { removeScenario( scenario.id ); } }, text( 'Delete' ) )
 							),
 							Number( historyScenarioId ) === Number( scenario.id ) ? h( 'div', { className: 'wpecir-version-history', 'aria-live': 'polite' },
@@ -238,6 +256,17 @@
 									const summary = [ expectation.shipping_method, expectation.shipping_cost !== undefined ? text( 'Shipping: ' ) + expectation.shipping_cost : '', expectation.coupon_code ? text( 'Coupon: ' ) + expectation.coupon_code : '', expectation.coupon_discount !== undefined ? text( 'Discount: ' ) + expectation.coupon_discount : '' ].filter( Boolean ).join( ' · ' );
 									return h( 'li', { key: version.id }, h( 'strong', null, text( 'Version ' ) + version.version ), ' · ' + version.created_at, summary ? h( 'p', null, summary ) : null );
 								} ) ) : h( 'p', null, text( 'No saved versions were returned.' ) )
+							) : null,
+							Number( baselineHistoryScenarioId ) === Number( scenario.id ) ? h( 'div', { className: 'wpecir-version-history', 'aria-live': 'polite' },
+								h( 'h4', null, text( 'Approved baseline revisions' ) ),
+								baselineHistory.length ? h( 'ol', null, baselineHistory.map( function ( baseline ) {
+									return h( 'li', { key: baseline.id },
+										h( 'strong', null, text( 'Revision ' ) + baseline.revision ),
+										' · ' + text( 'Scenario version ' ) + baseline.scenario_version_id + ' · ' + baseline.approved_at,
+										baseline.context_fingerprint ? h( 'p', null, text( 'Context: ' ) + baseline.context_fingerprint ) : null,
+										baseline.observation ? h( 'pre', null, JSON.stringify( baseline.observation, null, 2 ) ) : null
+									);
+								} ) ) : h( 'p', null, text( 'No approved baselines have been recorded for this scenario.' ) )
 							) : null
 						);
 					} ) ) : h( 'p', { className: 'wpecir-empty' }, text( 'No scenarios saved yet. Create one using synthetic values above.' ) )
