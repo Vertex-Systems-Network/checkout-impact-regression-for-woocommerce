@@ -35,7 +35,7 @@ $before = array(
 	'shipping.method' => array( 'state' => 'observed', 'value' => 'flat_rate:3' ),
 	'shipping.cost' => array( 'state' => 'observed', 'value' => '7.00' ),
 	'coupon.discount' => array( 'state' => 'missing' ),
-	'coupon.code' => array( 'state' => 'not_observed' ),
+	'coupon.code' => array( 'state' => 'missing' ),
 );
 $after = array(
 	'shipping.method' => array( 'state' => 'observed', 'value' => 'flat_rate:3' ),
