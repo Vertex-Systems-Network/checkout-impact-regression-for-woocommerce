@@ -110,7 +110,7 @@ final class ScenarioController {
 			'/scenarios/(?P<id>\\d+)/comparisons',
 			array(
 				array(
-					'methods'             => \\WP_REST_Server::READABLE,
+					'methods'             => \WP_REST_Server::READABLE,
 					'callback'            => array( __CLASS__, 'list_manual_comparisons' ),
 					'permission_callback' => array( __CLASS__, 'permissions_check' ),
 					'args'                => array( 'id' => array( 'required' => true, 'sanitize_callback' => 'absint' ) ),
@@ -122,7 +122,7 @@ final class ScenarioController {
 			'/comparisons',
 			array(
 				array(
-					'methods'             => \\WP_REST_Server::CREATABLE,
+					'methods'             => \WP_REST_Server::CREATABLE,
 					'callback'            => array( __CLASS__, 'save_manual_comparison' ),
 					'permission_callback' => array( __CLASS__, 'permissions_check' ),
 					'args'                => array(
