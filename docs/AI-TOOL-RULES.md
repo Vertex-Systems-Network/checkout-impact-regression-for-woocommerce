@@ -19,7 +19,9 @@ This repository has one canonical instruction set plus small tool-specific entry
 2. Read the tool entry point where one is available, then read `AGENTS.md`, `README.md`, and `docs/DEVELOPMENT-PLAN.md`.
 3. Identify a backlog task ID, phase, dependencies, and acceptance criteria before working.
 4. If any file could not be read, say so and stop short of claiming its instructions were followed.
-5. Preserve the no-product-CLI-before-final-release constraint and update README progress only with evidence.
+5. On resume messages (including “continue”, “start”, “...”, or “?”), resume the active authorized task; do not require another start prompt or return a status-only response while an unblocked task remains.
+6. Execute the mandatory implementation → checks → package → required staging verification → task/evidence/README update → verified main checkpoint loop in `AGENTS.md`. If a task is blocked, continue other independent work.
+7. Preserve the no-product-CLI-before-final-release constraint and calculate README progress from the explicit Phase 7 backlog denominator and complete-task count in the development plan.
 
 ## Official documentation checked
 
