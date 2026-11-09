@@ -439,6 +439,278 @@ final class Repository {
 		return $rows;
 	}
 
+
+	/**
+	 * Save a validated manual preview as a short-lived report.
+	 *
+	 * @param int    $scenario_id Scenario identifier.
+	 * @param int    $version_id Scenario version identifier.
+	 * @param string $context Context fingerprint.
+	 * @param array  $before Normalized before observations.
+	 * @param array  $after Normalized after observations.
+	 * @param array  $changes Server-calculated comparison changes.
+	 * @return array|\WP_Error
+	 */
+	public function create_manual_comparison( $scenario_id, $version_id, $context, $before, $after, $changes ) {
+		global $wpdb;
+
+		if ( ! $this->can_manage() ) {
+			return new \WP_Error( 'wpecir_forbidden', 'You are not allowed to save comparison reports.' );
+		}
+
+		$scenario_id = absint( $scenario_id );
+		$version_id  = absint( $version_id );
+		$context     = sanitize_text_field( (string) $context );
+		if ( $scenario_id < 1 || $version_id < 1 || ! preg_match( '/^[a-f0-9]{64}$/', $context ) ) {
+			return new \WP_Error( 'wpecir_invalid_comparison_context', 'A valid saved scenario version is required.' );
+		}
+
+		$version = $wpdb->get_row(
+			$wpdb->prepare(
+				'SELECT id FROM ' . $this->table( 'scenario_versions' ) . ' WHERE id = %d AND scenario_id = %d AND context_fingerprint = %s',
+				$version_id,
+				$scenario_id,
+				$context
+			)
+		);
+		if ( ! $version ) {
+			return new \WP_Error( 'wpecir_comparison_version_not_found', 'The report context does not match a saved version of this scenario.' );
+		}
+
+		$allowed_fields = array( 'shipping.method', 'shipping.cost', 'coupon.code', 'coupon.discount' );
+		foreach ( array( $before, $after ) as $observations ) {
+			if ( ! is_array( $observations ) || count( $observations ) > count( $allowed_fields ) ) {
+				return new \WP_Error( 'wpecir_invalid_comparison_observations', 'Only the supported manual checkout fields may be saved.' );
+			}
+			foreach ( $observations as $field => $observation ) {
+				if ( ! is_string( $field ) || ! in_array( $field, $allowed_fields, true ) || ! is_array( $observation ) || empty( $observation['state'] ) || ! in_array( $observation['state'], array( 'observed', 'missing', 'not_observed', 'unsupported', 'collection_error' ), true ) ) {
+					return new \WP_Error( 'wpecir_invalid_comparison_observations', 'The manual observations contain an unsupported field or state.' );
+				}
+				if ( 'observed' === $observation['state'] && ! array_key_exists( 'value', $observation ) ) {
+					return new \WP_Error( 'wpecir_invalid_comparison_observations', 'Every observed value must include its normalized value.' );
+				}
+				if ( 'observed' !== $observation['state'] && array_key_exists( 'value', $observation ) ) {
+					return new \WP_Error( 'wpecir_invalid_comparison_observations', 'Unobserved fields cannot include a value.' );
+				}
+			}
+		}
+		if ( ! is_array( $changes ) || count( $changes ) > count( $allowed_fields ) ) {
+			return new \WP_Error( 'wpecir_invalid_comparison_findings', 'The comparison output is invalid.' );
+		}
+		$allowed_changes = array( 'shipping_method', 'shipping_cost', 'coupon_code', 'coupon_discount' );
+		foreach ( $changes as $field => $change ) {
+			if ( ! is_string( $field ) || ! in_array( $field, $allowed_changes, true ) || ! is_array( $change ) || empty( $change['state'] ) || ! in_array( $change['state'], array( 'changed', 'missing', 'added', 'unchanged', 'not_comparable' ), true ) ) {
+				return new \WP_Error( 'wpecir_invalid_comparison_findings', 'The comparison output contains an unsupported field or state.' );
+			}
+		}
+
+		$before_json = $this->encode_safe_payload( $before, 'before observations' );
+		$after_json  = $this->encode_safe_payload( $after, 'after observations' );
+		$changes_json= $this->encode_safe_payload( $changes, 'comparison findings' );
+		if ( is_wp_error( $before_json ) || is_wp_error( $after_json ) || is_wp_error( $changes_json ) ) {
+			return new \WP_Error( 'wpecir_sensitive_comparison', 'Sensitive or invalid data cannot be saved in a comparison report.' );
+		}
+
+		$now       = current_time( 'mysql', true );
+		$expires   = gmdate( 'Y-m-d H:i:s', strtotime( $now . ' UTC' ) + ( 30 * DAY_IN_SECONDS ) );
+		$run_table = $this->table( 'runs' );
+		$inserted  = $wpdb->insert(
+			$run_table,
+			array(
+				'scenario_id'         => $scenario_id,
+				'scenario_version_id' => $version_id,
+				'baseline_id'         => null,
+				'change_event_id'     => null,
+				'state'               => 'manual_preview',
+				'context_fingerprint' => $context,
+				'started_at'          => $now,
+				'finished_at'         => $now,
+				'expires_at'          => $expires,
+				'created_by'          => get_current_user_id(),
+				'created_at'          => $now,
+			),
+			array( '%d', '%d', null, null, '%s', '%s', '%s', '%s', '%s', '%d', '%s' )
+		);
+		if ( false === $inserted || absint( $wpdb->insert_id ) < 1 ) {
+			return new \WP_Error( 'wpecir_comparison_save_failed', 'The comparison report could not be saved.' );
+		}
+		$run_id = absint( $wpdb->insert_id );
+
+		foreach ( array( 'before' => $before, 'after' => $after ) as $side => $observations ) {
+			foreach ( $observations as $field => $observation ) {
+				$observation_json = wp_json_encode( $observation, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+				$saved = $wpdb->insert(
+					$this->table( 'observations' ),
+					array(
+						'run_id'           => $run_id,
+						'field_key'        => $side . '_' . str_replace( '.', '_', $field ),
+						'state'            => $observation['state'],
+						'observation_json' => $observation_json,
+						'created_at'       => $now,
+					),
+					array( '%d', '%s', '%s', '%s', '%s' )
+				);
+				if ( false === $saved ) {
+					$this->delete_manual_comparison_rows( $run_id );
+					return new \WP_Error( 'wpecir_comparison_observation_save_failed', 'The comparison report could not save all observations; partial rows were cleaned up.' );
+				}
+			}
+		}
+
+		foreach ( $changes as $field => $change ) {
+			$expected_json = array_key_exists( 'baseline', $change ) ? wp_json_encode( $change['baseline'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) : null;
+			$observed_json = array_key_exists( 'current', $change ) ? wp_json_encode( $change['current'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) : null;
+			$evidence_json = wp_json_encode(
+				array(
+					'source' => 'manual_observation',
+					'reason' => isset( $change['reason'] ) ? sanitize_key( $change['reason'] ) : '',
+				),
+				JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE
+			);
+			$saved = $wpdb->insert(
+				$this->table( 'findings' ),
+				array(
+					'run_id'         => $run_id,
+					'field_key'      => $field,
+					'classification' => $change['state'],
+					'severity'       => 'unrated',
+					'expected_json'  => $expected_json,
+					'observed_json'  => $observed_json,
+					'evidence_json'  => $evidence_json,
+					'created_at'     => $now,
+				),
+				array( '%d', '%s', '%s', '%s', '%s', '%s', '%s', '%s' )
+			);
+			if ( false === $saved ) {
+				$this->delete_manual_comparison_rows( $run_id );
+				return new \WP_Error( 'wpecir_comparison_finding_save_failed', 'The comparison report could not save all findings; partial rows were cleaned up.' );
+			}
+		}
+
+		return array(
+			'id'         => $run_id,
+			'state'      => 'manual_preview',
+			'created_at' => $now,
+			'expires_at' => $expires,
+		);
+	}
+
+	/**
+	 * List recent, unexpired manual comparison reports for one scenario.
+	 *
+	 * @param int $scenario_id Scenario identifier.
+	 * @param int $limit Maximum report count.
+	 * @return array|\WP_Error
+	 */
+	public function list_manual_comparisons( $scenario_id, $limit = 10 ) {
+		global $wpdb;
+
+		if ( ! $this->can_manage() ) {
+			return new \WP_Error( 'wpecir_forbidden', 'You are not allowed to view comparison reports.' );
+		}
+
+		$scenario_id = absint( $scenario_id );
+		$limit       = min( 20, max( 1, absint( $limit ) ) );
+		$runs        = $wpdb->get_results(
+			$wpdb->prepare(
+				'SELECT id,scenario_version_id,state,context_fingerprint,created_at,expires_at FROM ' . $this->table( 'runs' ) . ' WHERE scenario_id = %d AND state = %s AND (expires_at IS NULL OR expires_at >= %s) ORDER BY created_at DESC,id DESC LIMIT %d',
+				$scenario_id,
+				'manual_preview',
+				current_time( 'mysql', true ),
+				$limit
+			),
+			ARRAY_A
+		);
+
+		$reports = array();
+		foreach ( $runs as $run ) {
+			$run_id = absint( $run['id'] );
+			$observations = $wpdb->get_results(
+				$wpdb->prepare( 'SELECT field_key,state,observation_json FROM ' . $this->table( 'observations' ) . ' WHERE run_id = %d ORDER BY id ASC', $run_id ),
+				ARRAY_A
+			);
+			$findings = $wpdb->get_results(
+				$wpdb->prepare( 'SELECT field_key,classification,severity,expected_json,observed_json,evidence_json FROM ' . $this->table( 'findings' ) . ' WHERE run_id = %d ORDER BY id ASC', $run_id ),
+				ARRAY_A
+			);
+
+			$before = array();
+			$after  = array();
+			foreach ( $observations as $observation ) {
+				$parts = explode( '_', $observation['field_key'], 2 );
+				if ( 2 !== count( $parts ) || ! in_array( $parts[0], array( 'before', 'after' ), true ) ) {
+					continue;
+				}
+				$field   = str_replace( '_', '.', $parts[1] );
+				$decoded = json_decode( $observation['observation_json'], true );
+				if ( ! is_array( $decoded ) ) {
+					continue;
+				}
+				if ( 'before' === $parts[0] ) {
+					$before[ $field ] = $decoded;
+				} else {
+					$after[ $field ] = $decoded;
+				}
+			}
+
+			$changes = array();
+			foreach ( $findings as $finding ) {
+				$field = sanitize_key( $finding['field_key'] );
+				$changes[ $field ] = array( 'state' => $finding['classification'] );
+				$expected = json_decode( (string) $finding['expected_json'], true );
+				$observed = json_decode( (string) $finding['observed_json'], true );
+				$evidence = json_decode( (string) $finding['evidence_json'], true );
+				if ( null !== $expected ) {
+					$changes[ $field ]['baseline'] = $expected;
+				}
+				if ( null !== $observed ) {
+					$changes[ $field ]['current'] = $observed;
+				}
+				if ( is_array( $evidence ) && ! empty( $evidence['reason'] ) ) {
+					$changes[ $field ]['reason'] = sanitize_key( $evidence['reason'] );
+				}
+			}
+
+			$summary = array( 'changed' => 0, 'missing' => 0, 'added' => 0, 'unchanged' => 0, 'not_comparable' => 0 );
+			foreach ( $changes as $change ) {
+				$key = isset( $change['state'] ) ? $change['state'] : 'not_comparable';
+				if ( isset( $summary[ $key ] ) ) {
+					++$summary[ $key ];
+				}
+			}
+
+			$reports[] = array(
+				'id'                  => $run_id,
+				'scenario_version_id' => absint( $run['scenario_version_id'] ),
+				'state'               => $run['state'],
+				'context_fingerprint' => $run['context_fingerprint'],
+				'created_at'          => $run['created_at'],
+				'expires_at'          => $run['expires_at'],
+				'before'              => $before,
+				'after'               => $after,
+				'changes'             => $changes,
+				'summary'             => $summary,
+			);
+		}
+
+		return $reports;
+	}
+
+	/**
+	 * Best-effort cleanup of a failed partial manual report write.
+	 *
+	 * @param int $run_id Run identifier.
+	 * @return void
+	 */
+	private function delete_manual_comparison_rows( $run_id ) {
+		global $wpdb;
+
+		$run_id = absint( $run_id );
+		$wpdb->delete( $this->table( 'observations' ), array( 'run_id' => $run_id ), array( '%d' ) );
+		$wpdb->delete( $this->table( 'findings' ), array( 'run_id' => $run_id ), array( '%d' ) );
+		$wpdb->delete( $this->table( 'runs' ), array( 'id' => $run_id ), array( '%d' ) );
+	}
+
 	/**
 	 * Delete a scenario and dependent history after an authorized request.
 	 *
