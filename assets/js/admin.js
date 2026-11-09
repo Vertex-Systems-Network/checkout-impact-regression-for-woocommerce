@@ -489,7 +489,7 @@
 						h( 'p', { className: 'wpecir-card__eyebrow' }, text( 'Before / after comparisons' ) ),
 						h( 'p', { className: 'wpecir-status wpecir-status--neutral' }, text( 'Manual preview available' ) ),
 						h( 'h2', null, text( 'Compare recorded values' ) ),
-						h( 'p', { className: 'wpecir-card__body' }, text( 'Preview differences from values you observed before and after a change. Automated checkout capture and saved impact reports are still unavailable.' ) )
+						h( 'p', { className: 'wpecir-card__body' }, text( 'Compare manual observations against an approved baseline. Automatic checkout capture is not available.' ) )
 					),
 					h( 'article', { className: 'wpecir-card' },
 						h( 'p', { className: 'wpecir-card__eyebrow' }, text( 'Change context' ) ),
