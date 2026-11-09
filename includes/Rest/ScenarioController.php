@@ -7,6 +7,7 @@
 
 namespace WPEssential\CheckoutImpactRegression\Rest;
 
+use WPEssential\CheckoutImpactRegression\Comparison\ManualComparison;
 use WPEssential\CheckoutImpactRegression\Storage\Repository;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -101,6 +102,17 @@ final class ScenarioController {
 					'callback'            => array( __CLASS__, 'list_change_events' ),
 					'permission_callback' => array( __CLASS__, 'permissions_check' ),
 					'args'                => array( 'per_page' => array( 'default' => 50, 'sanitize_callback' => 'absint' ) ),
+				),
+			)
+		);
+		register_rest_route(
+			self::REST_NAMESPACE,
+			'/comparisons/preview',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::CREATABLE,
+					'callback'            => array( __CLASS__, 'preview_comparison' ),
+					'permission_callback' => array( __CLASS__, 'permissions_check' ),
 				),
 			)
 		);
@@ -261,6 +273,52 @@ final class ScenarioController {
 	public static function list_change_events( $request ) {
 		$events = ( new Repository() )->list_change_events( $request->get_param( 'per_page' ) );
 		return is_wp_error( $events ) ? $events : rest_ensure_response( $events );
+	}
+
+
+	/**
+	 * Compare merchant-recorded before/after values without touching checkout.
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return array|\WP_Error
+	 */
+	public static function preview_comparison( $request ) {
+		$repository = new Repository();
+		$scenario   = $repository->get_scenario( $request->get_param( 'scenario_id' ) );
+		if ( is_wp_error( $scenario ) ) {
+			return $scenario;
+		}
+		if ( empty( $scenario['latest_version']['context_fingerprint'] ) || empty( $scenario['latest_version']['input']['currency'] ) ) {
+			return new \WP_Error( 'wpecir_comparison_context_missing', __( 'The selected scenario has no comparable saved version.', 'wpessential-checkout-impact-regression' ), array( 'status' => 409 ) );
+		}
+
+		$before = $request->get_param( 'before' );
+		$after  = $request->get_param( 'after' );
+		if ( ! is_array( $before ) || ! is_array( $after ) ) {
+			return new \WP_Error( 'wpecir_invalid_manual_comparison', __( 'Provide structured before and after observations.', 'wpessential-checkout-impact-regression' ), array( 'status' => 400 ) );
+		}
+
+		$result = ManualComparison::preview(
+			$before,
+			$after,
+			$scenario['latest_version']['context_fingerprint'],
+			$scenario['latest_version']['input']['currency']
+		);
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+
+		return rest_ensure_response(
+			array(
+				'scenario_id'      => (int) $scenario['id'],
+				'scenario_title'   => $scenario['title'],
+				'scenario_version' => (int) $scenario['latest_version']['version'],
+				'currency'         => strtoupper( $scenario['latest_version']['input']['currency'] ),
+				'mode'             => 'manual_preview',
+				'changes'          => $result['changes'],
+				'summary'          => $result['summary'],
+			)
+		);
 	}
 
 	/**
