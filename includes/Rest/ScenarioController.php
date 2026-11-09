@@ -113,6 +113,11 @@ final class ScenarioController {
 					'methods'             => \WP_REST_Server::CREATABLE,
 					'callback'            => array( __CLASS__, 'preview_comparison' ),
 					'permission_callback' => array( __CLASS__, 'permissions_check' ),
+					'args'                => array(
+						'scenario_id' => array( 'required' => true, 'sanitize_callback' => 'absint' ),
+						'before'      => array( 'required' => true ),
+						'after'       => array( 'required' => true ),
+					),
 				),
 			)
 		);
