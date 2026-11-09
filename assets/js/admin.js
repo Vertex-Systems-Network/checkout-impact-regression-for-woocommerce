@@ -124,6 +124,9 @@
 		const [ comparisonBusy, setComparisonBusy ] = wp.element.useState( false );
 		const [ comparisonResult, setComparisonResult ] = wp.element.useState( null );
 		const [ comparisonError, setComparisonError ] = wp.element.useState( '' );
+		const [ comparisonHistory, setComparisonHistory ] = wp.element.useState( [] );
+		const [ historyBusy, setHistoryBusy ] = wp.element.useState( false );
+		const [ savedReportId, setSavedReportId ] = wp.element.useState( null );
 
 		const refresh = function () {
 			setLoading( true );
@@ -144,10 +147,26 @@
 
 		wp.element.useEffect( function () { refresh(); refreshEvents(); }, [] );
 
+		const refreshComparisonHistory = function (scenarioId) {
+			if ( ! scenarioId ) { setComparisonHistory( [] ); return Promise.resolve(); }
+			setHistoryBusy( true );
+			return wp.apiFetch( { path: '/wpecir/v1/scenarios/' + Number( scenarioId ) + '/comparisons' } )
+				.then( function (result) { setComparisonHistory( Array.isArray( result.reports ) ? result.reports : [] ); } )
+				.catch( function (requestError) { setComparisonError( requestError.message || text( 'Could not load saved comparison history.' ) ); } )
+				.finally( function () { setHistoryBusy( false ); } );
+		};
+
+		wp.element.useEffect( function () {
+			setComparisonHistory( [] );
+			setSavedReportId( null );
+			refreshComparisonHistory( comparisonScenarioId );
+		}, [ comparisonScenarioId ] );
+
 
 		const updateObservation = function (setter, field, value ) {
 			setter( function (previous) { return Object.assign( {}, previous, { [ field ]: value } ); } );
 			setComparisonResult( null );
+			setSavedReportId( null );
 		};
 
 		const hasManualObservation = function () {
@@ -172,6 +191,24 @@
 			} )
 				.then( function (result) { setComparisonResult( result ); } )
 				.catch( function (requestError) { setComparisonError( requestError.message || text( 'Could not compare the recorded values.' ) ); } )
+				.finally( function () { setComparisonBusy( false ); } );
+		};
+
+		const saveManualComparison = function () {
+			if ( ! comparisonResult || ! comparisonScenarioId ) { return; }
+			setComparisonBusy( true );
+			setComparisonError( '' );
+			wp.apiFetch( { path: '/wpecir/v1/comparisons', method: 'POST', data: {
+				scenario_id: Number( comparisonScenarioId ),
+				before: toManualObservationMap( beforeObservations ),
+				after: toManualObservationMap( afterObservations ),
+			} } )
+				.then( function (result) {
+					setComparisonResult( result );
+					setSavedReportId( result.report && result.report.id ? result.report.id : null );
+					return refreshComparisonHistory( comparisonScenarioId );
+				} )
+				.catch( function (requestError) { setComparisonError( requestError.message || text( 'Could not save the comparison report.' ) ); } )
 				.finally( function () { setComparisonBusy( false ); } );
 		};
 
@@ -420,7 +457,7 @@
 							id: 'wpecir-comparison-scenario',
 							value: comparisonScenarioId,
 							required: true,
-							onChange: function (event) { setComparisonScenarioId( event.target.value ); setComparisonResult( null ); },
+							onChange: function (event) { setComparisonScenarioId( event.target.value ); setBeforeObservations( emptyManualObservations() ); setAfterObservations( emptyManualObservations() ); setComparisonResult( null ); setSavedReportId( null ); setComparisonError( '' ); },
 						},
 							h( 'option', { value: '' }, text( 'Choose a saved scenario' ) ),
 							scenarios.map( function (scenario) {
@@ -460,9 +497,24 @@
 								h( 'div', null, h( 'strong', null, comparisonFieldLabels[ field ] || field ), h( 'span', { className: 'wpecir-status wpecir-status--' + ( change.state === 'changed' || change.state === 'missing' ? 'warning' : change.state === 'not_comparable' ? 'muted' : 'neutral' ) }, comparisonStateLabels[ change.state ] || text( 'Needs review' ) ) ),
 								h( 'p', null, comparisonDetail( change ) )
 							);
-						} ) )
+						} ) ),
+						h( 'div', { className: 'wpecir-comparison-actions' },
+							h( 'button', { type: 'button', className: 'button', disabled: comparisonBusy || ! comparisonResult || Boolean( savedReportId ), onClick: saveManualComparison }, comparisonBusy ? text( 'Saving…' ) : savedReportId ? text( 'Report saved' ) : text( 'Save report for 30 days' ) ),
+							h( 'span', null, text( 'Only manually entered observations are saved. Checkout is not run.' ) )
+						)
 					) : null
-				) : h( 'p', { className: 'wpecir-empty' }, text( 'Create a synthetic scenario before previewing observed values.' ) )
+				) : h( 'p', { className: 'wpecir-empty' }, text( 'Create a synthetic scenario before previewing observed values.' ) ),
+				h( 'div', { className: 'wpecir-comparison-history' },
+					h( 'h3', null, text( 'Saved comparison history' ) ),
+					h( 'p', null, text( 'Reports are stored for 30 days and then purged automatically.' ) ),
+					historyBusy ? h( 'p', null, text( 'Loading history…' ) ) : comparisonHistory.length ? h( 'ul', null, comparisonHistory.map( function (report) {
+						return h( 'li', { key: report.id },
+							h( 'strong', null, text( 'Report #' ) + report.id + ( Number( report.id ) === Number( savedReportId ) ? ' · ' + text( 'Just saved' ) : '' ) ),
+							h( 'span', null, report.created_at + ' · ' + text( 'Expires ' ) + report.expires_at ),
+							h( 'span', null, text( 'Changed: ' ) + report.summary.changed + ' · ' + text( 'Missing: ' ) + report.summary.missing + ' · ' + text( 'Needs review: ' ) + report.summary.not_comparable )
+						);
+					} ) ) : h( 'p', { className: 'wpecir-empty' }, text( 'No saved reports for this scenario yet.' ) )
+				)
 			),
 
 			h( 'div', { className: 'wpecir-workspace' },
