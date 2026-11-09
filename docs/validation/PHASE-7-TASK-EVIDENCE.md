@@ -91,10 +91,10 @@ TasteWP runtime verification — 2026-11-09: installed and activated the v0.2.1 
 
 | Check | Result | Evidence |
 |---|---|---|
-| CI / PHP lint / JavaScript syntax / contract suite / installable ZIP | Pass | Workflow run #296, commit 7f8f9b34ec9f89f8d992d9c1a61c7bf5d08cf627; artifact 13707522149. Outer archive SHA-256: b762a117a635ae8ecfb970c781625b44f67ba22316623efc0898111e7eea3cef. Inner plugin ZIP SHA-256: 882bc152d34bffecd31c9f8178621ed25b5c9dc1c2d7bf3065383f6d5a159425. |
+| CI / PHP lint / JavaScript syntax / contract suite / installable ZIP | Pass | Workflow run #298, commit 993f7c7128ba36314f28f3909c30f487e2878673; artifact 13708240902. Outer archive SHA-256: c3c2d59f1adc9666a044f6d1fadaa302c701ab4b8552d6705a416e910fbc8644. Inner plugin ZIP SHA-256: ea3c29d58a74ee4d2c01144cc8276d1a502c80bfa2cac999c94469d50b0c3ad1. |
 | Package install/replace | Pass | Installed over existing plugin on authorized TasteWP Quirky Brake; WP 7.1.4 reported “Plugin updated successfully.” |
 | Synthetic manual comparison | Pass | DE/EUR: Standard shipping method became confirmed missing; shipping cost EUR 7→12; WELCOME10 unchanged; coupon discount EUR 10→8. Result summary: 2 changed, 1 missing, 1 unchanged, 0 added, 0 needs review. |
-| Save and retrieval | Pass | Explicit Save report action stored report #1 with created/expiry timestamps. After browser reload and scenario reselection, history returned the same report and counts. |
+| Save and retrieval | Pass | Explicit Save report action stored report #1 with created/expiry timestamps. After browser reload and scenario reselection, history returned the same report and counts. The final build's expandable history also displayed field labels, states and saved before/after deltas. |
 | Delete cleanup | Pass | Deleting disposable scenario returned count to zero and empty library; report row no longer appeared in scenario history. |
 | Checkout side effects | Not run by design | No checkout, order, payment, shipping, or coupon execution/request occurred; data was manually entered synthetic test data. |
 
