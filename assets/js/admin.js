@@ -373,9 +373,9 @@
 					),
 					h( 'article', { className: 'wpecir-card' },
 						h( 'p', { className: 'wpecir-card__eyebrow' }, text( 'Before / after comparisons' ) ),
-						h( 'p', { className: 'wpecir-status wpecir-status--warning' }, text( 'Not available yet' ) ),
-						h( 'h2', null, text( 'No impact results' ) ),
-						h( 'p', { className: 'wpecir-card__body' }, text( 'Approved baseline capture and safe checkout observation are not implemented. No regression is inferred from configuration alone.' ) )
+						h( 'p', { className: 'wpecir-status wpecir-status--neutral' }, text( 'Manual preview available' ) ),
+						h( 'h2', null, text( 'Compare recorded values' ) ),
+						h( 'p', { className: 'wpecir-card__body' }, text( 'Preview differences from values you observed before and after a change. Automated checkout capture and saved impact reports are still unavailable.' ) )
 					),
 					h( 'article', { className: 'wpecir-card' },
 						h( 'p', { className: 'wpecir-card__eyebrow' }, text( 'Change context' ) ),
@@ -438,7 +438,7 @@
 						h( 'section', { className: 'wpecir-observation-column', 'aria-label': text( 'After observations' ) },
 							h( 'h3', null, text( 'After' ) ),
 							manualFields.map( function (field) {
-								return h( ManualObservationField, { key: 'after-' + field.key, side: 'after', field: field.key, label: field.label, money: field.money, observation: afterObservations[ field.key ], onChange: function (value) { updateObservation( setAfterObservations, field.key, value ); } );
+								return h( ManualObservationField, { key: 'after-' + field.key, side: 'after', field: field.key, label: field.label, money: field.money, observation: afterObservations[ field.key ], onChange: function (value) { updateObservation( setAfterObservations, field.key, value ); } } );
 							} )
 						)
 					),
