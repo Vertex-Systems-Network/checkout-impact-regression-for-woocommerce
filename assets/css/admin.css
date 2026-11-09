@@ -253,6 +253,119 @@
 	}
 }
 
+
+.wpecir-manual-comparison {
+	margin: 24px 0;
+}
+
+.wpecir-manual-comparison__form {
+	display: grid;
+	gap: 18px;
+}
+
+.wpecir-manual-comparison__form > .wpecir-field {
+	max-width: 520px;
+}
+
+.wpecir-manual-comparison__form select,
+.wpecir-observation-field select,
+.wpecir-observation-field input {
+	box-sizing: border-box;
+	max-width: 100%;
+	width: 100%;
+}
+
+.wpecir-observation-columns {
+	display: grid;
+	gap: 16px;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.wpecir-observation-column {
+	background: var(--wpecir-subtle);
+	border: 1px solid var(--wpecir-border);
+	border-radius: 6px;
+	padding: 18px;
+}
+
+.wpecir-observation-column h3 {
+	font-size: 17px;
+	margin: 0 0 14px;
+}
+
+.wpecir-observation-field {
+	display: grid;
+	gap: 8px;
+	margin: 0 0 16px;
+}
+
+.wpecir-observation-field:last-child {
+	margin-bottom: 0;
+}
+
+.wpecir-observation-field label {
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.wpecir-observation-field small {
+	color: var(--wpecir-muted);
+	font-size: 12px;
+	line-height: 1.4;
+}
+
+.wpecir-comparison-results {
+	border-top: 1px solid var(--wpecir-border);
+	margin-top: 22px;
+	padding-top: 18px;
+}
+
+.wpecir-comparison-results h3 {
+	font-size: 18px;
+	margin: 0 0 8px;
+}
+
+.wpecir-comparison-results > p {
+	color: var(--wpecir-muted);
+	margin: 0 0 14px;
+}
+
+.wpecir-comparison-summary {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px 18px;
+	list-style: none;
+	margin: 0 0 16px;
+	padding: 0;
+}
+
+.wpecir-comparison-findings {
+	display: grid;
+	gap: 10px;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.wpecir-comparison-findings > li {
+	background: var(--wpecir-subtle);
+	border: 1px solid var(--wpecir-border);
+	border-radius: 6px;
+	padding: 12px 14px;
+}
+
+.wpecir-comparison-findings > li > div {
+	align-items: center;
+	display: flex;
+	gap: 10px;
+	justify-content: space-between;
+}
+
+.wpecir-comparison-findings p {
+	color: var(--wpecir-muted);
+	margin: 8px 0 0;
+}
+
 .wpecir-workspace {
 	display: grid;
 	gap: 20px;
