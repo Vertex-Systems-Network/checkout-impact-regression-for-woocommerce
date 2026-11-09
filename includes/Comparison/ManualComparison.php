@@ -62,8 +62,12 @@ final class ManualComparison {
 		}
 
 		return array(
-			'changes' => $changes,
-			'summary' => $summary,
+			'changes'      => $changes,
+			'summary'      => $summary,
+			'observations' => array(
+				'before' => $before,
+				'after'  => $after,
+			),
 		);
 	}
 
