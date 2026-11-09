@@ -113,3 +113,7 @@ TasteWP runtime verification — 2026-11-09: installed and activated the v0.2.1 
 | Checkout side effects | Not run by design | No checkout, order, payment, shipping, or coupon request was run; only manually entered synthetic values were used. |
 
 **Scope boundary:** this proves a merchant can explicitly approve complete manual observations and inspect immutable revisions on this staging build. It does not prove automated checkout capture, migration/privacy runtime, broader REST authorization/nonces in live WordPress, production compatibility, or Phase 6 safety. Phase 7 remains in progress at 75%.
+
+## Progress accounting correction — 2026-11-10
+
+Earlier progress entries above are historical snapshots using an inconsistent percentage method. The current backlog contains 26 Phase 7 rows (BUILD-001 and IMPL-001–025). Counting only rows marked Complete gives 15 Complete, 6 Partial, 4 Not started, and 1 Blocked: **15/26 = 58% Phase 7 task-count progress**. The README and development plan now use this denominator and formula; Partial and Blocked rows do not count as complete. Overall progress is the unweighted mean of the nine phase percentages: 82%. This correction does not change historical CI or staging results and does not mark Phase 7 complete.
