@@ -60,3 +60,6 @@ No product CLI was added.
 - **Observed:** The ZIP was selected in Plugins → Add Plugin → Upload Plugin. After clicking Install Now, the nested site showed a browser error (`chrome-error://chromewebdata/`) while navigating to `/wp-admin/update.php?action=upload-plugin`. Refreshing Playground restored the plugin installer screen.
 - **Result:** No success page, activation state, or plugin admin screen was observed. Installation is **not verified**. No WooCommerce installation/checkout scenario run; no actual order/payment/shipping/coupon operation.
 - **Phase status:** This attempt does not satisfy Phase 7's runtime or integration acceptance criteria. Existing 71% status is unchanged. Do not report Phase 7 complete.
+
+
+Follow-up CI after the documentation updates passed as workflow run #260 on commit `6079b36b26763787f206b94daa8344635704822b` (PHP lint, JS syntax, contracts and installable ZIP build); artifact `13641467446`. This revalidates the current source in CI, but does not change the unsuccessful Playground installation result or satisfy live runtime acceptance.
