@@ -520,3 +520,5 @@
 .wpecir-comparison-actions{display:flex;align-items:center;gap:12px;margin-top:16px;flex-wrap:wrap}.wpecir-comparison-actions span,.wpecir-comparison-history>p{color:#646970;font-size:13px}.wpecir-comparison-history{margin-top:20px;padding-top:16px;border-top:1px solid #dcdcde}.wpecir-comparison-history ul{margin:12px 0;padding:0;list-style:none}.wpecir-comparison-history li{display:flex;gap:8px 16px;align-items:center;flex-wrap:wrap;padding:12px;border:1px solid #dcdcde;border-radius:4px}.wpecir-comparison-history li span{font-size:13px;color:#50575e}
 
 .wpecir-history-details{flex:1 1 100%;font-size:13px}.wpecir-history-details summary{cursor:pointer;color:#2271b1}.wpecir-history-details ol{margin:8px 0 0 22px}.wpecir-history-details li{display:list-item;padding:5px 0;border:0}
+
+.wpecir-baseline-approval{flex:1 1 100%;margin-top:12px;padding:14px;border-left:3px solid #2271b1;background:#f6f7f7}.wpecir-baseline-approval p{margin:0 0 10px}.wpecir-baseline-approval small{display:block;margin-top:8px;color:#646970}.wpecir-baseline-approval .notice{padding:8px 12px;margin:8px 0}
