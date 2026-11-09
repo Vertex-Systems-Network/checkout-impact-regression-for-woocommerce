@@ -55,6 +55,7 @@ jobs:
         run: |
           php tests/php/normalizer-diff.php
           php tests/php/manual-comparison-contract.php
+          php tests/php/manual-baseline-comparison-contract.php
           php tests/php/scenario-contract.php
           php tests/php/multilingual-context-dry-run.php
           php tests/php/privacy-contract.php

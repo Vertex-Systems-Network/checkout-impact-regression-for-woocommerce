@@ -130,6 +130,7 @@
 		const [ baselineBusy, setBaselineBusy ] = wp.element.useState( false );
 		const [ baselineError, setBaselineError ] = wp.element.useState( '' );
 		const [ baselineNotice, setBaselineNotice ] = wp.element.useState( '' );
+		const [ comparisonBaselineId, setComparisonBaselineId ] = wp.element.useState( null );
 
 		const refresh = function () {
 			setLoading( true );
@@ -168,10 +169,62 @@
 
 		const updateObservation = function (setter, field, value ) {
 			setter( function (previous) { return Object.assign( {}, previous, { [ field ]: value } ); } );
+			if ( setter === setBeforeObservations ) { setComparisonBaselineId( null ); }
 			setComparisonResult( null );
 			setSavedReportId( null );
 			setBaselineError( '' );
 			setBaselineNotice( '' );
+		};
+
+		const comparisonPayload = function () {
+			const payload = {
+				scenario_id: Number( comparisonScenarioId ),
+				after: toManualObservationMap( afterObservations ),
+			};
+			if ( comparisonBaselineId ) {
+				payload.baseline_id = Number( comparisonBaselineId );
+			} else {
+				payload.before = toManualObservationMap( beforeObservations );
+			}
+			return payload;
+		};
+
+		const loadApprovedBaseline = function () {
+			if ( ! comparisonScenarioId ) { return; }
+			const requestedScenarioId = Number( comparisonScenarioId );
+			setBaselineBusy( true );
+			setBaselineError( '' );
+			setBaselineNotice( '' );
+			Promise.all( [
+				wp.apiFetch( { path: '/wpecir/v1/scenarios/' + requestedScenarioId } ),
+				wp.apiFetch( { path: '/wpecir/v1/scenarios/' + requestedScenarioId + '/baselines' } ),
+			] )
+				.then( function (results) {
+					if ( Number( comparisonScenarioId ) !== requestedScenarioId ) { return; }
+					const scenario = results[0];
+					const rows = Array.isArray( results[1] ) ? results[1] : [];
+					const baseline = rows.find( function (row) { return row && row.state === 'approved'; } ) || null;
+					const version = scenario && scenario.latest_version ? scenario.latest_version : null;
+					if ( ! baseline ) { throw new Error( text( 'No approved baseline exists for this scenario yet.' ) ); }
+					if ( Number( baseline.scenario_id ) !== requestedScenarioId || ! version || Number( baseline.scenario_version_id ) !== Number( version.id ) || baseline.context_fingerprint !== version.context_fingerprint ) {
+						throw new Error( text( 'This baseline belongs to an older scenario version. Approve a baseline for the current version first.' ) );
+					}
+					const observations = emptyManualObservations();
+					manualFields.forEach( function (field) {
+						const saved = baseline.observation && baseline.observation[ field.key ];
+						if ( ! saved || ! saved.state ) { return; }
+						let value = saved.value;
+						if ( value && typeof value === 'object' && value.amount !== undefined ) { value = value.amount; }
+						observations[ field.key ] = { state: saved.state, value: value === undefined ? '' : String( value ) };
+					} );
+					setBeforeObservations( observations );
+					setComparisonBaselineId( Number( baseline.id ) );
+					setComparisonResult( null );
+					setSavedReportId( null );
+					setBaselineNotice( text( 'Approved baseline revision ' ) + baseline.revision + text( ' loaded as the Before state. Comparison will use this saved revision.' ) );
+				} )
+				.catch( function (requestError) { setBaselineError( requestError.message || text( 'Could not load the approved baseline.' ) ); } )
+				.finally( function () { setBaselineBusy( false ); } );
 		};
 
 		const hasManualObservation = function () {
@@ -188,11 +241,7 @@
 			wp.apiFetch( {
 				path: '/wpecir/v1/comparisons/preview',
 				method: 'POST',
-				data: {
-					scenario_id: Number( comparisonScenarioId ),
-					before: toManualObservationMap( beforeObservations ),
-					after: toManualObservationMap( afterObservations ),
-				},
+				data: comparisonPayload(),
 			} )
 				.then( function (result) { setComparisonResult( result ); } )
 				.catch( function (requestError) { setComparisonError( requestError.message || text( 'Could not compare the recorded values.' ) ); } )
@@ -203,11 +252,7 @@
 			if ( ! comparisonResult || ! comparisonScenarioId ) { return; }
 			setComparisonBusy( true );
 			setComparisonError( '' );
-			wp.apiFetch( { path: '/wpecir/v1/comparisons', method: 'POST', data: {
-				scenario_id: Number( comparisonScenarioId ),
-				before: toManualObservationMap( beforeObservations ),
-				after: toManualObservationMap( afterObservations ),
-			} } )
+			wp.apiFetch( { path: '/wpecir/v1/comparisons', method: 'POST', data: comparisonPayload() } )
 				.then( function (result) {
 					setComparisonResult( result );
 					setSavedReportId( result.report && result.report.id ? result.report.id : null );
@@ -489,7 +534,7 @@
 							id: 'wpecir-comparison-scenario',
 							value: comparisonScenarioId,
 							required: true,
-							onChange: function (event) { setComparisonScenarioId( event.target.value ); setBeforeObservations( emptyManualObservations() ); setAfterObservations( emptyManualObservations() ); setComparisonResult( null ); setSavedReportId( null ); setComparisonError( '' ); setBaselineError( '' ); setBaselineNotice( '' ); },
+							onChange: function (event) { setComparisonScenarioId( event.target.value ); setBeforeObservations( emptyManualObservations() ); setAfterObservations( emptyManualObservations() ); setComparisonBaselineId( null ); setComparisonResult( null ); setSavedReportId( null ); setComparisonError( '' ); setBaselineError( '' ); setBaselineNotice( '' ); },
 						},
 							h( 'option', { value: '' }, text( 'Choose a saved scenario' ) ),
 							scenarios.map( function (scenario) {
@@ -497,6 +542,7 @@
 							} )
 						)
 					),
+					h( 'button', { type: 'button', className: 'button', onClick: loadApprovedBaseline, disabled: baselineBusy || ! comparisonScenarioId }, baselineBusy ? text( 'Loading baseline…' ) : text( 'Use latest approved baseline as Before' ) ),
 					h( 'div', { className: 'wpecir-observation-columns' },
 						h( 'section', { className: 'wpecir-observation-column', 'aria-label': text( 'Before observations' ) },
 							h( 'h3', null, text( 'Before' ) ),
@@ -512,10 +558,13 @@
 						)
 					),
 					comparisonError ? h( 'p', { className: 'notice notice-error inline', role: 'alert' }, comparisonError ) : null,
+					baselineError ? h( 'p', { className: 'notice notice-error inline', role: 'alert' }, baselineError ) : null,
+					baselineNotice ? h( 'p', { className: 'notice notice-success inline', role: 'status', 'aria-live': 'polite' }, baselineNotice ) : null,
 					h( 'button', { type: 'submit', className: 'button button-primary', disabled: comparisonBusy || ! comparisonScenarioId || ! hasManualObservation() }, comparisonBusy ? text( 'Comparing…' ) : text( 'Preview comparison' ) ),
 					comparisonResult ? h( 'div', { className: 'wpecir-comparison-results', role: 'status', 'aria-live': 'polite' },
 						h( 'h3', null, text( 'Comparison preview' ) ),
 						h( 'p', null, comparisonResult.scenario_title + ' · ' + text( 'Scenario version ' ) + comparisonResult.scenario_version + ' · ' + comparisonResult.currency ),
+						comparisonResult.baseline ? h( 'p', null, text( 'Compared against approved baseline revision ' ) + comparisonResult.baseline.revision + '.' ) : null,
 						h( 'ul', { className: 'wpecir-comparison-summary' },
 							h( 'li', null, text( 'Changed: ' ) + comparisonResult.summary.changed ),
 							h( 'li', null, text( 'Missing: ' ) + comparisonResult.summary.missing ),
@@ -535,8 +584,6 @@
 							h( 'span', null, text( 'Only manually entered observations are saved. Checkout is not run.' ) ),
 							h( 'div', { className: 'wpecir-baseline-approval' },
 								h( 'p', null, text( 'Approve a baseline only when these after-values are known-good. Record every field as observed or confirmed missing.' ) ),
-								baselineError ? h( 'p', { className: 'notice notice-error inline', role: 'alert' }, baselineError ) : null,
-								baselineNotice ? h( 'p', { className: 'notice notice-success inline', role: 'status' }, baselineNotice ) : null,
 								h( 'button', { type: 'button', className: 'button', disabled: baselineBusy || ! comparisonResult || ! hasCompleteBaselineObservation(), onClick: approveManualBaseline }, baselineBusy ? text( 'Approving…' ) : text( 'Approve after-values as baseline' ) ),
 								! hasCompleteBaselineObservation() ? h( 'small', null, text( 'Complete the four after-observation fields first. Use Confirmed missing where a value is absent.' ) ) : null
 							)
@@ -550,6 +597,7 @@
 						return h( 'li', { key: report.id },
 							h( 'strong', null, text( 'Report #' ) + report.id + ( Number( report.id ) === Number( savedReportId ) ? ' · ' + text( 'Just saved' ) : '' ) ),
 							h( 'span', null, report.created_at + ' · ' + text( 'Expires ' ) + report.expires_at ),
+							report.baseline_id ? h( 'span', null, text( 'Compared against approved baseline #' ) + report.baseline_id ) : null,
 							h( 'span', null, text( 'Changed: ' ) + report.summary.changed + ' · ' + text( 'Missing: ' ) + report.summary.missing + ' · ' + text( 'Needs review: ' ) + report.summary.not_comparable ),
 							h( 'details', { className: 'wpecir-history-details' },
 								h( 'summary', null, text( 'View saved differences' ) ),

@@ -136,8 +136,9 @@ final class ScenarioController {
 					'permission_callback' => array( __CLASS__, 'permissions_check' ),
 					'args'                => array(
 						'scenario_id' => array( 'required' => true, 'sanitize_callback' => 'absint' ),
-						'before'      => array( 'required' => true ),
+						'before'      => array( 'required' => false ),
 						'after'       => array( 'required' => true ),
+						'baseline_id' => array( 'required' => false, 'sanitize_callback' => 'absint' ),
 					),
 				),
 			)
@@ -152,8 +153,9 @@ final class ScenarioController {
 					'permission_callback' => array( __CLASS__, 'permissions_check' ),
 					'args'                => array(
 						'scenario_id' => array( 'required' => true, 'sanitize_callback' => 'absint' ),
-						'before'      => array( 'required' => true ),
+						'before'      => array( 'required' => false ),
 						'after'       => array( 'required' => true ),
+						'baseline_id' => array( 'required' => false, 'sanitize_callback' => 'absint' ),
 					),
 				),
 			)
@@ -409,7 +411,8 @@ final class ScenarioController {
 			$version['context_fingerprint'],
 			$result['observations']['before'],
 			$result['observations']['after'],
-			$result['changes']
+			$result['changes'],
+			isset( $data['baseline']['id'] ) ? $data['baseline']['id'] : null
 		);
 		if ( is_wp_error( $report ) ) {
 			return $report;
@@ -466,10 +469,36 @@ final class ScenarioController {
 			return new \WP_Error( 'wpecir_comparison_context_missing', __( 'The selected scenario has no comparable saved version.', 'wpessential-checkout-impact-regression' ), array( 'status' => 409 ) );
 		}
 
-		$before = $request->get_param( 'before' );
-		$after  = $request->get_param( 'after' );
+		$baseline_id = absint( $request->get_param( 'baseline_id' ) );
+		$baseline    = null;
+		$after       = $request->get_param( 'after' );
+		if ( $baseline_id > 0 ) {
+			$baseline = $repository->get_baseline( $scenario['id'], $baseline_id );
+			if ( is_wp_error( $baseline ) ) {
+				return $baseline;
+			}
+			$latest = $scenario['latest_version'];
+			if ( absint( $baseline['scenario_version_id'] ) !== absint( $latest['id'] ) || $baseline['context_fingerprint'] !== $latest['context_fingerprint'] ) {
+				return new \WP_Error( 'wpecir_baseline_context_mismatch', __( 'Approve a baseline for the current scenario version before comparing.', 'wpessential-checkout-impact-regression' ), array( 'status' => 409 ) );
+			}
+			$before = $baseline['observation'];
+			if ( ! is_array( $before ) ) {
+				return new \WP_Error( 'wpecir_invalid_baseline_observation', __( 'The approved baseline observations could not be read.', 'wpessential-checkout-impact-regression' ), array( 'status' => 409 ) );
+			}
+			foreach ( array( 'shipping.cost', 'coupon.discount' ) as $money_field ) {
+				if ( isset( $before[ $money_field ]['state'] ) && 'observed' === $before[ $money_field ]['state'] ) {
+					$money = isset( $before[ $money_field ]['value'] ) ? $before[ $money_field ]['value'] : null;
+					if ( ! is_array( $money ) || ! isset( $money['currency_code'], $money['amount'] ) || ! is_string( $money['currency_code'] ) || ( ! is_string( $money['amount'] ) && ! is_int( $money['amount'] ) ) || strtoupper( $money['currency_code'] ) !== strtoupper( $latest['input']['currency'] ) ) {
+						return new \WP_Error( 'wpecir_invalid_baseline_observation', __( 'The approved baseline money value does not match this scenario currency.', 'wpessential-checkout-impact-regression' ), array( 'status' => 409 ) );
+					}
+					$before[ $money_field ]['value'] = (string) $money['amount'];
+				}
+			}
+		} else {
+			$before = $request->get_param( 'before' );
+		}
 		if ( ! is_array( $before ) || ! is_array( $after ) ) {
-			return new \WP_Error( 'wpecir_invalid_manual_comparison', __( 'Provide structured before and after observations.', 'wpessential-checkout-impact-regression' ), array( 'status' => 400 ) );
+			return new \WP_Error( 'wpecir_invalid_manual_comparison', __( 'Provide structured after observations and either a saved baseline or before observations.', 'wpessential-checkout-impact-regression' ), array( 'status' => 400 ) );
 		}
 
 		$result = ManualComparison::preview(
@@ -485,6 +514,7 @@ final class ScenarioController {
 		return array(
 			'scenario' => $scenario,
 			'result'   => $result,
+			'baseline' => $baseline,
 		);
 	}
 
@@ -504,6 +534,10 @@ final class ScenarioController {
 			'scenario_version' => (int) $scenario['latest_version']['version'],
 			'currency'         => strtoupper( $scenario['latest_version']['input']['currency'] ),
 			'mode'             => 'manual_preview',
+			'baseline'         => ! empty( $data['baseline'] ) ? array(
+				'id'       => absint( $data['baseline']['id'] ),
+				'revision' => absint( $data['baseline']['revision'] ),
+			) : null,
 			'changes'          => $result['changes'],
 			'summary'          => $result['summary'],
 		);
