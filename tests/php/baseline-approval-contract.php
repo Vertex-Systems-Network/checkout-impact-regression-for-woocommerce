@@ -64,7 +64,7 @@ class WPECIR_Baseline_Test_WPDB {
 
 	public function get_var( $prepared ) {
 		$this->queries++;
-		if ( false !== strpos( $prepared['query'], 'FROM wp_wpecir_baselines' ) ) {
+		if ( false !== strpos( $prepared['query'], 'FROM wp_wpecir_baselines' ) && false !== strpos( $prepared['query'], 'SELECT id' ) ) {
 			return $this->baseline_match;
 		}
 		return $this->max_revision;
