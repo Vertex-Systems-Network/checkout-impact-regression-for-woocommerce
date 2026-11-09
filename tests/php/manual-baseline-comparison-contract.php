@@ -22,6 +22,7 @@ function sanitize_text_field( $value ) { return trim( strip_tags( (string) $valu
 function sanitize_key( $value ) { return preg_replace( '/[^a-z0-9_\\-]/', '', strtolower( $value ) ); }
 function is_email( $value ) { return is_string( $value ) && false !== filter_var( $value, FILTER_VALIDATE_EMAIL ); }
 function wp_json_encode( $value, $flags = 0 ) { return json_encode( $value, $flags ); }
+function __( $message, $domain = null ) { return $message; }
 function current_user_can( $capability ) { return 'manage_woocommerce' === $capability; }
 
 class WPECIR_Manual_Baseline_Test_WPDB {
