@@ -69,7 +69,7 @@ $GLOBALS['wpdb']->baseline = array(
 	'revision'            => 4,
 	'state'               => 'approved',
 	'context_fingerprint' => $context,
-	'observation_json'    => '{"shipping.method":{"state":"observed","value":"Standard"},"shipping.cost":{"state":"observed","value":{"currency_code":"EUR","amount":"7"}},"coupon.code":{"state":"missing"},"coupon.discount":{"state":"missing"}}',
+	'observation_json'    => '{"shipping.method":{"state":"observed","value":"Standard"},"shipping.cost":{"state":"observed","value":{"currency_code":"EUR","amount":"7"}},"coupon.code":{"state":"missing"},"coupon.discount":{"state":"missing"},"payment.methods":{"state":"observed","value":"cod, stripe"}}',
 );
 
 require dirname( __DIR__, 2 ) . '/vendor/autoload.php';
@@ -102,6 +102,7 @@ $request = new WPECIR_Manual_Baseline_Test_Request(
 			'shipping.cost'   => array( 'state' => 'observed', 'value' => '12.00' ),
 			'coupon.code'     => array( 'state' => 'missing' ),
 			'coupon.discount' => array( 'state' => 'missing' ),
+			'payment.methods' => array( 'state' => 'observed', 'value' => 'stripe, cod' ),
 		),
 	)
 );
@@ -115,7 +116,7 @@ baseline_comparison_check( 'changed' === $result['result']['changes']['shipping_
 $GLOBALS['wpdb']->baseline['observation_json'] = '{"shipping.cost":{"state":"observed","value":{"currency_code":{},"amount":7}}}';
 $malformed_money = $prepare->invoke( null, new WPECIR_Manual_Baseline_Test_Request( array( 'scenario_id' => 11, 'baseline_id' => 31, 'after' => array() ) ) );
 baseline_comparison_check( is_wp_error( $malformed_money ) && 'wpecir_invalid_baseline_observation' === $malformed_money->get_error_code(), 'malformed stored currency values fail closed without a type error' );
-$GLOBALS['wpdb']->baseline['observation_json'] = '{"shipping.method":{"state":"observed","value":"Standard"},"shipping.cost":{"state":"observed","value":{"currency_code":"EUR","amount":"7"}},"coupon.code":{"state":"missing"},"coupon.discount":{"state":"missing"}}';
+$GLOBALS['wpdb']->baseline['observation_json'] = '{"shipping.method":{"state":"observed","value":"Standard"},"shipping.cost":{"state":"observed","value":{"currency_code":"EUR","amount":"7"}},"coupon.code":{"state":"missing"},"coupon.discount":{"state":"missing"},"payment.methods":{"state":"observed","value":"cod, stripe"}}';
 
 $GLOBALS['wpdb']->baseline['scenario_version_id'] = 21;
 $stale = $prepare->invoke( null, new WPECIR_Manual_Baseline_Test_Request( array( 'scenario_id' => 11, 'baseline_id' => 31, 'after' => array() ) ) );

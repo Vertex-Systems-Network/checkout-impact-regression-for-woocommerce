@@ -36,12 +36,14 @@ $before = array(
 	'shipping.cost' => array( 'state' => 'observed', 'value' => '7.00' ),
 	'coupon.discount' => array( 'state' => 'missing' ),
 	'coupon.code' => array( 'state' => 'missing' ),
+	'payment.methods' => array( 'state' => 'observed', 'value' => 'stripe, cod' ),
 );
 $after = array(
 	'shipping.method' => array( 'state' => 'observed', 'value' => 'flat_rate:3' ),
 	'shipping.cost' => array( 'state' => 'observed', 'value' => '12.00' ),
 	'coupon.discount' => array( 'state' => 'observed', 'value' => '1.00' ),
 	'coupon.code' => array( 'state' => 'observed', 'value' => 'WELCOME10' ),
+	'payment.methods' => array( 'state' => 'observed', 'value' => 'COD, stripe, stripe' ),
 );
 
 $result = ManualComparison::preview( $before, $after, $context, 'USD' );
@@ -50,7 +52,9 @@ manual_check( 'unchanged' === $result['changes']['shipping_method']['state'], 'e
 manual_check( 'changed' === $result['changes']['shipping_cost']['state'], 'shipping cost change is identified' );
 manual_check( 'added' === $result['changes']['coupon_discount']['state'], 'newly observed coupon discount is added' );
 manual_check( 'added' === $result['changes']['coupon_code']['state'], 'new coupon code is shown as added' );
-manual_check( 1 === $result['summary']['changed'] && 2 === $result['summary']['added'] && 1 === $result['summary']['unchanged'], 'summary counts match field results' );
+manual_check( 'unchanged' === $result['changes']['payment_methods']['state'], 'payment method ordering, case, and duplicates do not create false changes' );
+manual_check( 'cod, stripe' === $result['observations']['after']['payment.methods']['value'], 'payment method IDs are normalized into a stable sorted list' );
+manual_check( 1 === $result['summary']['changed'] && 2 === $result['summary']['added'] && 2 === $result['summary']['unchanged'], 'summary counts match field results' );
 
 $equal_amounts = ManualComparison::preview(
 	array( 'shipping.cost' => array( 'state' => 'observed', 'value' => '7.0' ) ),
@@ -64,6 +68,8 @@ $unknown = ManualComparison::preview( array( 'customer.email' => array( 'state' 
 manual_check( is_wp_error( $unknown ) && 'wpecir_invalid_observation_field' === $unknown->get_error_code(), 'unapproved personal-data fields are rejected' );
 $bad_amount = ManualComparison::preview( array( 'shipping.cost' => array( 'state' => 'observed', 'value' => '1e2' ) ), array(), $context, 'USD' );
 manual_check( is_wp_error( $bad_amount ) && 'wpecir_invalid_manual_amount' === $bad_amount->get_error_code(), 'scientific notation is rejected' );
+$bad_payment = ManualComparison::preview( array( 'payment.methods' => array( 'state' => 'observed', 'value' => 'stripe, secret-token' ) ), array(), $context, 'USD' );
+manual_check( is_wp_error( $bad_payment ) && 'wpecir_invalid_payment_methods' === $bad_payment->get_error_code(), 'malformed or secret-like payment method identifiers are rejected' );
 $unobserved = ManualComparison::preview(
 	array( 'shipping.method' => array( 'state' => 'not_observed' ) ),
 	array( 'shipping.method' => array( 'state' => 'observed', 'value' => 'flat_rate:3' ) ),

@@ -527,7 +527,7 @@ final class Repository {
 			return new \WP_Error( 'wpecir_comparison_version_not_found', 'The report context does not match a saved version of this scenario.' );
 		}
 
-		$allowed_fields = array( 'shipping.method', 'shipping.cost', 'coupon.code', 'coupon.discount' );
+		$allowed_fields = array( 'shipping.method', 'shipping.cost', 'coupon.code', 'coupon.discount', 'payment.methods' );
 		foreach ( array( $before, $after ) as $observations ) {
 			if ( ! is_array( $observations ) || count( $observations ) > count( $allowed_fields ) ) {
 				return new \WP_Error( 'wpecir_invalid_comparison_observations', 'Only the supported manual checkout fields may be saved.' );
@@ -547,7 +547,7 @@ final class Repository {
 		if ( ! is_array( $changes ) || count( $changes ) > count( $allowed_fields ) ) {
 			return new \WP_Error( 'wpecir_invalid_comparison_findings', 'The comparison output is invalid.' );
 		}
-		$allowed_changes = array( 'shipping_method', 'shipping_cost', 'coupon_code', 'coupon_discount' );
+		$allowed_changes = array( 'shipping_method', 'shipping_cost', 'coupon_code', 'coupon_discount', 'payment_methods' );
 		foreach ( $changes as $field => $change ) {
 			if ( ! is_string( $field ) || ! in_array( $field, $allowed_changes, true ) || ! is_array( $change ) || empty( $change['state'] ) || ! in_array( $change['state'], array( 'changed', 'missing', 'added', 'unchanged', 'not_comparable' ), true ) ) {
 				return new \WP_Error( 'wpecir_invalid_comparison_findings', 'The comparison output contains an unsupported field or state.' );

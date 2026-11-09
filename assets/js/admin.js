@@ -71,6 +71,7 @@
 		{ key: 'shipping.cost', label: text( 'Shipping cost' ), money: true },
 		{ key: 'coupon.code', label: text( 'Coupon code' ), money: false },
 		{ key: 'coupon.discount', label: text( 'Coupon discount' ), money: true },
+		{ key: 'payment.methods', label: text( 'Available payment method IDs (comma-separated)' ), money: false },
 	];
 	const emptyManualObservations = function () {
 		return manualFields.reduce( function ( values, field ) {
@@ -301,6 +302,7 @@
 			shipping_cost: text( 'Shipping cost' ),
 			coupon_code: text( 'Coupon code' ),
 			coupon_discount: text( 'Coupon discount' ),
+			payment_methods: text( 'Available payment methods' ),
 		};
 		const comparisonDetail = function (change) {
 			if ( change.state === 'changed' ) {

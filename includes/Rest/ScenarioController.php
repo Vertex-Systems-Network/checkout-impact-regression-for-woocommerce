@@ -337,7 +337,7 @@ final class ScenarioController {
 			return $normalized;
 		}
 
-		$fields = array( 'shipping.method', 'shipping.cost', 'coupon.code', 'coupon.discount' );
+		$fields = array( 'shipping.method', 'shipping.cost', 'coupon.code', 'coupon.discount', 'payment.methods' );
 		foreach ( $fields as $field ) {
 			if ( ! isset( $normalized['observations']['after'][ $field ] ) || ! in_array( $normalized['observations']['after'][ $field ]['state'], array( 'observed', 'missing' ), true ) ) {
 				return new \WP_Error( 'wpecir_incomplete_baseline_observation', __( 'Record every supported field as observed or confirmed missing before approving this baseline.', 'wpessential-checkout-impact-regression' ), array( 'status' => 400 ) );

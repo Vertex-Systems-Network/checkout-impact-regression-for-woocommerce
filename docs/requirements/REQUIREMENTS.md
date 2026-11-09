@@ -12,7 +12,7 @@
 | J-02 | Operator compares a UK delivery scenario before and after a shipping-setting change. | Show expected £/$ amount and observed amount in the store's currency, with tax/zone context and evidence. |
 | J-03 | QA saves a US control scenario expected to remain unchanged. | Explicitly report unchanged, not merely omit the scenario. |
 | J-04 | Operator applies `WELCOME10` to a saved cart before and after a coupon or checkout change. | Compare eligibility, applied amount, discount type, tax effects, and final total; avoid assuming the coupon must always succeed. |
-| J-05 | Payment methods differ by country, currency, cart, or checkout type. | Report method availability and supported state; never initiate a real payment. |
+| J-05 | Payment methods differ by country, currency, cart, or checkout type. | Compare the observed gateway-ID set and supported state; never initiate a real payment. Current manual comparison accepts comma-separated gateway IDs, canonicalizes order/case/duplicates, and treats absence as confirmed missing only when the operator records it. |
 | J-06 | A replay is blocked, unstable, unsupported, or produces inconsistent observations. | Mark it unsupported/flaky/inconclusive with reason; do not convert missing evidence into a regression claim. |
 | J-07 | An authorized user reviews a difference and decides it is expected. | Record acknowledgement and baseline approval as an auditable action; do not silently overwrite the old baseline. |
 

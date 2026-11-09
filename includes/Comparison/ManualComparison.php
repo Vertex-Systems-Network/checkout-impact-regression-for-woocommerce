@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Compares merchant-recorded observations without contacting checkout.
  */
 final class ManualComparison {
-	private const FIELDS = array( 'shipping.method', 'shipping.cost', 'coupon.code', 'coupon.discount' );
+	private const FIELDS = array( 'shipping.method', 'shipping.cost', 'coupon.code', 'coupon.discount', 'payment.methods' );
 
 	/**
 	 * Validate a pair of manual observations and return a deterministic preview.
@@ -108,6 +108,11 @@ final class ManualComparison {
 				if ( is_wp_error( $value ) ) {
 					return $value;
 				}
+			} elseif ( 'payment.methods' === $field ) {
+				$value = self::normalize_payment_methods( $observation['value'] );
+				if ( is_wp_error( $value ) ) {
+					return $value;
+				}
 			} else {
 				$value = $observation['value'];
 				if ( ! is_string( $value ) || '' === trim( $value ) || strlen( $value ) > 191 || is_email( $value ) || preg_match( '/(?:password|secret|token|credential|api.?key)/i', $value ) ) {
@@ -147,5 +152,30 @@ final class ManualComparison {
 			'currency_code' => $currency,
 			'amount'        => $amount,
 		);
+	}
+
+	/**
+	 * Normalize a comma-separated list of observed gateway IDs.
+	 *
+	 * @param mixed $value Raw method IDs.
+	 * @return string|\WP_Error
+	 */
+	private static function normalize_payment_methods( $value ) {
+		if ( ! is_string( $value ) || strlen( $value ) > 500 ) {
+			return new \WP_Error( 'wpecir_invalid_payment_methods', 'Enter a comma-separated list of payment method IDs.' );
+		}
+
+		$methods = array();
+		foreach ( explode( ',', $value ) as $method ) {
+			$method = strtolower( trim( $method ) );
+			if ( '' === $method || ! preg_match( '/^[a-z0-9][a-z0-9_.:-]{0,99}$/', $method ) ) {
+				return new \WP_Error( 'wpecir_invalid_payment_methods', 'Payment method IDs may contain letters, numbers, dots, underscores, colons, and hyphens.' );
+			}
+			$methods[] = $method;
+		}
+
+		$methods = array_values( array_unique( $methods ) );
+		sort( $methods, SORT_STRING );
+		return implode( ', ', $methods );
 	}
 }
