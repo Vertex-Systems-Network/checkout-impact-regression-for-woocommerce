@@ -107,6 +107,34 @@ final class ScenarioController {
 		);
 		register_rest_route(
 			self::REST_NAMESPACE,
+			'/scenarios/(?P<id>\\d+)/comparisons',
+			array(
+				array(
+					'methods'             => \\WP_REST_Server::READABLE,
+					'callback'            => array( __CLASS__, 'list_manual_comparisons' ),
+					'permission_callback' => array( __CLASS__, 'permissions_check' ),
+					'args'                => array( 'id' => array( 'required' => true, 'sanitize_callback' => 'absint' ) ),
+				),
+			)
+		);
+		register_rest_route(
+			self::REST_NAMESPACE,
+			'/comparisons',
+			array(
+				array(
+					'methods'             => \\WP_REST_Server::CREATABLE,
+					'callback'            => array( __CLASS__, 'save_manual_comparison' ),
+					'permission_callback' => array( __CLASS__, 'permissions_check' ),
+					'args'                => array(
+						'scenario_id' => array( 'required' => true, 'sanitize_callback' => 'absint' ),
+						'before'      => array( 'required' => true ),
+						'after'       => array( 'required' => true ),
+					),
+				),
+			)
+		);
+		register_rest_route(
+			self::REST_NAMESPACE,
 			'/comparisons/preview',
 			array(
 				array(
@@ -287,7 +315,85 @@ final class ScenarioController {
 	 * @param \WP_REST_Request $request Request.
 	 * @return array|\WP_Error
 	 */
+
 	public static function preview_comparison( $request ) {
+		$data = self::prepare_manual_comparison( $request );
+		if ( is_wp_error( $data ) ) {
+			return $data;
+		}
+
+		return rest_ensure_response( self::manual_comparison_response( $data ) );
+	}
+
+	/**
+	 * Persist a user-approved manual comparison and return its report identity.
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return array|\WP_Error
+	 */
+	public static function save_manual_comparison( $request ) {
+		$data = self::prepare_manual_comparison( $request );
+		if ( is_wp_error( $data ) ) {
+			return $data;
+		}
+
+		$scenario = $data['scenario'];
+		$result   = $data['result'];
+		$version  = $scenario['latest_version'];
+		$report   = ( new Repository() )->create_manual_comparison(
+			$scenario['id'],
+			$version['id'],
+			$version['context_fingerprint'],
+			$result['observations']['before'],
+			$result['observations']['after'],
+			$result['changes']
+		);
+		if ( is_wp_error( $report ) ) {
+			return $report;
+		}
+
+		return rest_ensure_response(
+			array_merge(
+				self::manual_comparison_response( $data ),
+				array( 'report' => $report )
+			)
+		);
+	}
+
+	/**
+	 * Return recent, unexpired manual reports for a saved scenario.
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return array|\WP_Error
+	 */
+	public static function list_manual_comparisons( $request ) {
+		$repository = new Repository();
+		$scenario   = $repository->get_scenario( $request->get_param( 'id' ) );
+		if ( is_wp_error( $scenario ) ) {
+			return $scenario;
+		}
+
+		$reports = $repository->list_manual_comparisons( $scenario['id'], 10 );
+		if ( is_wp_error( $reports ) ) {
+			return $reports;
+		}
+
+		return rest_ensure_response(
+			array(
+				'scenario_id'    => (int) $scenario['id'],
+				'scenario_title' => $scenario['title'],
+				'reports'        => $reports,
+			)
+		);
+	}
+
+	/**
+	 * Validate and compute a preview for a saved scenario without side effects.
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return array|\WP_Error
+	 */
+	private static function prepare_manual_comparison( $request ) {
 		$repository = new Repository();
 		$scenario   = $repository->get_scenario( $request->get_param( 'scenario_id' ) );
 		if ( is_wp_error( $scenario ) ) {
@@ -313,16 +419,30 @@ final class ScenarioController {
 			return $result;
 		}
 
-		return rest_ensure_response(
-			array(
-				'scenario_id'      => (int) $scenario['id'],
-				'scenario_title'   => $scenario['title'],
-				'scenario_version' => (int) $scenario['latest_version']['version'],
-				'currency'         => strtoupper( $scenario['latest_version']['input']['currency'] ),
-				'mode'             => 'manual_preview',
-				'changes'          => $result['changes'],
-				'summary'          => $result['summary'],
-			)
+		return array(
+			'scenario' => $scenario,
+			'result'   => $result,
+		);
+	}
+
+	/**
+	 * Build the stable API response shared by preview and saved reports.
+	 *
+	 * @param array $data Scenario and computed comparison.
+	 * @return array
+	 */
+	private static function manual_comparison_response( $data ) {
+		$scenario = $data['scenario'];
+		$result   = $data['result'];
+
+		return array(
+			'scenario_id'      => (int) $scenario['id'],
+			'scenario_title'   => $scenario['title'],
+			'scenario_version' => (int) $scenario['latest_version']['version'],
+			'currency'         => strtoupper( $scenario['latest_version']['input']['currency'] ),
+			'mode'             => 'manual_preview',
+			'changes'          => $result['changes'],
+			'summary'          => $result['summary'],
 		);
 	}
 
