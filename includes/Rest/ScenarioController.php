@@ -89,7 +89,16 @@ final class ScenarioController {
 					'methods'             => \WP_REST_Server::READABLE,
 					'callback'            => array( __CLASS__, 'list_scenario_baselines' ),
 					'permission_callback' => array( __CLASS__, 'permissions_check' ),
-					'args'                => array( 'id' => array( 'sanitize_callback' => 'absint' ) ),
+					'args'                => array( 'id' => array( 'required' => true, 'sanitize_callback' => 'absint' ) ),
+				),
+				array(
+					'methods'             => \WP_REST_Server::CREATABLE,
+					'callback'            => array( __CLASS__, 'approve_manual_baseline' ),
+					'permission_callback' => array( __CLASS__, 'permissions_check' ),
+					'args'                => array(
+						'id'           => array( 'required' => true, 'sanitize_callback' => 'absint' ),
+						'observations' => array( 'required' => true ),
+					),
 				),
 			)
 		);
@@ -297,6 +306,60 @@ final class ScenarioController {
 	}
 
 
+	/**
+	 * Approve a complete, manually observed state as an immutable baseline.
+	 *
+	 * This endpoint never executes a checkout. The administrator must explicitly
+	 * submit all supported fields as observed or confirmed missing.
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return array|\WP_Error
+	 */
+	public static function approve_manual_baseline( $request ) {
+		$repository = new Repository();
+		$scenario   = $repository->get_scenario( $request->get_param( 'id' ) );
+		if ( is_wp_error( $scenario ) ) {
+			return $scenario;
+		}
+
+		$version      = isset( $scenario['latest_version'] ) ? $scenario['latest_version'] : array();
+		$context      = isset( $version['context_fingerprint'] ) ? $version['context_fingerprint'] : '';
+		$currency     = isset( $version['input']['currency'] ) ? $version['input']['currency'] : '';
+		$observations = $request->get_param( 'observations' );
+		if ( ! is_array( $observations ) || empty( $version['id'] ) || '' === $context || '' === $currency ) {
+			return new \\WP_Error( 'wpecir_invalid_baseline_observation', __( 'A saved scenario version and complete observations are required.', 'wpessential-checkout-impact-regression' ), array( 'status' => 400 ) );
+		}
+
+		$normalized = ManualComparison::preview( $observations, $observations, $context, $currency );
+		if ( is_wp_error( $normalized ) ) {
+			return $normalized;
+		}
+
+		$fields = array( 'shipping.method', 'shipping.cost', 'coupon.code', 'coupon.discount' );
+		foreach ( $fields as $field ) {
+			if ( ! isset( $normalized['observations']['after'][ $field ] ) || ! in_array( $normalized['observations']['after'][ $field ]['state'], array( 'observed', 'missing' ), true ) ) {
+				return new \\WP_Error( 'wpecir_incomplete_baseline_observation', __( 'Record every supported field as observed or confirmed missing before approving this baseline.', 'wpessential-checkout-impact-regression' ), array( 'status' => 400 ) );
+			}
+		}
+
+		$baseline = $repository->approve_baseline(
+			$scenario['id'],
+			$version['id'],
+			$normalized['observations']['after'],
+			$context
+		);
+		if ( is_wp_error( $baseline ) ) {
+			return $baseline;
+		}
+
+		return rest_ensure_response(
+			array(
+				'scenario_id' => (int) $scenario['id'],
+				'currency'    => strtoupper( $currency ),
+				'baseline'    => $baseline,
+			)
+		);
+	}
 	/**
 	 * Return a bounded, privacy-safe change-event history.
 	 *
