@@ -85,3 +85,17 @@ TasteWP runtime verification — 2026-11-09: installed and activated the v0.2.1 
 - **CI:** [run #286](https://github.com/Vertex-Systems-Network/wpessential-checkout-impact-regression/actions/runs/42688305277) passed Composer validation, optimized PSR-4 generation, PHP lint, JavaScript syntax, all contract tests (including the new manual comparison and REST route contracts), ZIP verification and artifact upload. Artifact 13704614526 (installable-plugin-v0.2.1), outer archive SHA-256 a05522617f7fe9e18d5a9ca897132f8ecbfceac07f89912d1f253e2009ab6640; the inner plugin ZIP checksum also passed.
 - **TasteWP:** the verified artifact was installed over the existing plugin on the authorized Quirky Brake test site (WordPress 7.1.4); WordPress reported Plugin updated successfully. The comparison panel rendered. Synthetic observations produced **Changed: 2, Missing: 1, Added: 0, Unchanged: 1, Needs review: 0** for shipping method flat_rate:3 → confirmed missing, shipping cost USD 7 → USD 12, coupon code WELCOME10 unchanged, and discount USD 1 → USD 0.5. The temporary scenario was deleted; the count returned to zero and the scenario library showed its empty state.
 - **Safety / limits:** no checkout, order, payment, shipping, or coupon request was run; all comparison values were entered manually as synthetic data. This does not prove automatic capture, baseline approval, durable report/history, plugin/settings impact attribution, migration/privacy runtime, or WPML/Polylang runtime. Phase 7 is now **73%**, not complete; automated runs remain blocked by the Phase 6 NO-GO.
+
+
+## Manual comparison report persistence — 2026-11-10
+
+| Check | Result | Evidence |
+|---|---|---|
+| CI / PHP lint / JavaScript syntax / contract suite / installable ZIP | Pass | Workflow run #296, commit 7f8f9b34ec9f89f8d992d9c1a61c7bf5d08cf627; artifact 13707522149. Outer archive SHA-256: b762a117a635ae8ecfb970c781625b44f67ba22316623efc0898111e7eea3cef. Inner plugin ZIP SHA-256: 882bc152d34bffecd31c9f8178621ed25b5c9dc1c2d7bf3065383f6d5a159425. |
+| Package install/replace | Pass | Installed over existing plugin on authorized TasteWP Quirky Brake; WP 7.1.4 reported “Plugin updated successfully.” |
+| Synthetic manual comparison | Pass | DE/EUR: Standard shipping method became confirmed missing; shipping cost EUR 7→12; WELCOME10 unchanged; coupon discount EUR 10→8. Result summary: 2 changed, 1 missing, 1 unchanged, 0 added, 0 needs review. |
+| Save and retrieval | Pass | Explicit Save report action stored report #1 with created/expiry timestamps. After browser reload and scenario reselection, history returned the same report and counts. |
+| Delete cleanup | Pass | Deleting disposable scenario returned count to zero and empty library; report row no longer appeared in scenario history. |
+| Checkout side effects | Not run by design | No checkout, order, payment, shipping, or coupon execution/request occurred; data was manually entered synthetic test data. |
+
+**Scope boundary:** this verifies manual report persistence and scenario-scoped cleanup on this staging instance only. It does not verify automated checkout observation, approved-baseline capture, configurable retention (current retention is fixed at 30 days), live schema/privacy migration, marketplace compatibility, or WPML/Polylang runtime integration. Phase 7 is tracked at 74% and remains in progress; Phase 6 NO-GO still blocks replay orchestration.
