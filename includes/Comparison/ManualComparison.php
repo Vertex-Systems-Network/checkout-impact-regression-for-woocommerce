@@ -168,7 +168,7 @@ final class ManualComparison {
 		$methods = array();
 		foreach ( explode( ',', $value ) as $method ) {
 			$method = strtolower( trim( $method ) );
-			if ( '' === $method || ! preg_match( '/^[a-z0-9][a-z0-9_.:-]{0,99}$/', $method ) ) {
+			if ( '' === $method || ! preg_match( '/^[a-z0-9][a-z0-9_.:-]{0,99}$/', $method ) || preg_match( '/(?:password|secret|credential|api.?key|access.?token)/i', $method ) ) {
 				return new \WP_Error( 'wpecir_invalid_payment_methods', 'Payment method IDs may contain letters, numbers, dots, underscores, colons, and hyphens.' );
 			}
 			$methods[] = $method;
