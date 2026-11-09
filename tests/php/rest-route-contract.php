@@ -40,7 +40,9 @@ route_check( 2 === count( $routes[0][2] ) && 3 === count( $routes[1][2] ), 'coll
 route_check( 'wpecir/v1' === $routes[2][0] && false !== strpos( $routes[2][1], '/scenarios/(?P<id>' ) && false !== strpos( $routes[2][1], '/versions' ), 'version history is scoped to a scenario item' );
 route_check( 1 === count( $routes[2][2] ) && 'GET' === $routes[2][2][0]['methods'], 'version history exposes read-only access' );
 route_check( 'wpecir/v1' === $routes[3][0] && false !== strpos( $routes[3][1], '/scenarios/(?P<id>' ) && false !== strpos( $routes[3][1], '/baselines' ), 'baseline history is scoped to a scenario item' );
-route_check( 1 === count( $routes[3][2] ) && 'GET' === $routes[3][2][0]['methods'], 'baseline history exposes read-only access' );
+route_check( 2 === count( $routes[3][2] ) && 'GET' === $routes[3][2][0]['methods'], 'baseline history remains read-only' );
+route_check( 'POST' === $routes[3][2][1]['methods'] && array( ScenarioController::class, 'approve_manual_baseline' ) === $routes[3][2][1]['callback'], 'baseline approval uses the admin-only manual observation callback' );
+route_check( isset( $routes[3][2][1]['args']['observations']['required'] ) && true === $routes[3][2][1]['args']['observations']['required'], 'baseline approval requires explicit observations' );
 route_check( 'wpecir/v1' === $routes[4][0] && '/change-events' === $routes[4][1], 'change-event history uses the expected route' );
 route_check( 1 === count( $routes[4][2] ) && 'GET' === $routes[4][2][0]['methods'], 'change-event history exposes read-only access' );
 route_check( 'wpecir/v1' === $routes[5][0] && false !== strpos( $routes[5][1], '/scenarios/(?P<id>' ) && false !== strpos( $routes[5][1], '/comparisons' ), 'scenario comparison history uses a scenario-scoped route' );
