@@ -127,6 +127,9 @@
 		const [ comparisonHistory, setComparisonHistory ] = wp.element.useState( [] );
 		const [ historyBusy, setHistoryBusy ] = wp.element.useState( false );
 		const [ savedReportId, setSavedReportId ] = wp.element.useState( null );
+		const [ baselineBusy, setBaselineBusy ] = wp.element.useState( false );
+		const [ baselineError, setBaselineError ] = wp.element.useState( '' );
+		const [ baselineNotice, setBaselineNotice ] = wp.element.useState( '' );
 
 		const refresh = function () {
 			setLoading( true );
@@ -167,6 +170,8 @@
 			setter( function (previous) { return Object.assign( {}, previous, { [ field ]: value } ); } );
 			setComparisonResult( null );
 			setSavedReportId( null );
+			setBaselineError( '' );
+			setBaselineNotice( '' );
 		};
 
 		const hasManualObservation = function () {
@@ -210,6 +215,33 @@
 				} )
 				.catch( function (requestError) { setComparisonError( requestError.message || text( 'Could not save the comparison report.' ) ); } )
 				.finally( function () { setComparisonBusy( false ); } );
+		};
+
+		const hasCompleteBaselineObservation = function () {
+			return manualFields.every( function (field) {
+				const observation = afterObservations[ field.key ];
+				return observation && ( observation.state === 'missing' || ( observation.state === 'observed' && String( observation.value ).trim() !== '' ) );
+			} );
+		};
+
+		const approveManualBaseline = function () {
+			if ( ! comparisonResult || ! comparisonScenarioId || ! hasCompleteBaselineObservation() ) { return; }
+			setBaselineBusy( true );
+			setBaselineError( '' );
+			setBaselineNotice( '' );
+			wp.apiFetch( {
+				path: '/wpecir/v1/scenarios/' + Number( comparisonScenarioId ) + '/baselines',
+				method: 'POST',
+				data: { observations: toManualObservationMap( afterObservations ) },
+			} )
+				.then( function ( result ) {
+					setBaselineNotice( text( 'Approved baseline revision ' ) + result.baseline.revision + text( ' saved from the manually recorded after-values.' ) );
+					setBaselineHistoryScenarioId( Number( comparisonScenarioId ) );
+					return wp.apiFetch( { path: '/wpecir/v1/scenarios/' + Number( comparisonScenarioId ) + '/baselines' } )
+						.then( function ( rows ) { setBaselineHistory( Array.isArray( rows ) ? rows : [] ); } );
+				} )
+				.catch( function (requestError) { setBaselineError( requestError.message || text( 'Could not approve this baseline.' ) ); } )
+				.finally( function () { setBaselineBusy( false ); } );
 		};
 
 		const comparisonStateLabels = {
@@ -457,7 +489,7 @@
 							id: 'wpecir-comparison-scenario',
 							value: comparisonScenarioId,
 							required: true,
-							onChange: function (event) { setComparisonScenarioId( event.target.value ); setBeforeObservations( emptyManualObservations() ); setAfterObservations( emptyManualObservations() ); setComparisonResult( null ); setSavedReportId( null ); setComparisonError( '' ); },
+							onChange: function (event) { setComparisonScenarioId( event.target.value ); setBeforeObservations( emptyManualObservations() ); setAfterObservations( emptyManualObservations() ); setComparisonResult( null ); setSavedReportId( null ); setComparisonError( '' ); setBaselineError( '' ); setBaselineNotice( '' ); },
 						},
 							h( 'option', { value: '' }, text( 'Choose a saved scenario' ) ),
 							scenarios.map( function (scenario) {
@@ -500,7 +532,14 @@
 						} ) ),
 						h( 'div', { className: 'wpecir-comparison-actions' },
 							h( 'button', { type: 'button', className: 'button', disabled: comparisonBusy || ! comparisonResult || Boolean( savedReportId ), onClick: saveManualComparison }, comparisonBusy ? text( 'Saving…' ) : savedReportId ? text( 'Report saved' ) : text( 'Save report for 30 days' ) ),
-							h( 'span', null, text( 'Only manually entered observations are saved. Checkout is not run.' ) )
+							h( 'span', null, text( 'Only manually entered observations are saved. Checkout is not run.' ) ),
+							h( 'div', { className: 'wpecir-baseline-approval' },
+								h( 'p', null, text( 'Approve a baseline only when these after-values are known-good. Record every field as observed or confirmed missing.' ) ),
+								baselineError ? h( 'p', { className: 'notice notice-error inline', role: 'alert' }, baselineError ) : null,
+								baselineNotice ? h( 'p', { className: 'notice notice-success inline', role: 'status' }, baselineNotice ) : null,
+								h( 'button', { type: 'button', className: 'button', disabled: baselineBusy || ! comparisonResult || ! hasCompleteBaselineObservation(), onClick: approveManualBaseline }, baselineBusy ? text( 'Approving…' ) : text( 'Approve after-values as baseline' ) ),
+								! hasCompleteBaselineObservation() ? h( 'small', null, text( 'Complete the four after-observation fields first. Use Confirmed missing where a value is absent.' ) ) : null
+							)
 						)
 					) : null
 				) : h( 'p', { className: 'wpecir-empty' }, text( 'Create a synthetic scenario before previewing observed values.' ) ),
