@@ -92,3 +92,5 @@ See the [distribution and marketplace submission plan](docs/release/DISTRIBUTION
 ## License
 
 No license has been selected yet. A GPL-compatible release license is a submission prerequisite and remains a decision.
+
+Follow-up CI after the documentation updates passed as workflow run #260 on commit `6079b36b26763787f206b94daa8344635704822b` (PHP lint, JS syntax, contracts and installable ZIP build); artifact `13641467446`. This revalidates the current source in CI, but does not change the unsuccessful Playground installation result or satisfy live runtime acceptance.
