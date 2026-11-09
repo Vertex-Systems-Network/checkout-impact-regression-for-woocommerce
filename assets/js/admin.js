@@ -511,7 +511,14 @@
 						return h( 'li', { key: report.id },
 							h( 'strong', null, text( 'Report #' ) + report.id + ( Number( report.id ) === Number( savedReportId ) ? ' · ' + text( 'Just saved' ) : '' ) ),
 							h( 'span', null, report.created_at + ' · ' + text( 'Expires ' ) + report.expires_at ),
-							h( 'span', null, text( 'Changed: ' ) + report.summary.changed + ' · ' + text( 'Missing: ' ) + report.summary.missing + ' · ' + text( 'Needs review: ' ) + report.summary.not_comparable )
+							h( 'span', null, text( 'Changed: ' ) + report.summary.changed + ' · ' + text( 'Missing: ' ) + report.summary.missing + ' · ' + text( 'Needs review: ' ) + report.summary.not_comparable ),
+							h( 'details', { className: 'wpecir-history-details' },
+								h( 'summary', null, text( 'View saved differences' ) ),
+								h( 'ol', null, Object.keys( report.changes || {} ).map( function (field) {
+									const change = report.changes[ field ];
+									return h( 'li', { key: field }, h( 'strong', null, comparisonFieldLabels[ field ] || field + ': ' ), ' ' + ( comparisonStateLabels[ change.state ] || text( 'Needs review' ) ) + ' · ' + comparisonDetail( change ) );
+								} ) )
+							)
 						);
 					} ) ) : h( 'p', { className: 'wpecir-empty' }, text( 'No saved reports for this scenario yet.' ) )
 				)
