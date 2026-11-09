@@ -54,6 +54,7 @@ jobs:
       - name: Run pure normalization, scenario, multilingual context and privacy contract checks
         run: |
           php tests/php/normalizer-diff.php
+          php tests/php/manual-comparison-contract.php
           php tests/php/scenario-contract.php
           php tests/php/multilingual-context-dry-run.php
           php tests/php/privacy-contract.php
