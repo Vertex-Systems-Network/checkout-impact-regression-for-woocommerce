@@ -231,6 +231,32 @@
 			error ? h( 'div', { className: 'notice notice-error inline', role: 'alert' }, h( 'p', null, error ) ) : null,
 			notice ? h( 'div', { className: 'notice notice-success inline', role: 'status', 'aria-live': 'polite' }, h( 'p', null, notice ) ) : null,
 
+			h( 'section', { className: 'wpecir-overview', 'aria-labelledby': 'wpecir-overview-title' },
+				h( 'div', { className: 'wpecir-overview__heading' },
+					h( 'p', { className: 'wpecir-card__eyebrow' }, text( 'Impact overview' ) ),
+					h( 'h2', { id: 'wpecir-overview-title' }, text( 'Change readiness' ) ),
+					h( 'p', null, text( 'See what is configured today and what still needs to be built before checkout behavior can be compared.' ) )
+				),
+				h( 'div', { className: 'wpecir-card-grid' },
+					h( 'article', { className: 'wpecir-card' },
+						h( 'p', { className: 'wpecir-card__eyebrow' }, text( 'Saved scenarios' ) ),
+						h( 'h2', null, loading ? '—' : String( scenarios.length ) ),
+						h( 'p', { className: 'wpecir-card__body' }, loading ? text( 'Loading scenario records.' ) : scenarios.length ? text( 'Synthetic customer and cart expectations are saved.' ) : text( 'Create a synthetic scenario to define a customer journey.' ) )
+					),
+					h( 'article', { className: 'wpecir-card' },
+						h( 'p', { className: 'wpecir-card__eyebrow' }, text( 'Before / after comparisons' ) ),
+						h( 'p', { className: 'wpecir-status wpecir-status--warning' }, text( 'Not available yet' ) ),
+						h( 'h2', null, text( 'No impact results' ) ),
+						h( 'p', { className: 'wpecir-card__body' }, text( 'Approved baseline capture and safe checkout observation are not implemented. No regression is inferred from configuration alone.' ) )
+					),
+					h( 'article', { className: 'wpecir-card' },
+						h( 'p', { className: 'wpecir-card__eyebrow' }, text( 'Change context' ) ),
+						h( 'h2', null, eventsLoading ? '—' : String( changeEvents.length ) ),
+						h( 'p', { className: 'wpecir-card__body' }, eventsLoading ? text( 'Loading recorded changes.' ) : changeEvents.length ? text( 'Recorded change fingerprints; impact has not been verified.' ) : text( 'No supported plugin or WooCommerce setting changes are recorded.' ) )
+					)
+				)
+			),
+
 			h( 'section', { className: 'wpecir-panel wpecir-events-panel', 'aria-labelledby': 'wpecir-events-title' },
 				h( 'div', { className: 'wpecir-panel__heading wpecir-panel__heading--row' },
 					h( 'div', null,
