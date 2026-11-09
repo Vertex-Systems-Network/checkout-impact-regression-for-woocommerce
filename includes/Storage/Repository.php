@@ -439,6 +439,40 @@ final class Repository {
 		return $rows;
 	}
 
+	/**
+	 * Retrieve one approved baseline scoped to its scenario.
+	 *
+	 * @param int $scenario_id Scenario identifier.
+	 * @param int $baseline_id Baseline identifier.
+	 * @return array|\WP_Error
+	 */
+	public function get_baseline( $scenario_id, $baseline_id ) {
+		global $wpdb;
+
+		if ( ! $this->can_manage() ) {
+			return new \WP_Error( 'wpecir_forbidden', 'You are not allowed to view baselines.' );
+		}
+
+		$row = $wpdb->get_row(
+			$wpdb->prepare(
+				'SELECT * FROM ' . $this->table( 'baselines' ) . ' WHERE id = %d AND scenario_id = %d AND state = %s',
+				absint( $baseline_id ),
+				absint( $scenario_id ),
+				'approved'
+			),
+			ARRAY_A
+		);
+
+		if ( ! $row ) {
+			return new \WP_Error( 'wpecir_baseline_not_found', 'The approved baseline does not exist for this scenario.' );
+		}
+
+		$row['observation'] = json_decode( $row['observation_json'], true );
+		unset( $row['observation_json'] );
+
+		return $row;
+	}
+
 
 	/**
 	 * Save a validated manual preview as a short-lived report.
@@ -451,7 +485,7 @@ final class Repository {
 	 * @param array  $changes Server-calculated comparison changes.
 	 * @return array|\WP_Error
 	 */
-	public function create_manual_comparison( $scenario_id, $version_id, $context, $before, $after, $changes ) {
+	public function create_manual_comparison( $scenario_id, $version_id, $context, $before, $after, $changes, $baseline_id = null ) {
 		global $wpdb;
 
 		if ( ! $this->can_manage() ) {
@@ -463,6 +497,22 @@ final class Repository {
 		$context     = sanitize_text_field( (string) $context );
 		if ( $scenario_id < 1 || $version_id < 1 || ! preg_match( '/^[a-f0-9]{64}$/', $context ) ) {
 			return new \WP_Error( 'wpecir_invalid_comparison_context', 'A valid saved scenario version is required.' );
+		}
+		if ( null !== $baseline_id ) {
+			$baseline_id = absint( $baseline_id );
+			$baseline    = $wpdb->get_var(
+				$wpdb->prepare(
+					'SELECT id FROM ' . $this->table( 'baselines' ) . ' WHERE id = %d AND scenario_id = %d AND scenario_version_id = %d AND context_fingerprint = %s AND state = %s',
+					$baseline_id,
+					$scenario_id,
+					$version_id,
+					$context,
+					'approved'
+				)
+			);
+			if ( $baseline_id < 1 || (int) $baseline !== $baseline_id ) {
+				return new \WP_Error( 'wpecir_baseline_context_mismatch', 'The approved baseline does not match the selected scenario version.' );
+			}
 		}
 
 		$version = $wpdb->get_row(
@@ -519,7 +569,7 @@ final class Repository {
 			array(
 				'scenario_id'         => $scenario_id,
 				'scenario_version_id' => $version_id,
-				'baseline_id'         => null,
+				'baseline_id'         => $baseline_id,
 				'change_event_id'     => null,
 				'state'               => 'manual_preview',
 				'context_fingerprint' => $context,
@@ -613,7 +663,7 @@ final class Repository {
 		$limit       = min( 20, max( 1, absint( $limit ) ) );
 		$runs        = $wpdb->get_results(
 			$wpdb->prepare(
-				'SELECT id,scenario_version_id,state,context_fingerprint,created_at,expires_at FROM ' . $this->table( 'runs' ) . ' WHERE scenario_id = %d AND state = %s AND (expires_at IS NULL OR expires_at >= %s) ORDER BY created_at DESC,id DESC LIMIT %d',
+				'SELECT id,scenario_version_id,baseline_id,state,context_fingerprint,created_at,expires_at FROM ' . $this->table( 'runs' ) . ' WHERE scenario_id = %d AND state = %s AND (expires_at IS NULL OR expires_at >= %s) ORDER BY created_at DESC,id DESC LIMIT %d',
 				$scenario_id,
 				'manual_preview',
 				current_time( 'mysql', true ),
@@ -682,6 +732,7 @@ final class Repository {
 			$reports[] = array(
 				'id'                  => $run_id,
 				'scenario_version_id' => absint( $run['scenario_version_id'] ),
+				'baseline_id'         => isset( $run['baseline_id'] ) ? absint( $run['baseline_id'] ) : 0,
 				'state'               => $run['state'],
 				'context_fingerprint' => $run['context_fingerprint'],
 				'created_at'          => $run['created_at'],

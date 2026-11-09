@@ -49,9 +49,11 @@ route_check( 'wpecir/v1' === $routes[5][0] && false !== strpos( $routes[5][1], '
 route_check( 'GET' === $routes[5][2][0]['methods'], 'comparison history exposes read-only access' );
 route_check( 'wpecir/v1' === $routes[6][0] && '/comparisons' === $routes[6][1], 'manual comparison persistence uses the expected route' );
 route_check( 1 === count( $routes[6][2] ) && 'POST' === $routes[6][2][0]['methods'], 'manual comparison save accepts only a create request' );
+route_check( false === $routes[6][2][0]['args']['before']['required'] && false === $routes[6][2][0]['args']['baseline_id']['required'], 'manual comparison can use either explicit before values or a saved baseline' );
 route_check( 'wpecir/v1' === $routes[7][0] && '/comparisons/preview' === $routes[7][1], 'manual comparison preview uses the expected route' );
 route_check( 1 === count( $routes[7][2] ) && 'POST' === $routes[7][2][0]['methods'], 'manual comparison preview accepts only a create request' );
 route_check( isset( $routes[7][2][0]['args']['scenario_id']['required'] ) && true === $routes[7][2][0]['args']['scenario_id']['required'], 'comparison preview requires a saved scenario context' );
+route_check( false === $routes[7][2][0]['args']['before']['required'] && false === $routes[7][2][0]['args']['baseline_id']['required'], 'comparison preview accepts saved-baseline or manual before-state input' );
 
 foreach ( $routes as $route ) {
 	foreach ( $route[2] as $endpoint ) {

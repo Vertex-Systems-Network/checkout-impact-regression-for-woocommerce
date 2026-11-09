@@ -9,6 +9,7 @@
 
 define( 'ABSPATH', __DIR__ . '/fixtures/' );
 define( 'ARRAY_A', 'ARRAY_A' );
+define( 'DAY_IN_SECONDS', 86400 );
 
 class WP_Error {
 	private $code;
@@ -24,6 +25,7 @@ function is_wp_error( $value ) { return $value instanceof WP_Error; }
 function absint( $value ) { return abs( (int) $value ); }
 function sanitize_text_field( $value ) { return trim( strip_tags( (string) $value ) ); }
 function wp_json_encode( $value, $options = 0 ) { return json_encode( $value, $options ); }
+function sanitize_key( $value ) { return preg_replace( '/[^a-z0-9_\\-]/', '', strtolower( $value ) ); }
 function is_email( $value ) { return is_string( $value ) && false !== filter_var( $value, FILTER_VALIDATE_EMAIL ); }
 function current_time( $type, $gmt = false ) { return '2026-11-07 12:00:00'; }
 function get_current_user_id() { return $GLOBALS['wpecir_baseline_user_id']; }
@@ -38,6 +40,9 @@ class WPECIR_Baseline_Test_WPDB {
 	public $queries = 0;
 	public $insert_result = 1;
 	public $rows = array();
+	public $baseline_row = null;
+	public $baseline_match = 0;
+	public $last_insert = null;
 
 	public function prepare( $query, ...$args ) {
 		$this->prepared[] = array( $query, $args );
@@ -46,6 +51,9 @@ class WPECIR_Baseline_Test_WPDB {
 
 	public function get_row( $prepared ) {
 		$this->queries++;
+		if ( false !== strpos( $prepared['query'], 'FROM wp_wpecir_baselines' ) ) {
+			return $this->baseline_row;
+		}
 		return $this->version_row;
 	}
 
@@ -56,11 +64,15 @@ class WPECIR_Baseline_Test_WPDB {
 
 	public function get_var( $prepared ) {
 		$this->queries++;
+		if ( false !== strpos( $prepared['query'], 'FROM wp_wpecir_baselines' ) && false !== strpos( $prepared['query'], 'SELECT id' ) ) {
+			return $this->baseline_match;
+		}
 		return $this->max_revision;
 	}
 
 	public function insert( $table, $data, $formats = null ) {
 		$this->inserts[] = array( $table, $data, $formats );
+		$this->last_insert = array( $table, $data, $formats );
 		if ( false === $this->insert_result ) {
 			return false;
 		}
@@ -97,6 +109,9 @@ baseline_check( 0 === $GLOBALS['wpdb']->queries && empty( $GLOBALS['wpdb']->inse
 $result = $repository->list_baselines( 11 );
 baseline_check( is_wp_error( $result ) && 'wpecir_forbidden' === $result->get_error_code(), 'unauthorized baseline history is denied' );
 baseline_check( 0 === $GLOBALS['wpdb']->queries && empty( $GLOBALS['wpdb']->inserts ), 'unauthorized history performs no database query or write' );
+$result = $repository->get_baseline( 11, 9 );
+baseline_check( is_wp_error( $result ) && 'wpecir_forbidden' === $result->get_error_code(), 'unauthorized baseline lookup is denied' );
+baseline_check( 0 === $GLOBALS['wpdb']->queries, 'unauthorized baseline lookup performs no query' );
 
 // Authorized approval still requires a version belonging to the selected scenario.
 $GLOBALS['wpecir_baseline_capabilities'] = array( 'manage_woocommerce' );
@@ -114,6 +129,32 @@ baseline_check( $writes_before_history === count( $GLOBALS['wpdb']->inserts ), '
 $history_query = end( $GLOBALS['wpdb']->prepared );
 baseline_check( false !== strpos( $history_query[0], 'FROM wp_wpecir_baselines' ) && false !== strpos( $history_query[0], 'ORDER BY revision DESC' ), 'history query is scoped to the plugin baseline table and ordered by revision' );
 baseline_check( array( 11 ) === $history_query[1], 'history query is scoped to the requested scenario ID' );
+$GLOBALS['wpdb']->baseline_row = array(
+	'id'                  => 9,
+	'scenario_id'         => 11,
+	'scenario_version_id' => 22,
+	'revision'            => 2,
+	'state'               => 'approved',
+	'context_fingerprint' => str_repeat( 'a', 64 ),
+	'observation_json'    => '{"shipping.cost":{"state":"observed","value":{"currency_code":"EUR","amount":"6"}}}',
+);
+$baseline = $repository->get_baseline( 11, 9 );
+baseline_check( 9 === (int) $baseline['id'] && 22 === (int) $baseline['scenario_version_id'], 'baseline lookup returns the selected scenario revision' );
+baseline_check( '6' === $baseline['observation']['shipping.cost']['value']['amount'], 'baseline lookup decodes approved normalized observations' );
+$baseline_query = end( $GLOBALS['wpdb']->prepared );
+baseline_check( false !== strpos( $baseline_query[0], 'WHERE id = %d AND scenario_id = %d AND state = %s' ), 'baseline lookup is constrained by ID, scenario and approved state' );
+$GLOBALS['wpdb']->baseline_row = null;
+$result = $repository->get_baseline( 12, 9 );
+baseline_check( is_wp_error( $result ) && 'wpecir_baseline_not_found' === $result->get_error_code(), 'baseline cannot be fetched through another scenario ID' );
+$GLOBALS['wpdb']->baseline_row = array(
+	'id'                  => 9,
+	'scenario_id'         => 11,
+	'scenario_version_id' => 22,
+	'revision'            => 2,
+	'state'               => 'approved',
+	'context_fingerprint' => str_repeat( 'a', 64 ),
+	'observation_json'    => '{"shipping.method":{"state":"observed","value":"Standard"}}',
+);
 $GLOBALS['wpdb']->version_row = null;
 $result = $repository->approve_baseline( 11, 22, $observation, $context );
 baseline_check( is_wp_error( $result ) && 'wpecir_version_not_found' === $result->get_error_code(), 'approval rejects a version that is not linked to the scenario' );
@@ -142,6 +183,20 @@ $GLOBALS['wpdb']->max_revision = 1;
 $result = $repository->approve_baseline( 11, 22, $observation, $context );
 baseline_check( ! is_wp_error( $result ) && 2 === $result['revision'], 'superseding approval advances revision' );
 baseline_check( 2 === count( $GLOBALS['wpdb']->inserts ), 'superseding approval inserts a new row instead of replacing history' );
+
+// Manual reports may reference only an approved baseline for the exact version.
+$GLOBALS['wpdb']->baseline_match = 31;
+$before = array( 'shipping.method' => array( 'state' => 'observed', 'value' => 'Standard' ) );
+$after  = array( 'shipping.method' => array( 'state' => 'missing' ) );
+$changes = array( 'shipping_method' => array( 'state' => 'missing', 'baseline' => 'Standard' ) );
+$inserts_before_report = count( $GLOBALS['wpdb']->inserts );
+$report = $repository->create_manual_comparison( 11, 22, $context, $before, $after, $changes, 31 );
+baseline_check( ! is_wp_error( $report ) && 'wp_wpecir_runs' === $GLOBALS['wpdb']->inserts[ $inserts_before_report ][0] && 31 === $GLOBALS['wpdb']->inserts[ $inserts_before_report ][1]['baseline_id'], 'manual report stores the exact approved baseline ID' );
+$insert_count = count( $GLOBALS['wpdb']->inserts );
+$GLOBALS['wpdb']->baseline_match = 0;
+$report = $repository->create_manual_comparison( 11, 22, $context, $before, $after, $changes, 99 );
+baseline_check( is_wp_error( $report ) && 'wpecir_baseline_context_mismatch' === $report->get_error_code(), 'manual report rejects a baseline not linked to the selected scenario version' );
+baseline_check( $insert_count === count( $GLOBALS['wpdb']->inserts ), 'mismatched baseline is rejected before report writes' );
 
 $GLOBALS['wpdb']->insert_result = false;
 $result = $repository->approve_baseline( 11, 22, $observation, $context );
