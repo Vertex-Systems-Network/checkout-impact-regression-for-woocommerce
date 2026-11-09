@@ -33,6 +33,67 @@
 		);
 	}
 
+
+	function ManualObservationField( props ) {
+		const valueId = 'wpecir-' + props.side + '-' + props.field;
+		return h(
+			'div',
+			{ className: 'wpecir-observation-field' },
+			h( 'label', { htmlFor: valueId + '-state' }, props.label ),
+			h(
+				'select',
+				{
+					id: valueId + '-state',
+					value: props.observation.state,
+					onChange: function ( event ) { props.onChange( { state: event.target.value, value: props.observation.value } ); },
+				},
+				h( 'option', { value: 'not_observed' }, text( 'Not recorded' ) ),
+				h( 'option', { value: 'observed' }, text( 'Observed' ) ),
+				h( 'option', { value: 'missing' }, text( 'Confirmed missing' ) ),
+				h( 'option', { value: 'unsupported' }, text( 'Unsupported' ) ),
+				h( 'option', { value: 'collection_error' }, text( 'Could not collect' ) )
+			),
+			props.observation.state === 'observed' ? h( 'input', {
+				id: valueId,
+				type: 'text',
+				inputMode: props.money ? 'decimal' : undefined,
+				value: props.observation.value,
+				maxLength: 191,
+				placeholder: props.money ? text( 'Exact decimal amount' ) : text( 'Observed value' ),
+				'aria-label': props.label + ' ' + text( 'observed value' ),
+				onChange: function ( event ) { props.onChange( { state: 'observed', value: event.target.value } ); },
+			} ) : h( 'small', null, props.observation.state === 'missing' ? text( 'Use only when you checked and confirmed this value is absent.' ) : text( 'This field will remain inconclusive unless you record an observation.' ) )
+		);
+	}
+
+	const manualFields = [
+		{ key: 'shipping.method', label: text( 'Shipping method' ), money: false },
+		{ key: 'shipping.cost', label: text( 'Shipping cost' ), money: true },
+		{ key: 'coupon.code', label: text( 'Coupon code' ), money: false },
+		{ key: 'coupon.discount', label: text( 'Coupon discount' ), money: true },
+	];
+	const emptyManualObservations = function () {
+		return manualFields.reduce( function ( values, field ) {
+			values[ field.key ] = { state: 'not_observed', value: '' };
+			return values;
+		}, {} );
+	};
+	const toManualObservationMap = function ( values ) {
+		return manualFields.reduce( function ( result, field ) {
+			const observation = values[ field.key ];
+			result[ field.key ] = observation.state === 'observed'
+				? { state: 'observed', value: observation.value }
+				: { state: observation.state };
+			return result;
+		}, {} );
+	};
+	function comparisonValue( value ) {
+		if ( value && typeof value === 'object' && value.currency_code && value.amount !== undefined ) {
+			return value.currency_code + ' ' + value.amount;
+		}
+		return value === undefined ? '' : String( value );
+	}
+
 	function App() {
 		const isWooCommerceActive = Boolean( config.woocommerceActive );
 		const [ scenarios, setScenarios ] = wp.element.useState( [] );
@@ -57,6 +118,13 @@
 		const [ changeEvents, setChangeEvents ] = wp.element.useState( [] );
 		const [ eventsLoading, setEventsLoading ] = wp.element.useState( true );
 
+		const [ comparisonScenarioId, setComparisonScenarioId ] = wp.element.useState( '' );
+		const [ beforeObservations, setBeforeObservations ] = wp.element.useState( emptyManualObservations );
+		const [ afterObservations, setAfterObservations ] = wp.element.useState( emptyManualObservations );
+		const [ comparisonBusy, setComparisonBusy ] = wp.element.useState( false );
+		const [ comparisonResult, setComparisonResult ] = wp.element.useState( null );
+		const [ comparisonError, setComparisonError ] = wp.element.useState( '' );
+
 		const refresh = function () {
 			setLoading( true );
 			return wp.apiFetch( { path: '/wpecir/v1/scenarios?per_page=50' } )
@@ -75,6 +143,66 @@
 		};
 
 		wp.element.useEffect( function () { refresh(); refreshEvents(); }, [] );
+
+
+		const updateObservation = function (setter, field, value ) {
+			setter( function (previous) { return Object.assign( {}, previous, { [ field ]: value } ); } );
+			setComparisonResult( null );
+		};
+
+		const hasManualObservation = function () {
+			return manualFields.some( function (field) {
+				return beforeObservations[ field.key ].state !== 'not_observed' || afterObservations[ field.key ].state !== 'not_observed';
+			} );
+		};
+
+		const previewManualComparison = function (event) {
+			event.preventDefault();
+			setComparisonBusy( true );
+			setComparisonError( '' );
+			setComparisonResult( null );
+			wp.apiFetch( {
+				path: '/wpecir/v1/comparisons/preview',
+				method: 'POST',
+				data: {
+					scenario_id: Number( comparisonScenarioId ),
+					before: toManualObservationMap( beforeObservations ),
+					after: toManualObservationMap( afterObservations ),
+				},
+			} )
+				.then( function (result) { setComparisonResult( result ); } )
+				.catch( function (requestError) { setComparisonError( requestError.message || text( 'Could not compare the recorded values.' ) ); } )
+				.finally( function () { setComparisonBusy( false ); } );
+		};
+
+		const comparisonStateLabels = {
+			changed: text( 'Changed' ),
+			missing: text( 'Missing after change' ),
+			added: text( 'Newly observed' ),
+			unchanged: text( 'Unchanged' ),
+			not_comparable: text( 'Needs review' ),
+		};
+		const comparisonFieldLabels = {
+			shipping_method: text( 'Shipping method' ),
+			shipping_cost: text( 'Shipping cost' ),
+			coupon_code: text( 'Coupon code' ),
+			coupon_discount: text( 'Coupon discount' ),
+		};
+		const comparisonDetail = function (change) {
+			if ( change.state === 'changed' ) {
+				return text( 'Before: ' ) + comparisonValue( change.baseline ) + ' → ' + text( 'After: ' ) + comparisonValue( change.current );
+			}
+			if ( change.state === 'missing' ) {
+				return text( 'Before: ' ) + comparisonValue( change.baseline ) + ' → ' + text( 'After: confirmed missing' );
+			}
+			if ( change.state === 'added' ) {
+				return text( 'Before: not present → After: ' ) + comparisonValue( change.current );
+			}
+			if ( change.state === 'unchanged' ) {
+				return text( 'Before and after: ' ) + comparisonValue( change.current !== undefined ? change.current : change.baseline );
+			}
+			return text( 'The values are incomplete, unsupported, or not from a comparable capture.' );
+		};
 
 		const resetForm = function () {
 			setEditingId( null );
@@ -276,6 +404,65 @@
 						)
 					);
 				} ) ) : h( 'p', { className: 'wpecir-empty' }, text( 'No supported plugin or WooCommerce settings changes have been recorded yet.' ) )
+			),
+
+
+			h( 'section', { className: 'wpecir-panel wpecir-manual-comparison', 'aria-labelledby': 'wpecir-manual-comparison-title' },
+				h( 'div', { className: 'wpecir-panel__heading' },
+					h( 'p', { className: 'wpecir-card__eyebrow' }, text( 'Manual comparison' ) ),
+					h( 'h2', { id: 'wpecir-manual-comparison-title' }, text( 'Preview before and after observations' ) ),
+					h( 'p', null, text( 'Enter values you observed yourself for the same saved scenario. This preview does not open checkout, and unrecorded values stay inconclusive.' ) )
+				),
+				scenarios.length ? h( 'form', { onSubmit: previewManualComparison, className: 'wpecir-manual-comparison__form' },
+					h( 'label', { className: 'wpecir-field', htmlFor: 'wpecir-comparison-scenario' },
+						h( 'span', null, text( 'Scenario context' ) ),
+						h( 'select', {
+							id: 'wpecir-comparison-scenario',
+							value: comparisonScenarioId,
+							required: true,
+							onChange: function (event) { setComparisonScenarioId( event.target.value ); setComparisonResult( null ); },
+						},
+							h( 'option', { value: '' }, text( 'Choose a saved scenario' ) ),
+							scenarios.map( function (scenario) {
+								return h( 'option', { key: scenario.id, value: String( scenario.id ) }, scenario.title );
+							} )
+						)
+					),
+					h( 'div', { className: 'wpecir-observation-columns' },
+						h( 'section', { className: 'wpecir-observation-column', 'aria-label': text( 'Before observations' ) },
+							h( 'h3', null, text( 'Before' ) ),
+							manualFields.map( function (field) {
+								return h( ManualObservationField, { key: 'before-' + field.key, side: 'before', field: field.key, label: field.label, money: field.money, observation: beforeObservations[ field.key ], onChange: function (value) { updateObservation( setBeforeObservations, field.key, value ); } } );
+							} )
+						),
+						h( 'section', { className: 'wpecir-observation-column', 'aria-label': text( 'After observations' ) },
+							h( 'h3', null, text( 'After' ) ),
+							manualFields.map( function (field) {
+								return h( ManualObservationField, { key: 'after-' + field.key, side: 'after', field: field.key, label: field.label, money: field.money, observation: afterObservations[ field.key ], onChange: function (value) { updateObservation( setAfterObservations, field.key, value ); } );
+							} )
+						)
+					),
+					comparisonError ? h( 'p', { className: 'notice notice-error inline', role: 'alert' }, comparisonError ) : null,
+					h( 'button', { type: 'submit', className: 'button button-primary', disabled: comparisonBusy || ! comparisonScenarioId || ! hasManualObservation() }, comparisonBusy ? text( 'Comparing…' ) : text( 'Preview comparison' ) ),
+					comparisonResult ? h( 'div', { className: 'wpecir-comparison-results', role: 'status', 'aria-live': 'polite' },
+						h( 'h3', null, text( 'Comparison preview' ) ),
+						h( 'p', null, comparisonResult.scenario_title + ' · ' + text( 'Scenario version ' ) + comparisonResult.scenario_version + ' · ' + comparisonResult.currency ),
+						h( 'ul', { className: 'wpecir-comparison-summary' },
+							h( 'li', null, text( 'Changed: ' ) + comparisonResult.summary.changed ),
+							h( 'li', null, text( 'Missing: ' ) + comparisonResult.summary.missing ),
+							h( 'li', null, text( 'Added: ' ) + comparisonResult.summary.added ),
+							h( 'li', null, text( 'Unchanged: ' ) + comparisonResult.summary.unchanged ),
+							h( 'li', null, text( 'Needs review: ' ) + comparisonResult.summary.not_comparable )
+						),
+						h( 'ol', { className: 'wpecir-comparison-findings' }, Object.keys( comparisonResult.changes ).map( function (field) {
+							const change = comparisonResult.changes[ field ];
+							return h( 'li', { key: field },
+								h( 'div', null, h( 'strong', null, comparisonFieldLabels[ field ] || field ), h( 'span', { className: 'wpecir-status wpecir-status--' + ( change.state === 'changed' || change.state === 'missing' ? 'warning' : change.state === 'not_comparable' ? 'muted' : 'neutral' ) }, comparisonStateLabels[ change.state ] || text( 'Needs review' ) ) ),
+								h( 'p', null, comparisonDetail( change ) )
+							);
+						} ) )
+					) : null
+				) : h( 'p', { className: 'wpecir-empty' }, text( 'Create a synthetic scenario before previewing observed values.' ) )
 			),
 
 			h( 'div', { className: 'wpecir-workspace' },
