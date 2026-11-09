@@ -2,7 +2,7 @@
 /**
  * Contract checks for manual before/after previews.
  *
- * @package WPEssential\\CheckoutImpactRegression
+ * @package WPEssential\CheckoutImpactRegression
  */
 
 define( 'ABSPATH', __DIR__ . '/' );
@@ -16,12 +16,12 @@ class WP_Error {
 function is_wp_error( $value ) { return $value instanceof WP_Error; }
 function sanitize_text_field( $value ) { return trim( strip_tags( (string) $value ) ); }
 function is_email( $value ) { return is_string( $value ) && false !== filter_var( $value, FILTER_VALIDATE_EMAIL ); }
-function sanitize_key( $value ) { return preg_replace( '/[^a-z0-9_\\-]/', '', strtolower( (string) $value ) ); }
+function sanitize_key( $value ) { return preg_replace( '/[^a-z0-9_\-]/', '', strtolower( (string) $value ) ); }
 function wp_json_encode( $value, $flags = 0 ) { return json_encode( $value, $flags ); }
 
 require dirname( __DIR__, 2 ) . '/vendor/autoload.php';
 
-use WPEssential\\CheckoutImpactRegression\\Comparison\\ManualComparison;
+use WPEssential\CheckoutImpactRegression\Comparison\ManualComparison;
 
 function manual_check( $condition, $message ) {
 	if ( ! $condition ) {
@@ -72,4 +72,4 @@ $unobserved = ManualComparison::preview(
 );
 manual_check( 'not_comparable' === $unobserved['changes']['shipping_method']['state'], 'unobserved baseline never becomes a regression or unchanged result' );
 
-echo "Manual comparison contracts passed.\\n";
+echo "Manual comparison contracts passed.\n";
