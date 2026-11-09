@@ -110,6 +110,41 @@
 	margin: 0 0 14px;
 }
 
+.wpecir-overview {
+	margin: 0 0 28px;
+}
+
+.wpecir-overview__heading {
+	margin-bottom: 14px;
+}
+
+.wpecir-overview__heading h2 {
+	font-size: 20px;
+	font-weight: 600;
+	margin: 7px 0;
+}
+
+.wpecir-overview__heading > p:last-child {
+	color: var(--wpecir-muted);
+	line-height: 1.5;
+	margin: 0;
+	max-width: 760px;
+}
+
+.wpecir-overview .wpecir-card {
+	min-height: 164px;
+}
+
+.wpecir-overview .wpecir-card > h2 {
+	font-size: 25px;
+	letter-spacing: -0.02em;
+}
+
+.wpecir-overview .wpecir-status {
+	margin: 10px 0 0;
+	width: fit-content;
+}
+
 .wpecir-card-grid {
 	display: grid;
 	gap: 16px;
