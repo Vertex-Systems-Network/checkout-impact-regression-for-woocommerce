@@ -41,10 +41,10 @@ route_check( 'wpecir/v1' === $routes[2][0] && false !== strpos( $routes[2][1], '
 route_check( 1 === count( $routes[2][2] ) && 'GET' === $routes[2][2][0]['methods'], 'version history exposes read-only access' );
 route_check( 'wpecir/v1' === $routes[3][0] && false !== strpos( $routes[3][1], '/scenarios/(?P<id>' ) && false !== strpos( $routes[3][1], '/baselines' ), 'baseline history is scoped to a scenario item' );
 route_check( 1 === count( $routes[3][2] ) && 'GET' === $routes[3][2][0]['methods'], 'baseline history exposes read-only access' );
-route_check( 'wpecir/v1' === $routes[4][0] && false !== strpos( $routes[4][1], '/scenarios/(?P<id>' ) && false !== strpos( $routes[4][1], '/comparisons' ), 'scenario comparison history uses a scenario-scoped route' );
-route_check( 'GET' === $routes[4][2][0]['methods'], 'comparison history exposes read-only access' );
-route_check( 'wpecir/v1' === $routes[5][0] && '/change-events' === $routes[5][1], 'change-event history uses the expected route' );
-route_check( 1 === count( $routes[5][2] ) && 'GET' === $routes[5][2][0]['methods'], 'change-event history exposes read-only access' );
+route_check( 'wpecir/v1' === $routes[4][0] && '/change-events' === $routes[4][1], 'change-event history uses the expected route' );
+route_check( 1 === count( $routes[4][2] ) && 'GET' === $routes[4][2][0]['methods'], 'change-event history exposes read-only access' );
+route_check( 'wpecir/v1' === $routes[5][0] && false !== strpos( $routes[5][1], '/scenarios/(?P<id>' ) && false !== strpos( $routes[5][1], '/comparisons' ), 'scenario comparison history uses a scenario-scoped route' );
+route_check( 'GET' === $routes[5][2][0]['methods'], 'comparison history exposes read-only access' );
 route_check( 'wpecir/v1' === $routes[6][0] && '/comparisons' === $routes[6][1], 'manual comparison persistence uses the expected route' );
 route_check( 1 === count( $routes[6][2] ) && 'POST' === $routes[6][2][0]['methods'], 'manual comparison save accepts only a create request' );
 route_check( 'wpecir/v1' === $routes[7][0] && '/comparisons/preview' === $routes[7][1], 'manual comparison preview uses the expected route' );
