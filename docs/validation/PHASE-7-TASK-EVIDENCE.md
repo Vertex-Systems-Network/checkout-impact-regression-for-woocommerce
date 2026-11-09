@@ -51,3 +51,12 @@ The uploaded package replaced the existing v0.2.0 plugin successfully on the use
 Phase 6 remains **NO-GO** for automatic checkout observation/replay. The shared site has no recorded side-effect snapshots, isolated reset process, test-only gateway, or external email/webhook containment evidence. No checkout, order, payment, shipping, coupon, or replay operation was run. Schema migration was not independently inspected; do not report it as verified. Keep automatic checkout modes unsupported until an exact-version isolated proof passes and Phase 6 is reopened.
 
 No product CLI was added.
+
+
+## WordPress Playground install attempt — 2026-11-09
+
+- **Artifact:** CI run #254, installable v0.2.1 ZIP, artifact `13600558599`.
+- **Environment:** WordPress Playground; WordPress 7.1.4. Admin session was available.
+- **Observed:** The ZIP was selected in Plugins → Add Plugin → Upload Plugin. After clicking Install Now, the nested site showed a browser error (`chrome-error://chromewebdata/`) while navigating to `/wp-admin/update.php?action=upload-plugin`. Refreshing Playground restored the plugin installer screen.
+- **Result:** No success page, activation state, or plugin admin screen was observed. Installation is **not verified**. No WooCommerce installation/checkout scenario run; no actual order/payment/shipping/coupon operation.
+- **Phase status:** This attempt does not satisfy Phase 7's runtime or integration acceptance criteria. Existing 71% status is unchanged. Do not report Phase 7 complete.
