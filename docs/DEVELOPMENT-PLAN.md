@@ -438,3 +438,6 @@ The workflow derives its package version from the main plugin header, generates 
 ### Phase 7 update — 2026-11-09
 
 A browser-based WordPress Playground attempt was made with the current CI #254 v0.2.1 ZIP. Playground booted to WordPress 7.1.4 and allowed the ZIP to be selected in the standard plugin-upload form. On submitting **Install Now**, the nested WordPress site navigated to `chrome-error://chromewebdata/` at the upload handler; a Playground refresh restored the site, but no installed-plugin confirmation was obtained. Treat this as a failed/inconclusive install attempt, not runtime validation. No alternate upload path or CLI was used. Phase 7 remains in progress at 71%; the remaining tasks and release blockers listed below are unchanged.
+
+
+Follow-up CI after the documentation updates passed as workflow run #260 on commit `6079b36b26763787f206b94daa8344635704822b` (PHP lint, JS syntax, contracts and installable ZIP build); artifact `13641467446`. This revalidates the current source in CI, but does not change the unsuccessful Playground installation result or satisfy live runtime acceptance.
