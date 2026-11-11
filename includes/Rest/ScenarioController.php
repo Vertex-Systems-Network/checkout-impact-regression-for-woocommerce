@@ -160,6 +160,46 @@ final class ScenarioController {
 				),
 			)
 		);
+		register_rest_route(
+			self::REST_NAMESPACE,
+			'/settings',
+			array(
+				array(
+					'methods'             => \WP_REST_Server::READABLE,
+					'callback'            => array( __CLASS__, 'get_settings' ),
+					'permission_callback' => array( __CLASS__, 'permissions_check' ),
+				),
+				array(
+					'methods'             => \WP_REST_Server::EDITABLE,
+					'callback'            => array( __CLASS__, 'update_settings' ),
+					'permission_callback' => array( __CLASS__, 'permissions_check' ),
+					'args'                => array(
+						'retention_days'     => array( 'required' => true ),
+						'erase_on_uninstall' => array( 'required' => true, 'type' => 'boolean' ),
+					),
+				),
+			)
+		);
+	}
+
+	/**
+	 * Return plugin settings.
+	 *
+	 * @return \WP_REST_Response
+	 */
+	public static function get_settings() {
+		return rest_ensure_response( \WPEssential\CheckoutImpactRegression\Settings::to_array() );
+	}
+
+	/**
+	 * Update report retention and uninstall preferences.
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response|\WP_Error
+	 */
+	public static function update_settings( $request ) {
+		$result = \WPEssential\CheckoutImpactRegression\Settings::update( $request->get_param( 'retention_days' ), $request->get_param( 'erase_on_uninstall' ) );
+		return is_wp_error( $result ) ? $result : rest_ensure_response( $result );
 	}
 
 	/**
@@ -169,7 +209,7 @@ final class ScenarioController {
 	 */
 	public static function permissions_check() {
 		if ( ! current_user_can( 'manage_woocommerce' ) && ! current_user_can( 'manage_options' ) ) {
-			return new \WP_Error( 'wpecir_forbidden', __( 'You are not allowed to manage scenarios.', 'wpessential-checkout-impact-regression' ), array( 'status' => 403 ) );
+			return new \WP_Error( 'wpecir_forbidden', __( 'You are not allowed to manage scenarios.', 'checkout-impact-regression-for-woocommerce' ), array( 'status' => 403 ) );
 		}
 
 		return true;
@@ -198,7 +238,7 @@ final class ScenarioController {
 		$input       = $request->get_param( 'input' );
 		$expectation = $request->get_param( 'expectation' );
 		if ( ! is_array( $input ) || ! is_array( $expectation ) ) {
-			return new \WP_Error( 'wpecir_invalid_scenario', __( 'Scenario inputs and expectations must be structured values.', 'wpessential-checkout-impact-regression' ), array( 'status' => 400 ) );
+			return new \WP_Error( 'wpecir_invalid_scenario', __( 'Scenario inputs and expectations must be structured values.', 'checkout-impact-regression-for-woocommerce' ), array( 'status' => 400 ) );
 		}
 
 		$validation = self::validate_scenario( $title, $input, $expectation );
@@ -225,28 +265,28 @@ final class ScenarioController {
 		$cart    = isset( $input['cart'] ) && is_array( $input['cart'] ) ? $input['cart'] : array();
 		$items   = isset( $cart['items'] ) ? $cart['items'] : array();
 		if ( ! is_string( $title ) || '' === trim( $title ) || ! preg_match( '/^[A-Z]{2}$/', $country ) || ! preg_match( '/^[A-Z]{3}$/', $currency ) || ! is_array( $items ) || 1 !== count( $items ) ) {
-			return new \WP_Error( 'wpecir_invalid_scenario', __( 'Enter a name, two-letter country, three-letter currency, and one synthetic cart item.', 'wpessential-checkout-impact-regression' ), array( 'status' => 400 ) );
+			return new \WP_Error( 'wpecir_invalid_scenario', __( 'Enter a name, two-letter country, three-letter currency, and one synthetic cart item.', 'checkout-impact-regression-for-woocommerce' ), array( 'status' => 400 ) );
 		}
 
 		$item = reset( $items );
 		if ( ! is_array( $item ) || ! self::is_positive_integer( isset( $item['product_id'] ) ? $item['product_id'] : null ) || ! self::is_positive_integer( isset( $item['quantity'] ) ? $item['quantity'] : null ) || absint( $item['quantity'] ) > 100 ) {
-			return new \WP_Error( 'wpecir_invalid_cart_item', __( 'Use a valid test product ID and a quantity from 1 to 100.', 'wpessential-checkout-impact-regression' ), array( 'status' => 400 ) );
+			return new \WP_Error( 'wpecir_invalid_cart_item', __( 'Use a valid test product ID and a quantity from 1 to 100.', 'checkout-impact-regression-for-woocommerce' ), array( 'status' => 400 ) );
 		}
 
 		$allowed = array( 'shipping_method', 'shipping_cost', 'coupon_code', 'coupon_discount' );
 		foreach ( $expectation as $key => $value ) {
 			if ( ! in_array( $key, $allowed, true ) ) {
-				return new \WP_Error( 'wpecir_invalid_expectation', __( 'An expected field is not supported by this scenario builder version.', 'wpessential-checkout-impact-regression' ), array( 'status' => 400 ) );
+				return new \WP_Error( 'wpecir_invalid_expectation', __( 'An expected field is not supported by this scenario builder version.', 'checkout-impact-regression-for-woocommerce' ), array( 'status' => 400 ) );
 			}
 			if ( in_array( $key, array( 'shipping_method', 'coupon_code' ), true ) && ( ! is_string( $value ) || '' === trim( $value ) ) ) {
-				return new \WP_Error( 'wpecir_invalid_expectation_value', __( 'Expected method and coupon values must be non-empty text.', 'wpessential-checkout-impact-regression' ), array( 'status' => 400 ) );
+				return new \WP_Error( 'wpecir_invalid_expectation_value', __( 'Expected method and coupon values must be non-empty text.', 'checkout-impact-regression-for-woocommerce' ), array( 'status' => 400 ) );
 			}
 			if ( in_array( $key, array( 'shipping_cost', 'coupon_discount' ), true ) && ! self::is_valid_expected_amount( $value ) ) {
-				return new \WP_Error( 'wpecir_invalid_expectation_value', __( 'Expected monetary values must be exact non-negative decimals with at most 6 fractional digits.', 'wpessential-checkout-impact-regression' ), array( 'status' => 400 ) );
+				return new \WP_Error( 'wpecir_invalid_expectation_value', __( 'Expected monetary values must be exact non-negative decimals with at most 6 fractional digits.', 'checkout-impact-regression-for-woocommerce' ), array( 'status' => 400 ) );
 			}
 		}
 		if ( isset( $expectation['coupon_discount'] ) && empty( $expectation['coupon_code'] ) ) {
-			return new \WP_Error( 'wpecir_coupon_expectation', __( 'A coupon discount expectation requires a coupon code.', 'wpessential-checkout-impact-regression' ), array( 'status' => 400 ) );
+			return new \WP_Error( 'wpecir_coupon_expectation', __( 'A coupon discount expectation requires a coupon code.', 'checkout-impact-regression-for-woocommerce' ), array( 'status' => 400 ) );
 		}
 
 		return true;
@@ -329,7 +369,7 @@ final class ScenarioController {
 		$currency     = isset( $version['input']['currency'] ) ? $version['input']['currency'] : '';
 		$observations = $request->get_param( 'observations' );
 		if ( ! is_array( $observations ) || empty( $version['id'] ) || '' === $context || '' === $currency ) {
-			return new \WP_Error( 'wpecir_invalid_baseline_observation', __( 'A saved scenario version and complete observations are required.', 'wpessential-checkout-impact-regression' ), array( 'status' => 400 ) );
+			return new \WP_Error( 'wpecir_invalid_baseline_observation', __( 'A saved scenario version and complete observations are required.', 'checkout-impact-regression-for-woocommerce' ), array( 'status' => 400 ) );
 		}
 
 		$normalized = ManualComparison::preview( $observations, $observations, $context, $currency );
@@ -340,7 +380,7 @@ final class ScenarioController {
 		$fields = array( 'shipping.method', 'shipping.cost', 'coupon.code', 'coupon.discount', 'payment.methods' );
 		foreach ( $fields as $field ) {
 			if ( ! isset( $normalized['observations']['after'][ $field ] ) || ! in_array( $normalized['observations']['after'][ $field ]['state'], array( 'observed', 'missing' ), true ) ) {
-				return new \WP_Error( 'wpecir_incomplete_baseline_observation', __( 'Record every supported field as observed or confirmed missing before approving this baseline.', 'wpessential-checkout-impact-regression' ), array( 'status' => 400 ) );
+				return new \WP_Error( 'wpecir_incomplete_baseline_observation', __( 'Record every supported field as observed or confirmed missing before approving this baseline.', 'checkout-impact-regression-for-woocommerce' ), array( 'status' => 400 ) );
 			}
 		}
 
@@ -466,7 +506,7 @@ final class ScenarioController {
 			return $scenario;
 		}
 		if ( empty( $scenario['latest_version']['context_fingerprint'] ) || empty( $scenario['latest_version']['input']['currency'] ) ) {
-			return new \WP_Error( 'wpecir_comparison_context_missing', __( 'The selected scenario has no comparable saved version.', 'wpessential-checkout-impact-regression' ), array( 'status' => 409 ) );
+			return new \WP_Error( 'wpecir_comparison_context_missing', __( 'The selected scenario has no comparable saved version.', 'checkout-impact-regression-for-woocommerce' ), array( 'status' => 409 ) );
 		}
 
 		$baseline_id = absint( $request->get_param( 'baseline_id' ) );
@@ -479,17 +519,17 @@ final class ScenarioController {
 			}
 			$latest = $scenario['latest_version'];
 			if ( absint( $baseline['scenario_version_id'] ) !== absint( $latest['id'] ) || $baseline['context_fingerprint'] !== $latest['context_fingerprint'] ) {
-				return new \WP_Error( 'wpecir_baseline_context_mismatch', __( 'Approve a baseline for the current scenario version before comparing.', 'wpessential-checkout-impact-regression' ), array( 'status' => 409 ) );
+				return new \WP_Error( 'wpecir_baseline_context_mismatch', __( 'Approve a baseline for the current scenario version before comparing.', 'checkout-impact-regression-for-woocommerce' ), array( 'status' => 409 ) );
 			}
 			$before = $baseline['observation'];
 			if ( ! is_array( $before ) ) {
-				return new \WP_Error( 'wpecir_invalid_baseline_observation', __( 'The approved baseline observations could not be read.', 'wpessential-checkout-impact-regression' ), array( 'status' => 409 ) );
+				return new \WP_Error( 'wpecir_invalid_baseline_observation', __( 'The approved baseline observations could not be read.', 'checkout-impact-regression-for-woocommerce' ), array( 'status' => 409 ) );
 			}
 			foreach ( array( 'shipping.cost', 'coupon.discount' ) as $money_field ) {
 				if ( isset( $before[ $money_field ]['state'] ) && 'observed' === $before[ $money_field ]['state'] ) {
 					$money = isset( $before[ $money_field ]['value'] ) ? $before[ $money_field ]['value'] : null;
 					if ( ! is_array( $money ) || ! isset( $money['currency_code'], $money['amount'] ) || ! is_string( $money['currency_code'] ) || ( ! is_string( $money['amount'] ) && ! is_int( $money['amount'] ) ) || strtoupper( $money['currency_code'] ) !== strtoupper( $latest['input']['currency'] ) ) {
-						return new \WP_Error( 'wpecir_invalid_baseline_observation', __( 'The approved baseline money value does not match this scenario currency.', 'wpessential-checkout-impact-regression' ), array( 'status' => 409 ) );
+						return new \WP_Error( 'wpecir_invalid_baseline_observation', __( 'The approved baseline money value does not match this scenario currency.', 'checkout-impact-regression-for-woocommerce' ), array( 'status' => 409 ) );
 					}
 					$before[ $money_field ]['value'] = (string) $money['amount'];
 				}
@@ -498,7 +538,7 @@ final class ScenarioController {
 			$before = $request->get_param( 'before' );
 		}
 		if ( ! is_array( $before ) || ! is_array( $after ) ) {
-			return new \WP_Error( 'wpecir_invalid_manual_comparison', __( 'Provide structured after observations and either a saved baseline or before observations.', 'wpessential-checkout-impact-regression' ), array( 'status' => 400 ) );
+			return new \WP_Error( 'wpecir_invalid_manual_comparison', __( 'Provide structured after observations and either a saved baseline or before observations.', 'checkout-impact-regression-for-woocommerce' ), array( 'status' => 400 ) );
 		}
 
 		$result = ManualComparison::preview(
@@ -565,7 +605,7 @@ final class ScenarioController {
 		$input       = $request->get_param( 'input' );
 		$expectation = $request->get_param( 'expectation' );
 		if ( ! is_array( $input ) || ! is_array( $expectation ) ) {
-			return new \WP_Error( 'wpecir_invalid_scenario', __( 'Scenario inputs and expectations must be structured values.', 'wpessential-checkout-impact-regression' ), array( 'status' => 400 ) );
+			return new \WP_Error( 'wpecir_invalid_scenario', __( 'Scenario inputs and expectations must be structured values.', 'checkout-impact-regression-for-woocommerce' ), array( 'status' => 400 ) );
 		}
 
 		$validation = self::validate_scenario( $title, $input, $expectation );

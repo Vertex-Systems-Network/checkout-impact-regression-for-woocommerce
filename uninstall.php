@@ -31,3 +31,5 @@ foreach ( $tables as $table ) {
 
 delete_option( 'wpecir_schema_version' );
 delete_option( 'wpecir_erase_data_on_uninstall' );
+delete_option( 'wpecir_retention_days' );
+wp_clear_scheduled_hook( 'wpecir_purge_expired_run_records' );

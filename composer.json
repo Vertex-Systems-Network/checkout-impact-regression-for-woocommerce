@@ -1,8 +1,12 @@
 {
-  "name": "vertex-systems-network/wpessential-checkout-impact-regression",
-  "description": "WPEssential Checkout Impact Regression WooCommerce add-on",
+  "name": "vertex-systems-network/checkout-impact-regression-for-woocommerce",
+  "description": "Checkout Impact Regression for WooCommerce by WPEssential: before/after checkout comparison after plugin updates and settings changes.",
   "type": "wordpress-plugin",
   "license": "GPL-2.0-or-later",
+  "homepage": "https://wpessential.org/plugins/checkout-impact-regression-for-woocommerce",
+  "require": {
+    "php": ">=8.2"
+  },
   "autoload": {
     "psr-4": {
       "WPEssential\\CheckoutImpactRegression\\": "includes/"
@@ -10,6 +14,9 @@
   },
   "config": {
     "optimize-autoloader": true,
-    "sort-packages": true
+    "sort-packages": true,
+    "platform": {
+      "php": "8.2"
+    }
   }
 }

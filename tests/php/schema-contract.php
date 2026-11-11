@@ -53,6 +53,7 @@ class WPECIR_Schema_Test_WPDB {
 
 $GLOBALS['wpdb'] = new WPECIR_Schema_Test_WPDB();
 
+require __DIR__ . '/stubs.php';
 require dirname( __DIR__, 2 ) . '/vendor/autoload.php';
 
 use WPEssential\CheckoutImpactRegression\Storage\Schema;
@@ -124,10 +125,10 @@ $GLOBALS['wpecir_schema_missing_table'] = '';
 $GLOBALS['wpdb']->checked_tables = array();
 $installed = Schema::install();
 schema_check( true === $installed, 'activation install completes when all tables are verified' );
-schema_check( '1' === $GLOBALS['wpecir_schema_option'], 'schema version is saved only after all tables verify' );
+schema_check( '2' === $GLOBALS['wpecir_schema_option'], 'schema version is saved only after all tables verify' );
 schema_check( 14 === count( $GLOBALS['wpecir_schema_queries'] ), 'successful installation runs dbDelta for all seven tables' );
 schema_check( 7 === count( $GLOBALS['wpdb']->checked_tables ), 'successful installation verifies every table' );
-schema_check( array( 'wpecir_schema_version', '1', false ) === $GLOBALS['wpecir_schema_option_updates'][0], 'schema version is stored without autoload' );
+schema_check( array( 'wpecir_schema_version', '2', false ) === $GLOBALS['wpecir_schema_option_updates'][0], 'schema version is stored without autoload' );
 
 $queries_before_noop = count( $GLOBALS['wpecir_schema_queries'] );
 schema_check( true === Schema::maybe_upgrade(), 'matching schema version is a no-op' );

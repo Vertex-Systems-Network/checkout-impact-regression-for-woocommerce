@@ -62,6 +62,7 @@ $GLOBALS['wpecir_event_hooks'] = array();
 $GLOBALS['wpecir_extra_tracked_options'] = array( 'custom_carrier_settings' );
 $GLOBALS['wpdb'] = new WPECIR_Event_Test_WPDB();
 
+require __DIR__ . '/stubs.php';
 require dirname( __DIR__, 2 ) . '/vendor/autoload.php';
 
 use WPEssential\CheckoutImpactRegression\Events\ChangeEventCollector;

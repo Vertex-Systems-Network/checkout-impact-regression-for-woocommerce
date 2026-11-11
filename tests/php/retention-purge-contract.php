@@ -42,6 +42,7 @@ class WPECIR_Retention_Test_WPDB {
 }
 $GLOBALS['wpdb'] = new WPECIR_Retention_Test_WPDB();
 
+require __DIR__ . '/stubs.php';
 require dirname( __DIR__, 2 ) . '/vendor/autoload.php';
 
 use WPEssential\CheckoutImpactRegression\Storage\Repository;

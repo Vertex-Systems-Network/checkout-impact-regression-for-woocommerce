@@ -72,6 +72,7 @@ $GLOBALS['wpdb']->baseline = array(
 	'observation_json'    => '{"shipping.method":{"state":"observed","value":"Standard"},"shipping.cost":{"state":"observed","value":{"currency_code":"EUR","amount":"7"}},"coupon.code":{"state":"missing"},"coupon.discount":{"state":"missing"},"payment.methods":{"state":"observed","value":"cod, stripe"}}',
 );
 
+require __DIR__ . '/stubs.php';
 require dirname( __DIR__, 2 ) . '/vendor/autoload.php';
 
 use WPEssential\CheckoutImpactRegression\Rest\ScenarioController;

@@ -53,6 +53,7 @@ class WPECIR_Test_WPDB {
 $GLOBALS['wpecir_test_hooks'] = array();
 $GLOBALS['wpdb'] = new WPECIR_Test_WPDB();
 
+require __DIR__ . '/stubs.php';
 require dirname( __DIR__, 2 ) . '/vendor/autoload.php';
 
 use WPEssential\CheckoutImpactRegression\Privacy\PersonalData;

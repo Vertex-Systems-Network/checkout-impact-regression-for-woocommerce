@@ -20,6 +20,7 @@ function sanitize_text_field( $value ) { return trim( strip_tags( (string) $valu
 function __( $value, $domain = null ) { return $value; }
 function current_user_can( $capability ) { return in_array( $capability, $GLOBALS['wpecir_test_capabilities'], true ); }
 
+require __DIR__ . '/stubs.php';
 require dirname( __DIR__, 2 ) . '/vendor/autoload.php';
 
 use WPEssential\CheckoutImpactRegression\Rest\ScenarioController;

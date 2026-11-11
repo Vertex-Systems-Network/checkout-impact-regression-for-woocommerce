@@ -61,7 +61,9 @@ final class ChangeEventCollector {
 			$object_id   = $plugin_file . '@' . $version;
 			$context     = hash( 'sha256', 'plugin-update|' . $plugin_file . '|' . $version );
 
-			$repository->record_change_event( 'plugin_update', 'plugin', $object_id, $context, '', true );
+			$name        = is_readable( $path ) ? get_plugin_data( $path, false, false ) : array();
+			$label       = ( ! empty( $name['Name'] ) ? sanitize_text_field( $name['Name'] ) : $plugin_file ) . ' ' . $version;
+			$repository->record_change_event( 'plugin_update', 'plugin', $object_id, $context, '', true, $label );
 		}
 	}
 
@@ -102,7 +104,7 @@ final class ChangeEventCollector {
 
 		$context = hash( 'sha256', 'deleted|' . $option );
 		$repo    = new Repository();
-		$repo->record_change_event( 'woocommerce_setting', 'setting', $option, $context, '', true );
+		$repo->record_change_event( 'woocommerce_setting', 'setting', $option, $context, '', true, $option );
 	}
 
 	/**
@@ -131,7 +133,7 @@ final class ChangeEventCollector {
 
 		$context = hash( 'sha256', $json );
 		$repo    = new Repository();
-		$repo->record_change_event( $source, 'setting', $option, $context, '', true );
+		$repo->record_change_event( $source, 'setting', $option, $context, '', true, $option );
 	}
 
 	/**
