@@ -50,11 +50,15 @@ It never places orders, charges payments, sends emails to customers or opens che
 
 = Pro add-on =
 
-Checkout Impact Regression Pro (sold separately on the WooCommerce Marketplace) adds email alerts when a checkout-related change is recorded and CSV/JSON export of reports. Everything listed above is free and fully working without it.
+Checkout Impact Regression Pro for WooCommerce (sold separately on the WooCommerce Marketplace) adds email alerts when a checkout-related change is recorded and CSV/JSON export of reports. Pro is a separate plugin that needs this free plugin to be installed and active. Everything listed above is free and fully working without Pro.
 
 = Documentation =
 
 Open **WooCommerce → Checkout Impact → Docs** in your dashboard, or use the **Documentation** link on the Plugins screen. More information: [wpessential.org/plugins/checkout-impact-regression-for-woocommerce](https://wpessential.org/plugins/checkout-impact-regression-for-woocommerce)
+
+== External services ==
+
+This plugin does not connect to any external service. It sends no data off your site, loads no remote scripts, fonts or images, and has no tracking or licence checks.
 
 == Installation ==
 

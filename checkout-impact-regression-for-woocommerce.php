@@ -28,6 +28,7 @@ define( 'WPECIR_PATH', plugin_dir_path( __FILE__ ) );
 define( 'WPECIR_URL', plugin_dir_url( __FILE__ ) );
 define( 'WPECIR_SLUG', 'checkout-impact-regression-for-woocommerce' );
 define( 'WPECIR_SITE_URL', 'https://wpessential.org/plugins/checkout-impact-regression-for-woocommerce' );
+define( 'WPECIR_WIKI_URL', 'https://github.com/Vertex-Systems-Network/checkout-impact-regression-for-woocommerce/wiki' );
 
 /**
  * Load the Composer-generated PSR-4 autoloader.

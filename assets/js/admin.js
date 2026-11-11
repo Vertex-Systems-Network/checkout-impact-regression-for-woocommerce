@@ -826,7 +826,10 @@
 		return h( 'div', { className: 'wpecir-docs' },
 			h( 'nav', { className: 'wpecir-docs__nav', 'aria-label': __( 'Documentation sections', 'checkout-impact-regression-for-woocommerce' ) },
 				h( 'ul', null, sections.map( function ( section ) { return h( 'li', { key: section.id }, h( 'a', { href: '#docs-' + section.id, onClick: function ( event ) { event.preventDefault(); const target = document.getElementById( 'wpecir-docs-' + section.id ); if ( target ) { target.scrollIntoView( { behavior: 'smooth' } ); target.focus(); } } }, section.title ) ); } ) ),
-				h( 'a', { className: 'button wpecir-docs__external', href: config.pluginUrl, target: '_blank', rel: 'noopener noreferrer' }, __( 'Plugin page', 'checkout-impact-regression-for-woocommerce' ), h( 'span', { className: 'screen-reader-text' }, ' ' + __( '(opens in a new tab)', 'checkout-impact-regression-for-woocommerce' ) ) )
+				h( 'p', { className: 'wpecir-docs__links' },
+					h( 'a', { className: 'button button-primary', href: config.wikiUrl, target: '_blank', rel: 'noopener noreferrer' }, __( 'Full documentation (Wiki)', 'checkout-impact-regression-for-woocommerce' ), h( 'span', { className: 'screen-reader-text' }, ' ' + __( '(opens in a new tab)', 'checkout-impact-regression-for-woocommerce' ) ) ),
+					h( 'a', { className: 'button', href: config.pluginUrl, target: '_blank', rel: 'noopener noreferrer' }, __( 'Plugin page', 'checkout-impact-regression-for-woocommerce' ), h( 'span', { className: 'screen-reader-text' }, ' ' + __( '(opens in a new tab)', 'checkout-impact-regression-for-woocommerce' ) ) )
+				)
 			),
 			h( 'div', { className: 'wpecir-docs__content' }, sections.map( function ( section ) {
 				return h( Card, { key: section.id, id: 'wpecir-docs-' + section.id + '-title' },

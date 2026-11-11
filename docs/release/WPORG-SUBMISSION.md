@@ -9,14 +9,15 @@
 | Item | Where | State |
 |---|---|---|
 | Main file with full header (Name, URI, Version, Requires at least/PHP/Plugins, Author, License, Text Domain, WC headers) | `checkout-impact-regression-for-woocommerce.php` | Done |
-| `readme.txt` (Stable tag 1.0.0, Tested up to 7.1, 5 tags, FAQ, screenshots, changelog, privacy) | `readme.txt` | Done |
+| `readme.txt` generated from `wordpress-org/readme.md` by `tools/readme-to-txt.php` (WPEssential readme system; checks Stable tag, ≤5 tags, ≤150-char summary, required sections incl. External services) | `wordpress-org/readme.md` | Done |
 | GPL-2.0-or-later licence file | `LICENSE` | Done |
 | Text domain = slug, all strings translatable, `languages/` folder | code | Done |
 | No external calls, no tracking, no remote assets, no locked features | code review | Done |
 | Data sanitised, capability + nonce checks on every REST route | code + runtime test (anonymous/subscriber 403) | Done |
 | Uninstall keeps data by default, opt-in erase removes everything | runtime test | Done |
 | Privacy exporter/eraser + suggested policy text | runtime test | Done |
-| Icon 128/256, banner 772×250 / 1544×500, screenshots 1–7 | `wordpress-org/` | Done |
+| Icon 128/256, banner 772×250 / 1544×500, screenshots 1–7, Live Preview blueprint | `wordpress-org/` | Done |
+| User documentation | `docs/wiki/` → GitHub Wiki (enable Wiki in repo settings first) | Pages done |
 | Package ZIP without dev files | `./bin/build.sh` or CI artifact **plugin-packages** | Done |
 | Plugin Check (official action) | CI job **WordPress.org Plugin Check** | Pass (CI run 43103077615) |
 

@@ -12,18 +12,20 @@ The plugin never places orders or runs checkout. You record what checkout shows 
 
 **Version 1.0.0 – release candidate.** Last updated 2026-11-12.
 
+Pro add-on: <https://github.com/Vertex-Systems-Network/checkout-impact-regression-pro-for-woocommerce> · Documentation: [Wiki](https://github.com/Vertex-Systems-Network/checkout-impact-regression-for-woocommerce/wiki) (source in [`docs/wiki/`](docs/wiki/Home.md)) and the in-plugin Docs tab.
+
 | Phase | Status |
 |---|---|
 | 0–5 Brief, research, requirements, architecture, scenario design, UX | Complete (2026-11-06) |
 | 6 Technical proof for *automatic* checkout replay | Closed as **NO-GO** – automatic mode deferred to v1.x |
-| 7 Implementation (v1.0 manual comparison scope) | 93% – 26 of 28 rows complete; 2 partial (IMPL-010 failure UI, IMPL-011 MySQL/accessibility checks) |
+| 7 Implementation (v1.0 manual comparison scope) | 97% – 29 of 30 rows complete; 1 partial (IMPL-032: Wiki must be enabled to publish) |
 | 8 Release (WordPress.org + WooCommerce Marketplace) | 25% – packages, readme, assets and checklists ready; submissions need the owner's accounts |
 
 **Overall: 91%** (formula and row list in [the plan, §8.1–9](docs/DEVELOPMENT-PLAN.md)).
 
 ```
 Overall  [██████████████████░░] 91%
-Phase 7  [██████████████████▌░] 93%  (v1 scope)
+Phase 7  [███████████████████▍] 97%  (v1 scope)
 Phase 8  [█████░░░░░░░░░░░░░░░] 25%
 ```
 
@@ -39,11 +41,18 @@ Phase 8  [█████░░░░░░░░░░░░░░░] 25%
 | Email alerts when a change is recorded | – | ✓ |
 | CSV / JSON report export | – | ✓ |
 
-The free plugin has no locked or time-limited features. Pro is a separate plugin in [`pro/`](pro/checkout-impact-regression-pro) that requires the free one.
+The free plugin has no locked or time-limited features and contains no Pro code. Pro is a separate plugin in its own repository; WordPress will not activate it without the free plugin.
+
+### How free and Pro stay in sync
+
+- Pro's [`tests/free-api-contract.php`](https://github.com/Vertex-Systems-Network/checkout-impact-regression-pro-for-woocommerce/blob/main/tests/free-api-contract.php) lists every hook, method, JS filter and CSS class Pro uses from this plugin. Both repositories' CI run it.
+- Both CIs run free + Pro together in WordPress Playground (latest WordPress + WooCommerce, PHP 8.2 and 8.4).
+- Both CIs build **both** ZIPs into one `plugin-packages` artifact.
+- Same-named branches in the two repositories are tested together; nightly runs catch drift; an optional `CROSS_REPO_TOKEN` secret re-runs the other repository's CI after every merge.
 
 ## Requirements
 
-WordPress 6.9+, PHP 8.2+, WooCommerce 10.8+. Verified on WordPress 7.1.4, WooCommerce 11.2.2, PHP 8.3 and WordPress Playground (PHP 8.2) (see [evidence](docs/validation/PHASE-7-TASK-EVIDENCE.md)).
+WordPress 6.9+, PHP 8.2+, WooCommerce 10.8+. Verified on WordPress 7.1.4 and WooCommerce 11.2.2 with PHP 8.2–8.4 on MariaDB 10.11 and SQLite; axe-core WCAG 2.2 AA audit has 0 violations (see [evidence](docs/validation/PHASE-7-TASK-EVIDENCE.md)).
 
 ## Development
 
@@ -51,16 +60,18 @@ WordPress 6.9+, PHP 8.2+, WooCommerce 10.8+. Verified on WordPress 7.1.4, WooCom
 composer install
 for t in tests/php/*-contract.php tests/php/normalizer-diff.php tests/php/multilingual-context-dry-run.php; do php "$t" || exit 1; done
 php tests/php/uninstall-contract.php erase
-./bin/build.sh        # dist/checkout-impact-regression-for-woocommerce-<v>.zip and dist/checkout-impact-regression-pro-<v>.zip
+php tools/readme-to-txt.php        # readme.txt is generated from wordpress-org/readme.md
+./bin/build.sh                     # dist/checkout-impact-regression-for-woocommerce-<v>.zip
+PRO_DIR=../checkout-impact-regression-pro-for-woocommerce ./bin/build.sh   # + Pro ZIP
 ```
 
-CI (`.github/workflows/ci.yml`) runs lint and contract tests on PHP 8.2–8.4, builds both ZIPs and runs the official WordPress.org Plugin Check. Download packages from the run's **plugin-packages** artifact.
+CI (`.github/workflows/ci.yml`) runs lint and contract tests on PHP 8.2–8.4, Pro's compatibility contract and tests, a free + Pro Playground integration run, builds both ZIPs and runs the official WordPress.org Plugin Check. Download packages from the run's **plugin-packages** artifact.
 
 ## Documentation
 
 - [Development plan](docs/DEVELOPMENT-PLAN.md) – scope, decisions, backlog, progress formula
 - [WordPress.org submission checklist](docs/release/WPORG-SUBMISSION.md)
-- [WooCommerce Marketplace checklist](docs/release/WOO-MARKETPLACE-SUBMISSION.md)
+- [WooCommerce Marketplace checklist (Pro repo)](https://github.com/Vertex-Systems-Network/checkout-impact-regression-pro-for-woocommerce/blob/main/docs/WOO-MARKETPLACE-SUBMISSION.md)
 - [Phase 7 evidence](docs/validation/PHASE-7-TASK-EVIDENCE.md)
 - AI contributors: start with [AGENTS.md](AGENTS.md)
 
