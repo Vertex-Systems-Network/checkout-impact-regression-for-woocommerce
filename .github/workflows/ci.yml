@@ -1,0 +1,89 @@
+name: CI, Plugin Check and packages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Lint and contract tests (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.2', '8.3', '8.4']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          tools: composer:v2
+          coverage: none
+      - name: Validate Composer and build autoloader
+        run: |
+          composer validate --strict
+          composer install --no-interaction --prefer-dist --no-progress --no-dev --optimize-autoloader
+      - name: Lint PHP
+        shell: bash
+        run: |
+          find . -type f -name '*.php' -not -path './.git/*' -not -path './dist/*' -not -path './build/*' -print0 | xargs -0 -n1 php -l > /dev/null
+      - name: Check JavaScript syntax
+        run: |
+          node --check assets/js/admin.js
+          node --check pro/checkout-impact-regression-pro/assets/pro.js
+      - name: Run contract tests
+        shell: bash
+        run: |
+          set -e
+          for test in tests/php/*-contract.php tests/php/normalizer-diff.php tests/php/multilingual-context-dry-run.php; do
+            case "$test" in
+              *uninstall-contract.php) php "$test" preserve; php "$test" erase ;;
+              *) php "$test" ;;
+            esac
+          done
+
+  package:
+    name: Build installable ZIPs
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer:v2
+          coverage: none
+      - name: Build free (WordPress.org) and Pro (WooCommerce Marketplace) packages
+        run: ./bin/build.sh
+      - name: Upload packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: plugin-packages
+          path: |
+            dist/*.zip
+            dist/*.sha256
+          if-no-files-found: error
+      - name: Keep unpacked free build for Plugin Check
+        uses: actions/upload-artifact@v4
+        with:
+          name: free-build
+          path: build/checkout-impact-regression-for-woocommerce
+
+  plugin-check:
+    name: WordPress.org Plugin Check (free plugin)
+    needs: package
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: free-build
+          path: checkout-impact-regression-for-woocommerce
+      - uses: wordpress/plugin-check-action@v1
+        with:
+          build-dir: ./checkout-impact-regression-for-woocommerce
+          slug: checkout-impact-regression-for-woocommerce
