@@ -156,11 +156,11 @@ final class PersonalData {
 		$scenarios = $wpdb->prefix . 'wpecir_scenarios';
 		$versions  = $wpdb->prefix . 'wpecir_scenario_versions';
 		$baselines = $wpdb->prefix . 'wpecir_baselines';
-		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery -- anonymise authorship in the plugin's own tables.
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- anonymise authorship in the plugin's own tables.
 		$wpdb->update( $scenarios, array( 'created_by' => 0 ), array( 'created_by' => $user->ID ), array( '%d' ), array( '%d' ) );
 		$wpdb->update( $versions, array( 'created_by' => 0 ), array( 'created_by' => $user->ID ), array( '%d' ), array( '%d' ) );
 		$wpdb->update( $baselines, array( 'approved_by' => 0 ), array( 'approved_by' => $user->ID ), array( '%d' ), array( '%d' ) );
-		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 
 		return array(
 			'items_removed'  => false,

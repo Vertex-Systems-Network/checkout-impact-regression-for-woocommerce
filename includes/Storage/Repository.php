@@ -53,7 +53,7 @@ final class Repository {
 			return 0;
 		}
 		$placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
-		// phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- placeholders are generated from the ID count.
+		// phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- placeholders are generated from the ID count.
 		return $wpdb->query( $wpdb->prepare( "DELETE FROM %i WHERE %i IN ($placeholders)", array_merge( array( $this->table( $suffix ), $column ), $ids ) ) );
 	}
 
@@ -320,13 +320,16 @@ final class Repository {
 		$page     = max( 1, absint( $page ) );
 		$per_page = min( 100, max( 1, absint( $per_page ) ) );
 		$offset   = ( $page - 1 ) * $per_page;
-		$sql      = $wpdb->prepare(
-			'SELECT * FROM %i ORDER BY updated_at DESC, id DESC LIMIT %d OFFSET %d', $this->table( 'scenarios' ),
-			$per_page,
-			$offset
-		);
 
-		return $wpdb->get_results( $sql, ARRAY_A );
+		return $wpdb->get_results(
+			$wpdb->prepare(
+				'SELECT * FROM %i ORDER BY updated_at DESC, id DESC LIMIT %d OFFSET %d',
+				$this->table( 'scenarios' ),
+				$per_page,
+				$offset
+			),
+			ARRAY_A
+		);
 	}
 
 	/**
