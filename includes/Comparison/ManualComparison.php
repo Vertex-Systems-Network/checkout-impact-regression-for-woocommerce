@@ -29,7 +29,7 @@ final class ManualComparison {
 	public static function preview( $before, $after, $context_fingerprint, $currency ) {
 		$currency = strtoupper( sanitize_text_field( (string) $currency ) );
 		if ( ! preg_match( '/^[a-f0-9]{64}$/', (string) $context_fingerprint ) || ! preg_match( '/^[A-Z]{3}$/', $currency ) ) {
-			return new \WP_Error( 'wpecir_invalid_comparison_context', 'A saved scenario context and valid currency are required.' );
+			return new \WP_Error( 'wpecir_invalid_comparison_context', __( 'A saved scenario context and valid currency are required.', 'checkout-impact-regression-for-woocommerce' ) );
 		}
 
 		$before = self::normalize_fields( $before, $currency );
@@ -80,18 +80,18 @@ final class ManualComparison {
 	 */
 	private static function normalize_fields( $fields, $currency ) {
 		if ( ! is_array( $fields ) || count( $fields ) > count( self::FIELDS ) ) {
-			return new \WP_Error( 'wpecir_invalid_observation_map', 'Observations must use the supported checkout fields.' );
+			return new \WP_Error( 'wpecir_invalid_observation_map', __( 'Observations must use the supported checkout fields.', 'checkout-impact-regression-for-woocommerce' ) );
 		}
 
 		$normalized = array();
 		foreach ( $fields as $field => $observation ) {
 			if ( ! is_string( $field ) || ! in_array( $field, self::FIELDS, true ) || ! is_array( $observation ) || ! isset( $observation['state'] ) ) {
-				return new \WP_Error( 'wpecir_invalid_observation_field', 'An observation contains an unsupported field or state.' );
+				return new \WP_Error( 'wpecir_invalid_observation_field', __( 'An observation contains an unsupported field or state.', 'checkout-impact-regression-for-woocommerce' ) );
 			}
 
 			$state = $observation['state'];
 			if ( ! in_array( $state, array( 'observed', 'missing', 'not_observed', 'unsupported', 'collection_error' ), true ) ) {
-				return new \WP_Error( 'wpecir_invalid_observation_state', 'Choose observed, missing, not recorded, unsupported, or collection error.' );
+				return new \WP_Error( 'wpecir_invalid_observation_state', __( 'Choose observed, missing, not recorded, unsupported, or collection error.', 'checkout-impact-regression-for-woocommerce' ) );
 			}
 
 			if ( 'observed' !== $state ) {
@@ -100,7 +100,7 @@ final class ManualComparison {
 			}
 
 			if ( ! array_key_exists( 'value', $observation ) ) {
-				return new \WP_Error( 'wpecir_observation_value_missing', 'Enter a value for every field marked observed.' );
+				return new \WP_Error( 'wpecir_observation_value_missing', __( 'Enter a value for every field marked observed.', 'checkout-impact-regression-for-woocommerce' ) );
 			}
 
 			if ( in_array( $field, array( 'shipping.cost', 'coupon.discount' ), true ) ) {
@@ -116,7 +116,7 @@ final class ManualComparison {
 			} else {
 				$value = $observation['value'];
 				if ( ! is_string( $value ) || '' === trim( $value ) || strlen( $value ) > 191 || is_email( $value ) || preg_match( '/(?:password|secret|token|credential|api.?key)/i', $value ) ) {
-					return new \WP_Error( 'wpecir_invalid_observation_value', 'Use a short synthetic shipping or coupon value; personal or secret data is not allowed.' );
+					return new \WP_Error( 'wpecir_invalid_observation_value', __( 'Use a short synthetic shipping or coupon value; personal or secret data is not allowed.', 'checkout-impact-regression-for-woocommerce' ) );
 				}
 				$value = sanitize_text_field( $value );
 			}
@@ -139,11 +139,11 @@ final class ManualComparison {
 	 */
 	private static function normalize_amount( $value, $currency ) {
 		if ( ! is_string( $value ) && ! is_int( $value ) ) {
-			return new \WP_Error( 'wpecir_invalid_manual_amount', 'Money must be entered as an exact decimal string.' );
+			return new \WP_Error( 'wpecir_invalid_manual_amount', __( 'Money must be entered as an exact decimal string.', 'checkout-impact-regression-for-woocommerce' ) );
 		}
 		$value = (string) $value;
 		if ( ! preg_match( '/^(0|[1-9][0-9]{0,15})(?:\.([0-9]{1,6}))?$/', $value, $matches ) ) {
-			return new \WP_Error( 'wpecir_invalid_manual_amount', 'Enter a non-negative decimal with at most 6 fractional digits.' );
+			return new \WP_Error( 'wpecir_invalid_manual_amount', __( 'Enter a non-negative decimal with at most 6 fractional digits.', 'checkout-impact-regression-for-woocommerce' ) );
 		}
 		$fraction = isset( $matches[2] ) ? rtrim( $matches[2], '0' ) : '';
 		$amount   = $matches[1] . ( '' !== $fraction ? '.' . $fraction : '' );
@@ -162,14 +162,14 @@ final class ManualComparison {
 	 */
 	private static function normalize_payment_methods( $value ) {
 		if ( ! is_string( $value ) || strlen( $value ) > 500 ) {
-			return new \WP_Error( 'wpecir_invalid_payment_methods', 'Enter a comma-separated list of payment method IDs.' );
+			return new \WP_Error( 'wpecir_invalid_payment_methods', __( 'Enter a comma-separated list of payment method IDs.', 'checkout-impact-regression-for-woocommerce' ) );
 		}
 
 		$methods = array();
 		foreach ( explode( ',', $value ) as $method ) {
 			$method = strtolower( trim( $method ) );
 			if ( '' === $method || ! preg_match( '/^[a-z0-9][a-z0-9_.:-]{0,99}$/', $method ) || preg_match( '/(?:password|secret|credential|api.?key|access.?token)/i', $method ) ) {
-				return new \WP_Error( 'wpecir_invalid_payment_methods', 'Payment method IDs may contain letters, numbers, dots, underscores, colons, and hyphens.' );
+				return new \WP_Error( 'wpecir_invalid_payment_methods', __( 'Payment method IDs may contain letters, numbers, dots, underscores, colons, and hyphens.', 'checkout-impact-regression-for-woocommerce' ) );
 			}
 			$methods[] = $method;
 		}

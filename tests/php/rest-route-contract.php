@@ -20,6 +20,7 @@ function register_rest_route( $namespace, $route, $args ) {
 	$GLOBALS['wpecir_registered_routes'][] = array( $namespace, $route, $args );
 }
 
+require __DIR__ . '/stubs.php';
 require dirname( __DIR__, 2 ) . '/vendor/autoload.php';
 
 use WPEssential\CheckoutImpactRegression\Rest\ScenarioController;
@@ -33,7 +34,7 @@ function route_check( $condition, $message ) {
 
 ScenarioController::register_routes();
 $routes = $GLOBALS['wpecir_registered_routes'];
-route_check( 8 === count( $routes ), 'scenario, baseline, event, comparison save, comparison history and preview routes are registered' );
+route_check( 9 === count( $routes ), 'scenario, baseline, event, comparison save, comparison history, preview and settings routes are registered' );
 route_check( 'wpecir/v1' === $routes[0][0] && '/scenarios' === $routes[0][1], 'scenario collection route uses the expected namespace and path' );
 route_check( 'wpecir/v1' === $routes[1][0] && '/scenarios/(?P<id>\\d+)' === $routes[1][1], 'scenario item route uses an integer identifier pattern' );
 route_check( 2 === count( $routes[0][2] ) && 3 === count( $routes[1][2] ), 'collection exposes read/create and item exposes read/update/delete only' );

@@ -11,6 +11,39 @@ define( 'ABSPATH', __DIR__ . '/fixtures/' );
 define( 'ARRAY_A', 'ARRAY_A' );
 define( 'DAY_IN_SECONDS', 86400 );
 
+
+if ( ! function_exists( 'wpecir_test_identifiers' ) ) {
+	/**
+	 * Resolve %i identifier placeholders like wpdb::prepare() so doubles see table names.
+	 *
+	 * @param string $query Query.
+	 * @param array  $args  Arguments.
+	 * @return array
+	 */
+	function wpecir_test_identifiers( $query, $args ) {
+		if ( 1 === count( $args ) && is_array( $args[0] ) ) {
+			$args = $args[0];
+		}
+		$args = array_values( $args );
+		$rest = array();
+		$i    = 0;
+		$out  = preg_replace_callback(
+			'/%[ids]/',
+			static function ( $m ) use ( &$i, &$rest, $args ) {
+				$arg = $args[ $i ] ?? null;
+				++$i;
+				if ( '%i' === $m[0] ) {
+					return (string) $arg;
+				}
+				$rest[] = $arg;
+				return $m[0];
+			},
+			$query
+		);
+		return array( $out, $rest );
+	}
+}
+
 class WP_Error {
 	private $code;
 	public function __construct( $code, $message = '' ) { $this->code = $code; }
@@ -45,6 +78,7 @@ class WPECIR_Baseline_Test_WPDB {
 	public $last_insert = null;
 
 	public function prepare( $query, ...$args ) {
+		list( $query, $args ) = wpecir_test_identifiers( $query, $args );
 		$this->prepared[] = array( $query, $args );
 		return array( 'query' => $query, 'args' => $args );
 	}
@@ -83,6 +117,7 @@ class WPECIR_Baseline_Test_WPDB {
 
 $GLOBALS['wpdb'] = new WPECIR_Baseline_Test_WPDB();
 
+require __DIR__ . '/stubs.php';
 require dirname( __DIR__, 2 ) . '/vendor/autoload.php';
 
 use WPEssential\CheckoutImpactRegression\Storage\Repository;

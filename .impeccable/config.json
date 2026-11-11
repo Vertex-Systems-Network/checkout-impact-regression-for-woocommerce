@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "assets/css/admin.css"
+        ],
+        "createdAt": "2026-11-11T21:30:53.762Z",
+        "reason": "Claude decided: .wpecir-notice mirrors WordPress core admin notices (.notice uses a 4px left border), so it matches wp-admin conventions"
+      }
+    ]
+  }
+}

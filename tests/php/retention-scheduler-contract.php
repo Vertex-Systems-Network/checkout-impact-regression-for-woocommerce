@@ -39,6 +39,7 @@ function wp_unschedule_event( $timestamp, $hook ) {
 	return true;
 }
 
+require __DIR__ . '/stubs.php';
 require dirname( __DIR__, 2 ) . '/vendor/autoload.php';
 
 use WPEssential\CheckoutImpactRegression\Storage\RetentionScheduler;

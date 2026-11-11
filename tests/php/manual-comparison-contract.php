@@ -19,6 +19,7 @@ function is_email( $value ) { return is_string( $value ) && false !== filter_var
 function sanitize_key( $value ) { return preg_replace( '/[^a-z0-9_\-]/', '', strtolower( (string) $value ) ); }
 function wp_json_encode( $value, $flags = 0 ) { return json_encode( $value, $flags ); }
 
+require __DIR__ . '/stubs.php';
 require dirname( __DIR__, 2 ) . '/vendor/autoload.php';
 
 use WPEssential\CheckoutImpactRegression\Comparison\ManualComparison;
