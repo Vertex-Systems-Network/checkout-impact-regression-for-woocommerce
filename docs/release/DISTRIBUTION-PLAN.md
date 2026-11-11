@@ -1,5 +1,7 @@
 # Distribution and marketplace submission plan
 
+> **Update 2026-11-12 (D-021):** The split is decided. Free: `checkout-impact-regression-for-woocommerce` on WordPress.org with every v1 feature. Pro: separate `checkout-impact-regression-pro` plugin on the WooCommerce Marketplace with email alerts and report export. Step-by-step owner actions: [WPORG-SUBMISSION.md](WPORG-SUBMISSION.md) and [WOO-MARKETPLACE-SUBMISSION.md](WOO-MARKETPLACE-SUBMISSION.md).
+
 **Status:** Target channels approved for planning; no marketplace application or submission has been made.  
 **Checked:** 2026-11-06  
 **Product:** WPEssential Checkout Impact Regression

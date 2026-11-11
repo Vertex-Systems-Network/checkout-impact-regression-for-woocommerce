@@ -1,129 +1,69 @@
-# WPEssential Checkout Impact Regression
+# Checkout Impact Regression for WooCommerce
 
-A planned WPEssential add-on that detects how plugin updates and checkout or payment configuration changes affect real customer checkout scenarios.
+By [WPEssential](https://wpessential.org) · Plugin page: <https://wpessential.org/plugins/checkout-impact-regression-for-woocommerce>
 
-It is designed to answer **what changed, for whom, and where** by comparing saved cart and customer scenarios before and after a change. The primary output is a clear impact report, for example:
+See what changed at checkout after a plugin update or settings change. Save checkout scenarios, approve a known-good baseline, and compare shipping method, shipping cost, coupon, discount and payment methods field by field.
 
-- **Germany:** expected shipping method is missing.
-- **United Kingdom:** shipping cost changed from $7 to $12.
-- **United States:** checkout behavior is unchanged.
-- **WELCOME10:** applied discount differs from the saved expectation.
+> Example: after updating a shipping plugin, the Germany scenario shows *flat_rate:1 → missing*, shipping cost *EUR 7 → EUR 12*, coupon unchanged.
 
-This is a change-impact regression tool. Checkout pass/fail monitoring is useful context, but the product's core job is comparing expected checkout behavior across saved scenarios.
+The plugin never places orders or runs checkout. You record what checkout shows (ideally on a staging copy) and the plugin stores and compares it.
 
-## Project status
+## Status
 
-This repository is in the **early implementation** stage. Checkout replay and observation remain unsupported until exact runtime proofs reopen that scope. The plan below is the source of truth for phases and progress. Dates are recorded as YYYY-MM-DD; **TBD** means the schedule has not yet been estimated.
+**Version 1.0.0 – release candidate.** Last updated 2026-11-12.
 
-| Phase | Status | Progress | Start date | End date |
-|---|---|---:|---|---|
-| 0. Project brief and AI handoff foundation | Complete | ██████████ 100% | 2026-11-06 | 2026-11-06 |
-| 1. Market and competitor research | Complete | ██████████ 100% | 2026-11-06 | 2026-11-06 |
-| 2. Requirements and compatibility matrix | Complete (planning) | ██████████ 100% | 2026-11-06 | 2026-11-06 |
-| 3. Options bank and system architecture | Complete (planning) | ██████████ 100% | 2026-11-06 | 2026-11-06 |
-| 4. Checkout scenario and comparison design | Complete (design) | ██████████ 100% | 2026-11-06 | 2026-11-06 |
-| 5. UX and React-based admin interface | Complete (UX/prototype) | ██████████ 100% | 2026-11-06 | 2026-11-06 |
-| 6. Pre-development technical proof | Complete (no-go decision; runtime modes unsupported) | ██████████ 100% | 2026-11-06 | 2026-11-06 |
-| 7. Plugin implementation and verification | In progress: v0.2.1 staging smoke passed; scenario CRUD/version/delete and exact 7.25 read-back verified; invalid country rejected without saving; CI covers decimal, REST capability, multilingual/currency, synthetic privacy, schema install, change-event redaction/idempotency, malformed-payload and sensitive-payload no-write contracts, and preserve-by-default/explicit-erase uninstall behavior (run #155 passed); previous hardened v0.2.1 artifact is active on staging and rejects invalid country input; the newer baseline-history build from CI run #243 has not been installed. CI run #164 verifies bounded expired-run cleanup and authorization; #173 verifies scenario route permissions/methods; #182 verifies scheduler lifecycle; #189 verifies mocked schema uniqueness/indexes. IMPL-023 scenario version history UI/API passed CI run #199 and staging: synthetic shipping expectation 5→6 appeared as immutable Version 1/Version 2, then the temporary scenario was deleted and the library returned empty. IMPL-024 baseline approval and read-history contracts passed CI run #218: access control, revision order, decoded observations and no-write behavior are covered. IMPL-025 dependency/admin guard contract passed CI run #232: missing autoloader behavior, WooCommerce capability fallback, scoped assets and accessible screen guards are covered. IMPL-008 now supports explicit manual baseline approval as well as read-only history: REST accepts only complete, validated observed/missing values, ties an immutable revision to the current scenario version, and the React UI enables approval only after a manual comparison preview. CI run #310 passed route, PHP/JS, contract checks and ZIP packaging (artifact `13709541699`; plugin v0.2.1). On the user-authorized TasteWP `Quirky Brake` site (WordPress 7.1.4), the uploaded package installed successfully; a disposable synthetic DE/EUR scenario approved revision 1 (shipping Standard / EUR 7; coupon fields confirmed missing), then revision 2 (EUR 8). History showed both immutable revisions; leaving a field unrecorded disabled the approval button. The synthetic scenario was deleted and the library returned to zero. No checkout, order, payment, shipping, or coupon request ran. This verifies only explicit manual baseline approval/history on this test setup; automated observations, migration/privacy runtime, compatibility and marketplace readiness remain pending. IMPL-003 now includes a bounded read-only change-event history API/admin panel; CI run #254 passed authorization, newest-first/100-row cap, route registration, PHP/JS validation and ZIP build (artifact `13600558599`). The event UI shows redacted context fingerprints only; live change-hook runtime remains unverified. Runtime migration/privacy, automated baseline observation, automated run/observation, adapters and compatibility remain | ██████░░░░ 58% (15/26 complete; 6 partial, 4 not started, 1 blocked) | 2026-11-06 | TBD |
-| 8. Release readiness | Not started | ░░░░░░░░░░ 0% | TBD | TBD |
+| Phase | Status |
+|---|---|
+| 0–5 Brief, research, requirements, architecture, scenario design, UX | Complete (2026-11-06) |
+| 6 Technical proof for *automatic* checkout replay | Closed as **NO-GO** – automatic mode deferred to v1.x |
+| 7 Implementation (v1.0 manual comparison scope) | 93% – 26 of 28 rows complete; 2 partial (IMPL-010 failure UI, IMPL-011 MySQL/accessibility checks) |
+| 8 Release (WordPress.org + WooCommerce Marketplace) | 25% – packages, readme, assets and checklists ready; submissions need the owner's accounts |
 
-**Latest Phase 7 checkpoint (2026-11-09):** CI run #334 passed and built artifact `13714470782`; both artifact checksum layers passed. The user installed this build on TasteWP, where a synthetic approved baseline was loaded, exact manual shipping/coupon differences were previewed, and report #3 was saved and verified in history with its approved-baseline link. IMPL-008 remains Partial; Phase 7 remains 58% (15/26 complete). See [Phase 7 task evidence](docs/validation/PHASE-7-TASK-EVIDENCE.md).
+**Overall: 91%** (formula and row list in [the plan, §8.1–9](docs/DEVELOPMENT-PLAN.md)).
 
-**Overall tracked progress: 84%** — rounded unweighted average across nine phases. Phase 7 counts all 26 Phase 7 backlog rows; only rows with complete acceptance evidence count as complete. Phases 0–6 are complete for their documented research/design/no-go outcomes; Phase 7 is 58% (15/26 Phase 7 tasks complete) and in progress; Phase 8 has not started. The no-go decision is not a checkout runtime pass: replay and checkout integration remain unsupported until a version-specific, isolated safety proof is completed. The user confirmed `/el-test/` is a shared test environment used for multiple in-progress plugins. Site Health reports WordPress 7.1.4 and PHP 8.3.36; WooCommerce 11.2.2 is active and Elementor is not installed. The v0.2.0 package was updated from workflow artifact `13558177915` (run #77, commit `69e6ee6d5daaf396c4bd4e7d2844bb7afcdba700`; expires 2027-02-05). WordPress confirmed the replacement installed successfully. The Checkout Impact screen showed the Edit action after asset `filemtime` cache busting. On the current user-uploaded v0.2.0 build, a second synthetic GB/GBP scenario was created, its saved fields were loaded in Edit, shipping expectation 7→8 was saved as an immutable version, and the record was deleted; WordPress confirmed deletion and an empty library. A synthetic Germany/EUR scenario was created; the saved fields were fetched into the form, then expected shipping cost was changed from 5 to 6 and saved as a new immutable version. The UI confirmed “New scenario version saved. Checkout execution is still disabled.” The browser confirmation was subsequently accepted; WordPress displayed “Scenario deleted” and an empty scenario library, confirming the temporary scenario and its versions were removed. No checkout, order, payment, shipping, or coupon request was run; coupon data was only saved as a synthetic expectation. Current source uses Composer PSR-4 with `vendor/autoload.php`, no SPL loader, and no product CLI. Workflow #77 passed Composer validation, optimized PSR-4 generation, PHP lint, JavaScript syntax, pure comparison checks, ZIP integrity and package generation. Scenario create/read/edit/version/delete persistence is verified through synthetic staging smoke tests. Exact decimal and capability-authorization contracts pass CI in workflow run #107, artifact `13575111534` (package v0.2.1; expires 2026-12-07). The staging site was updated to v0.2.1; a synthetic GB/GBP `7.25` shipping expectation saved and read back exactly in Edit, then its record was deleted and the scenario library verified empty. The v0.2.1 fractional-value path is runtime-verified for `7.25`; database migration/version, privacy hooks, retention, event hooks, reports/history, and runtime role/accessibility matrices remain unverified. CI authorization tests cover only the REST capability callback. Automatic checkout modes remain no-go until an isolated side-effect proof passes. See the [Phase 7 task evidence](docs/validation/PHASE-7-TASK-EVIDENCE.md), [Phase 6 closure decision](docs/validation/PHASE-6-CLOSURE-DECISION.md), and [runtime proof runbook](docs/validation/RUNTIME-PROOF-RUNBOOK.md#0-environment-provisioning-gate). No CLI is included or planned before final release. On 2026-11-08, the current `/el-test/` Checkout Impact admin page rendered its React scenario form and empty scenario library; no plugin-console errors were observed (the visible console errors were from a browser extension). This was a read-only screen smoke check; no scenario was changed and no checkout request was run. On 2026-11-09, WordPress Playground started successfully (WordPress 7.1.4; admin session available) and accepted the run #254 v0.2.1 ZIP in the upload form, but after selecting Install Now its nested site navigated to `chrome-error://chromewebdata/` at `wp-admin/update.php?action=upload-plugin`; refreshing restored the site and the plugin was not present/confirmed installed. No workaround was attempted, no WooCommerce or checkout scenario was exercised, and this attempt does not upgrade Phase 7 evidence or progress.
+```
+Overall  [██████████████████░░] 91%
+Phase 7  [██████████████████▌░] 93%  (v1 scope)
+Phase 8  [█████░░░░░░░░░░░░░░░] 25%
+```
 
-**Documentation check:** a previous repository-wide link audit was recorded on 2026-11-06. The exact counts are not re-certified in this update; navigation checks are not runtime evidence.
+## Editions
 
-## Start here
+| | Free – WordPress.org | Pro – WooCommerce Marketplace |
+|---|---|---|
+| Scenarios, versions, approved baselines | ✓ | ✓ |
+| Before/after comparison and saved reports | ✓ | ✓ |
+| Change log of plugin updates and settings changes | ✓ | ✓ |
+| Retention and data-removal settings, privacy tools | ✓ | ✓ |
+| In-plugin documentation (WooCommerce → Checkout Impact → Docs) | ✓ | ✓ |
+| Email alerts when a change is recorded | – | ✓ |
+| CSV / JSON report export | – | ✓ |
 
-1. Read [AGENTS.md](AGENTS.md) before making project changes. It explains how AI coding tools should work in this repository.
-2. Read the [Development Plan](docs/DEVELOPMENT-PLAN.md) for scope, phases, requirements, research areas, and acceptance criteria.
-3. Use [AI tool instruction loading](docs/AI-TOOL-RULES.md) to confirm the correct entry point for Cursor, Claude, Gemini, or ChatGPT.
-4. Check the [competitor research report](docs/research/COMPETITOR-RESEARCH.md) for dated findings and source links.
-5. Use the [deduplicated options bank](docs/research/OPTIONS-BANK.md) and [system inventory](docs/architecture/SYSTEM-INVENTORY.md) before adding scope or proposing architecture.
-6. Read the [proposed architecture and data flow](docs/architecture/ARCHITECTURE.md), [storage/retention decision](docs/architecture/STORAGE-AND-RETENTION-DECISION.md), and [shipping/payment integration matrix](docs/architecture/INTEGRATION-MATRIX.md).
-7. Read the [scenario and comparison specification](docs/design/SCENARIO-AND-COMPARISON-SPEC.md) before changing scenario, baseline or diff semantics.
-8. Review the [admin UX/React specification](docs/design/ADMIN-UX-SPEC.md) and [interactive interface prototype](docs/design/admin-interface-prototype.html) for the planned screens and states.
-9. Read the [requirements and compatibility plan](docs/requirements/REQUIREMENTS.md); planned targets are not tested compatibility claims.
-10. For Phase 6 checkout safety, adapter boundaries, canonical field mapping, change-event handling and runtime proof cases, read the [safe checkout proof protocol](docs/validation/PREDEVELOPMENT-SAFE-CHECKOUT-PROOF.md), [Store API observation adapter spike](docs/validation/STORE-API-OBSERVATION-ADAPTER-SPIKE.md), [Store API canonicalization spike](docs/validation/STORE-API-CANONICALIZATION-SPIKE.md), [change-source hooks spike](docs/validation/CHANGE-SOURCE-HOOKS-SPIKE.md), [background run scheduling spike](docs/validation/BACKGROUND-RUN-SCHEDULING-SPIKE.md) and [runtime proof runbook](docs/validation/RUNTIME-PROOF-RUNBOOK.md), including the exact isolated-environment provisioning gate and V-01–V-07 before/after operator matrix.
-11. Read the [multilingual checkout compatibility spike](docs/validation/MULTILINGUAL-CHECKOUT-COMPATIBILITY-SPIKE.md) for WPML/WCML and Polylang scenario fingerprints and proof cases; these integrations are not runtime-supported.
-12. Read the [Phase 6 closure decision](docs/validation/PHASE-6-CLOSURE-DECISION.md) before treating any automatic replay mode as implementation-ready.
-13. Review the [plugin bootstrap and PSR-4 loader](wpessential-checkout-impact-regression.php), [namespaced admin page](includes/Admin/AdminPage.php), [versioned storage schema scaffold](includes/Storage/Schema.php), [React admin shell](assets/js/admin.js), and [admin styles](assets/css/admin.css). The v0.2 bootstrap/admin UI passed a limited WordPress smoke test; database migration, CRUD persistence, and checkout runtime remain unverified.
-14. Read the [Phase 7 task evidence](docs/validation/PHASE-7-TASK-EVIDENCE.md) for precise PHP lint, storage, and checkout-safety status.
-15. Update the phase status, progress bar, start date, and end date in this README when project progress changes. Keep detailed decisions and evidence in the development plan.
+The free plugin has no locked or time-limited features. Pro is a separate plugin in [`pro/`](pro/checkout-impact-regression-pro) that requires the free one.
 
-## Downloading a test build
+## Requirements
 
-A versioned installable plugin package is built by GitHub Actions. To build or download one:
+WordPress 6.9+, PHP 8.2+, WooCommerce 10.8+. Verified on WordPress 7.1.4, WooCommerce 11.2.2, PHP 8.3 (see [evidence](docs/validation/PHASE-7-TASK-EVIDENCE.md)).
 
-1. Open the repository's [Actions](https://github.com/Vertex-Systems-Network/wpessential-checkout-impact-regression/actions) page.
-2. Select **Plugin CI and installable build**. New commits and pull requests build automatically; use **Run workflow** on the `main` branch to request a build manually.
-3. Open a successful run and download its `installable-plugin-v<version>` artifact. The artifact contains the WordPress install ZIP and a SHA-256 checksum file.
-4. Extract the downloaded artifact archive once. In WordPress Admin, go to **Plugins → Add Plugin → Upload Plugin**, select the inner `wpessential-checkout-impact-regression-<version>.zip`, then install or replace the existing version.
+## Development
 
-The workflow reads the version from the plugin header, generates Composer's optimized PSR-4 loader, runs validation/lint/comparison checks, verifies the ZIP contents and uploads the package artifact for 30 days. Run #107 produced v0.2.1 (artifact ID `13575111534`), including exact decimal expectation handling and scenario REST authorization contract tests. This is a downloadable test build, not a marketplace release. No product CLI is involved.
+```bash
+composer install
+for t in tests/php/*-contract.php tests/php/normalizer-diff.php tests/php/multilingual-context-dry-run.php; do php "$t" || exit 1; done
+php tests/php/uninstall-contract.php erase
+./bin/build.sh        # dist/checkout-impact-regression-for-woocommerce-<v>.zip and dist/checkout-impact-regression-pro-<v>.zip
+```
 
-## Product principles
+CI (`.github/workflows/ci.yml`) runs lint and contract tests on PHP 8.2–8.4, builds both ZIPs and runs the official WordPress.org Plugin Check. Download packages from the run's **plugin-packages** artifact.
 
-- Compare saved, representative customer/cart scenarios before and after a plugin or settings change.
-- Report material differences by country/region, shipping method and cost, payment option, taxes, coupons/discounts, and checkout completion behavior where supported.
-- Distinguish a confirmed regression from an environment-dependent or inconclusive result.
-- Make comparison results understandable to store owners, with evidence and a clear expected-versus-observed view.
-- Keep scenario data, customer privacy, store performance, accessibility, and recovery behavior in the architecture from the start.
-- Use a polished, human-centered React interface that fits naturally into WordPress administration.
-- Finalize and document PHP, WordPress, WooCommerce, WPML, and Polylang compatibility before implementation scope is locked.
-- **Do not add a CLI to the product before the final release.** No CLI product interface or CLI commands are in scope during planning and implementation.
-- Treat Store API Cart Tokens as session identifiers, not side-effect isolation; use the [adapter spike](docs/validation/STORE-API-OBSERVATION-ADAPTER-SPIKE.md) for the observation boundary.
-- The sequenced Phase 7 implementation backlog is recorded in the [development plan](docs/DEVELOPMENT-PLAN.md); tasks that depend on safe replay stay gated by Phase 6 runtime evidence.
-- Do not claim compatibility or automated detection capability until it has been validated.
+## Documentation
 
-## Planned research references
-
-Competitor research begins in Phase 1. Initial references supplied for review:
-
-- [Cart Lookout](https://wordpress.org/plugins/cartlookout/)
-- [ShopMonitor](https://shopmonitor.io/)
-
-Research must verify the current feature set and limitations from primary product materials, record findings and sources, and use them to build a deduplicated options bank. No feature should be copied into scope without a user need, rationale, and acceptance criteria.
-
-## Planned distribution
-
-The release target is a **free edition for the WordPress.org Plugin Directory** and a **paid edition for the WooCommerce.com Marketplace**. These are planning targets only; neither marketplace application nor product submission has been made. The free edition must provide genuine standalone value and comply with WordPress.org's licensing and no-trialware rules. Paid packaging, update ownership, pricing and cross-marketplace presentation still require review.
-
-See the [distribution and marketplace submission plan](docs/release/DISTRIBUTION-PLAN.md) for current requirements, release gates, edition decisions and official references. The proposed $119/year price is not approved.
+- [Development plan](docs/DEVELOPMENT-PLAN.md) – scope, decisions, backlog, progress formula
+- [WordPress.org submission checklist](docs/release/WPORG-SUBMISSION.md)
+- [WooCommerce Marketplace checklist](docs/release/WOO-MARKETPLACE-SUBMISSION.md)
+- [Phase 7 evidence](docs/validation/PHASE-7-TASK-EVIDENCE.md)
+- AI contributors: start with [AGENTS.md](AGENTS.md)
 
 ## License
 
-No license has been selected yet. A GPL-compatible release license is a submission prerequisite and remains a decision.
-
-Follow-up CI after the documentation updates passed as workflow run #260 on commit `6079b36b26763787f206b94daa8344635704822b` (PHP lint, JS syntax, contracts and installable ZIP build); artifact `13641467446`. This revalidates the current source in CI, but does not change the unsuccessful Playground installation result or satisfy live runtime acceptance.
-
-TasteWP runtime verification — 2026-11-09: installed and activated the v0.2.1 CI #254 package on the user-designated TasteWP WordPress 7.1.4 site with WooCommerce 11.2.2 active. The React admin screen loaded. A synthetic DE/EUR scenario with shipping method `flat_rate:3`, expected shipping 5.25, coupon `WELCOME10`, and expected discount 1.00 was created; saved fields read back; shipping was revised to 6.25 and saved as a new version. After the history panel finished loading, the UI showed immutable Version 1 (5.25) and Version 2 (6.25) with timestamps. The initial transient empty-history message resolved without a code change. The synthetic scenario and versions were then deleted, and WordPress showed the empty scenario-library state. No checkout, order, payment, shipping, or coupon request was executed; the coupon was stored only as expectation data. Console errors observed belonged to a browser extension, not the plugin. This confirms the tested admin scenario/version path on this environment only; it does not verify migrations, plugin/settings change hooks, checkout comparison/replay, WPML/Polylang integration, or Phase 7 completion. Progress remains 71% pending the other IMPL-002/003/008/011 work and safety-gated tasks.
-
-TasteWP dashboard update — 2026-11-10: CI run #268 passed PHP lint, JavaScript syntax, contract checks and installable ZIP build (artifact `13702750081`; [workflow run](https://github.com/Vertex-Systems-Network/wpessential-checkout-impact-regression/actions/runs/42679936893)). The build adds a React “Change readiness” overview with real saved-scenario and change-event counts, plus an explicit unavailable-comparisons state that does not infer regressions. The v0.2.1 ZIP was checksum-verified, uploaded over the active build on the authorized TasteWP site, and the updated screen rendered. A synthetic scenario made the count change 0→1; after deleting it, the count returned to 0 and the scenario library showed its empty state. No checkout/order/payment/shipping/coupon call ran. Phase 7 stays at 71% because baseline approval, observed comparison reports, runtime schema/privacy and compatibility acceptance remain incomplete.
-
-
-### Manual before/after comparison preview — 2026-11-10
-
-**Verified implementation slice:** the admin can choose a saved synthetic scenario and record before/after observations for shipping method, shipping cost, coupon code, and coupon discount. The admin-only preview endpoint validates the saved scenario context/currency, rejects unsupported fields and email/secret-like values, canonicalizes exact decimals without floating point, and returns field-level changed, confirmed-missing, newly-observed, unchanged, or inconclusive outcomes. Not-recorded, unsupported, and collection-error values remain inconclusive. The preview is ephemeral and manual; it does not run checkout or persist results.
-
-- **CI:** [run #286](https://github.com/Vertex-Systems-Network/wpessential-checkout-impact-regression/actions/runs/42688305277) passed Composer validation, optimized PSR-4 generation, PHP lint, JavaScript syntax, all contract tests (including the new manual comparison and REST route contracts), ZIP verification and artifact upload. Artifact 13704614526 (installable-plugin-v0.2.1), outer archive SHA-256 a05522617f7fe9e18d5a9ca897132f8ecbfceac07f89912d1f253e2009ab6640; the inner plugin ZIP checksum also passed.
-- **TasteWP:** the verified artifact was installed over the existing plugin on the authorized Quirky Brake test site (WordPress 7.1.4); WordPress reported Plugin updated successfully. The comparison panel rendered. Synthetic observations produced **Changed: 2, Missing: 1, Added: 0, Unchanged: 1, Needs review: 0** for shipping method flat_rate:3 → confirmed missing, shipping cost USD 7 → USD 12, coupon code WELCOME10 unchanged, and discount USD 1 → USD 0.5. The temporary scenario was deleted; the count returned to zero and the scenario library showed its empty state.
-- **Safety / limits:** no checkout, order, payment, shipping, or coupon request was run; all comparison values were entered manually as synthetic data. This does not prove automatic capture, baseline approval, durable report/history, plugin/settings impact attribution, migration/privacy runtime, or WPML/Polylang runtime. Phase 7 is now **74%**, not complete; automated runs remain blocked by the Phase 6 NO-GO.
-
-
-### Durable manual comparison reports — 2026-11-10
-
-The manual before/after result now has an explicit **Save report for 30 days** action. Saving recomputes the comparison on the server against the selected scenario version, stores the run, normalized before/after observations and findings in the existing schema, and returns the report identity and expiry. A scenario-scoped, capability-guarded REST route lists recent unexpired reports; the React admin view shows saved time, expiry, change counts and expandable field-level before/after differences. Checkout execution remains disabled. Retention is currently fixed at 30 days; configurable retention is still pending.
-
-- **CI:** [run #298](https://github.com/Vertex-Systems-Network/wpessential-checkout-impact-regression/actions/runs/42693036588) passed Composer validation, optimized PSR-4 generation, PHP lint, JavaScript syntax, all contract checks, ZIP verification and artifact upload. Artifact 13708240902 (installable-plugin-v0.2.1); outer archive SHA-256 c3c2d59f1adc9666a044f6d1fadaa302c701ab4b8552d6705a416e910fbc8644; inner plugin ZIP SHA-256 ea3c29d58a74ee4d2c01144cc8276d1a502c80bfa2cac999c94469d50b0c3ad1.
-- **TasteWP:** the artifact was installed over the active plugin on Quirky Brake (WordPress 7.1.4). A synthetic DE/EUR report showed **Changed: 2, Missing: 1, Unchanged: 1, Needs review: 0**: shipping option Standard missing, shipping cost EUR 7→12, WELCOME10 unchanged, discount EUR 10→8. After reload and reselecting the scenario, report #1 remained visible with its 30-day expiry. Expanded saved history displayed each stored outcome and value delta after the latest UI build. Deleting the disposable scenario removed it and its report history; the scenario library returned to 0.
-- **Safety / limits:** no checkout, payment, shipping, coupon or order request ran. This verifies manual report persistence and scenario deletion cleanup on this staging environment only. It does not verify automated observation, approved-baseline capture, migration/privacy runtime, marketplace compatibility or WPML/Polylang runtime. Phase 7 is **74%** and remains in progress.
-
-
-### Latest staging verification — 2026-11-09
-
-The user-installed build passed a synthetic baseline-to-regression UI flow on TasteWP: approved Standard / EUR 7 / WELCOME10 / EUR 10 baseline; After reported shipping missing, EUR 12, same coupon, EUR 5 discount; comparison showed 2 changed, 1 missing, 1 unchanged, and saved report #3 linked to approved baseline #3. Manual synthetic data only; checkout/payment/shipping/coupon execution was not run. IMPL-008 remains Partial; Phase 7 remains 58% (15/26 complete). Full scope and limits: [Phase 7 evidence](docs/validation/PHASE-7-TASK-EVIDENCE.md#approved-baseline-regression-comparison-on-staging--2026-11-09).
-
-### Manual payment availability comparison — 2026-11-10
-
-The manual before/after comparison now includes observed payment gateway IDs, so an operator can record a set such as `cod, stripe` for each side and identify a removed or newly available method without initiating payment. IDs are lowercased, deduplicated, sorted, and validated; secret-like names are rejected, and baseline approval requires this fifth field as observed or confirmed missing. CI #340 caught a mismatch in the secret-like-ID contract; the validator was fixed and CI #341 passed PHP lint, JavaScript syntax, all contract checks and installable ZIP packaging. Artifact `13714704734` has SHA-256 `2c4949ae886e28c97c9c9ad952f64229cad1a6f2441b73203be7d5bec8477d79`; the inner install ZIP SHA-256 is `0227dd1ba3b84b27e4060244baf2605b6bcd33dc20e7c92d68a4b67aa3e1cf0e` and its archive integrity check passed. On 2026-11-10, the CI #341 artifact was installed on TasteWP (WordPress 7.1.4 / WooCommerce 11.2.2). A synthetic scenario confirmed `cod, stripe` → `stripe`, approved the saved baseline, loaded it into Before, then confirmed `stripe` → `cod, stripe` in preview and saved report #4 with the expected history entry. The disposable scenario was deleted. No checkout, payment, shipping, order, or coupon request was run. Phase 7 remains 58% (15/26 complete); IMPL-008 remains Partial.
+GPL-2.0-or-later. See [LICENSE](LICENSE).

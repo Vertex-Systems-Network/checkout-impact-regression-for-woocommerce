@@ -1,10 +1,6 @@
 ---
-description: Always load the canonical WPEssential Checkout Impact Regression project context and workflow.
+description: Load the canonical Checkout Impact Regression for WooCommerce project rules.
 alwaysApply: true
 ---
 
-This repository plans and builds the WPEssential Checkout Impact Regression add-on.
-
-Before making changes, read `AGENTS.md`, `README.md`, and `docs/DEVELOPMENT-PLAN.md`. Treat `AGENTS.md` as canonical contributor rules, README as the phase/status tracker, and the development plan as the scope and backlog source of truth.
-
-Select and execute the highest-priority unblocked backlog task. Resume prompts such as “continue”, “start”, “...”, and “?” mean resume the already authorized project work; do not request another start message or substitute status narration for implementation. Complete implementation, checks, packaging and required safe staging verification; fix failures; update backlog, evidence and README; push only verified work to authorized main. When a task is blocked, record its specific missing proof and continue with independent tasks. Follow AGENTS.md for the task-count progress formula and mandatory delivery loop. Phase 6 NO-GO blocks automated checkout replay/observation only. Preserve the before/after scenario regression focus, cite official sources, avoid unverified compatibility claims, and add no product CLI before final release.
+Follow `AGENTS.md` (canonical). Read `README.md` and `docs/DEVELOPMENT-PLAN.md` before changes; the plan is the source of truth for scope, decisions, backlog and progress formula. Work on a branch and open a pull request; do not push to `main`. Resume prompts never authorise external or irreversible actions. v1.0 is manual comparison; never run real checkout; no product CLI; free plugin stays fully useful, Pro lives in `pro/`.
