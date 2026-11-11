@@ -18,7 +18,7 @@
 | Privacy exporter/eraser + suggested policy text | runtime test | Done |
 | Icon 128/256, banner 772×250 / 1544×500, screenshots 1–7 | `wordpress-org/` | Done |
 | Package ZIP without dev files | `./bin/build.sh` or CI artifact **plugin-packages** | Done |
-| Plugin Check (official action) | CI job **WordPress.org Plugin Check** on the PR | Check result on the PR |
+| Plugin Check (official action) | CI job **WordPress.org Plugin Check** | Pass (CI run 43103077615) |
 
 ## Owner steps (need your WordPress.org login)
 

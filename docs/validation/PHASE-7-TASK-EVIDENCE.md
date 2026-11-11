@@ -163,7 +163,7 @@ Earlier progress entries above are historical snapshots using an inconsistent pe
 | Deactivate unschedules purge; default uninstall keeps tables and data; opt-in uninstall drops 7 tables and all `wpecir_` options | package + local runtime | Pass |
 | Privacy exporter/eraser via registered WordPress callbacks; policy suggestion registered | local runtime | Pass |
 | Pro: invalid recipients rejected, dedupe, real settings change queued, digest scheduled, mail lists change without values; CSV download in browser; Alerts tab saves | local runtime | Pass |
-| Plugin Check, PHP 8.2/8.4 lint | CI | Runs on the pull request – see PR checks |
+| Official WordPress.org Plugin Check (free build), lint + contracts on PHP 8.2/8.3/8.4, package build | CI run 43103077615 (PR #2, commit after `4b33d4b`) | Pass – first run found unprepared table-name SQL; fixed with `%i` placeholders and re-verified on local runtime |
 
 Screenshots used for WordPress.org are in `wordpress-org/screenshot-1..7.png` (captured with Pro deactivated).
 
