@@ -168,6 +168,17 @@ Earlier progress entries above are historical snapshots using an inconsistent pe
 Screenshots used for WordPress.org are in `wordpress-org/screenshot-1..7.png` (captured with Pro deactivated).
 
 
+### 2026-11-12 — WordPress Playground run and review fixes
+
+| Check | Layer | Result |
+|---|---|---|
+| WordPress Playground CLI (php-wasm **PHP 8.2**, SQLite) with the built free + Pro ZIPs and WooCommerce 11.2.2: same browser e2e flow (scenarios → baseline → compare → report → settings → docs → change log → mobile) and Pro export/Alerts tab | Playground runtime | Pass, no JS errors |
+| Qodo review fixes (d833ed6): alert retry/keep-queue, export > 20 reports (25 exported), Pro boot gate, single privacy-policy entry, schema auto-upgrade from a stale v1 option with no logged-in user, settings/alerts load-failure guards | local runtime + contract | Pass |
+| WordPress.org screenshot 4 recaptured (the first capture was only the card heading) | asset | Fixed (5e760f7) |
+
+`wordpress-org/blueprints/blueprint.json` enables the WordPress.org "Live Preview" button once the plugin is approved (installs WooCommerce + the plugin and seeds demo products, a Germany zone and a coupon).
+
+
 ## Historical logs moved from the development plan (2026-11-12)
 
 > These dated entries were appended to `DEVELOPMENT-PLAN.md` between 2026-11-09 and 2026-11-10. They are kept verbatim as history. Percentages in them (71%, 73%, 74%, 75%) were superseded by the 2026-11-12 progress model (D-018).

@@ -43,7 +43,7 @@ The free plugin has no locked or time-limited features. Pro is a separate plugin
 
 ## Requirements
 
-WordPress 6.9+, PHP 8.2+, WooCommerce 10.8+. Verified on WordPress 7.1.4, WooCommerce 11.2.2, PHP 8.3 (see [evidence](docs/validation/PHASE-7-TASK-EVIDENCE.md)).
+WordPress 6.9+, PHP 8.2+, WooCommerce 10.8+. Verified on WordPress 7.1.4, WooCommerce 11.2.2, PHP 8.3 and WordPress Playground (PHP 8.2) (see [evidence](docs/validation/PHASE-7-TASK-EVIDENCE.md)).
 
 ## Development
 

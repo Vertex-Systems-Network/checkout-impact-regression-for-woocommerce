@@ -295,7 +295,7 @@ Dates remain TBD until the team estimates the work. Record actual start/end date
 
 **Evidence layers (2026-11-12):** contract tests (18 scripts, all pass); local runtime on WordPress 7.1.4 / WooCommerce 11.2.2 / PHP 8.3 / SQLite: browser end-to-end flow, package install on a fresh site, activation, schema install and v1→v2 upgrade, REST authorization (anonymous 403, subscriber 403), uninstall preserve and erase, privacy export/erase, Pro alerts and export. CI adds PHP 8.2/8.3/8.4 lint+contracts, package build and the official WordPress.org Plugin Check action. Details: [Phase 7 task evidence](validation/PHASE-7-TASK-EVIDENCE.md).
 
-**Not yet verified:** MySQL/MariaDB runtime (local runs used the SQLite drop-in), PHP 8.2 runtime (lint only), assistive-technology testing, WPML/Polylang runtime. The official WordPress.org Plugin Check passes in CI (run 43103077615).
+**Not yet verified:** MySQL/MariaDB runtime (local and Playground runs used SQLite), assistive-technology testing, WPML/Polylang runtime. The official WordPress.org Plugin Check passes in CI (run 43103077615).
 
 ### Phase 8 — Release readiness
 
@@ -337,7 +337,7 @@ Rows from Phases 1–6 are unchanged and Complete/Deferred as recorded on 2026-1
 | IMPL-007 | v1 | P0 | Normaliser and diff engine (manual fields) | Exact money, five supported fields, mismatch/incomplete never "unchanged" | Complete for v1 manual fields; adapter normalisation moves with IMPL-005 |
 | IMPL-008 | v1 | P0 | Baseline approval, comparison, reports, history UI | Approve/prefill baseline, stale-version guard, compare, save, list, retention notice | Complete (2026-11-12; browser e2e) |
 | IMPL-010 | v1 (Pro) | P1 | Notifications and redacted export | Digest email with dedupe/batching and no values; CSV/JSON export; delivery failure is surfaced | Partial (alerts and export verified on runtime; a failed `wp_mail` is not yet shown in the UI) |
-| IMPL-011 | v1 | P0 | Compatibility, security, performance, accessibility | Published matrix contains only verified entries | Partial (WP 7.1.4 / Woo 11.2.2 / PHP 8.3 runtime on SQLite; CI lint PHP 8.2–8.4; Plugin Check passes; MySQL runtime and AT testing pending) |
+| IMPL-011 | v1 | P0 | Compatibility, security, performance, accessibility | Published matrix contains only verified entries | Partial (WP 7.1.4 / Woo 11.2.2 on PHP 8.3 and Playground PHP 8.2, both SQLite; CI lint PHP 8.2–8.4; Plugin Check passes; MySQL runtime and AT testing pending) |
 | IMPL-012 … IMPL-025 | v1 | P1 | Contract-test hardening tasks from 2026-11-07 | As recorded in evidence | Complete (14 rows; unchanged) |
 | IMPL-026 | v1 | P0 | Settings: retention days and erase-on-delete | REST + UI; 7–365 validated server-side; applies to new reports | Complete (2026-11-12; contract + browser) |
 | IMPL-027 | v1 | P0 | Admin UI v2 and in-plugin documentation | Full-width tabbed screen under WooCommerce, keyboard-operable tabs, Docs tab, Plugins-screen links, responsive to 390 px | Complete (2026-11-12; screenshots in evidence) |

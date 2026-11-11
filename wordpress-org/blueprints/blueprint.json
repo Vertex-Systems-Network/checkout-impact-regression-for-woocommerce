@@ -1,0 +1,14 @@
+{
+  "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+  "landingPage": "/wp-admin/admin.php?page=wpessential-checkout-impact#overview",
+  "preferredVersions": { "php": "8.2", "wp": "latest" },
+  "login": true,
+  "steps": [
+    { "step": "installPlugin", "pluginData": { "resource": "wordpress.org/plugins", "slug": "woocommerce" }, "options": { "activate": true } },
+    { "step": "installPlugin", "pluginData": { "resource": "wordpress.org/plugins", "slug": "checkout-impact-regression-for-woocommerce" }, "options": { "activate": true } },
+    {
+      "step": "runPHP",
+      "code": "<?php require '/wordpress/wp-load.php'; update_option('woocommerce_default_country','DE'); update_option('woocommerce_currency','EUR'); foreach ([['Demo T-shirt','24.00'],['Demo Mug','14.50']] as $d) { $p = new WC_Product_Simple(); $p->set_name($d[0]); $p->set_regular_price($d[1]); $p->set_status('publish'); $p->save(); } $z = new WC_Shipping_Zone(); $z->set_zone_name('Germany'); $z->add_location('DE','country'); $z->save(); $z->add_shipping_method('flat_rate'); $c = new WC_Coupon(); $c->set_code('welcome10'); $c->set_discount_type('percent'); $c->set_amount(10); $c->save();"
+    }
+  ]
+}
