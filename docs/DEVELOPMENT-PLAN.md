@@ -4,7 +4,7 @@
 **Repository:** `Vertex-Systems-Network/checkout-impact-regression-for-woocommerce`  
 **WordPress.org slug:** `checkout-impact-regression-for-woocommerce` · **Plugin URI:** https://wpessential.org/plugins/checkout-impact-regression-for-woocommerce  
 **Stage:** v1.0.0 release candidate (Phase 7 v1 scope done; Phase 8 submission prepared, waiting on owner actions)  
-**Plan last updated:** 2026-11-12
+**Plan last updated:** 2026-11-12 (evening: Pro split into its own repository, MySQL + accessibility evidence)
 
 This document is the detailed product and engineering plan. Keep it aligned with the phase tracker in the repository README. Any implementation proposal must fit the product goals, compatibility decisions, privacy constraints, and the no-CLI boundary below.
 
@@ -291,11 +291,11 @@ Dates remain TBD until the team estimates the work. Record actual start/end date
 - Privacy: exporter/eraser, privacy-policy suggestion, preserve-by-default uninstall with opt-in erase.
 - HPOS and Cart/Checkout blocks compatibility declared (the plugin never touches orders).
 - Extension points for add-ons: `wpecir_loaded`, `wpecir_change_event_recorded`, `wpecir_manual_report_saved`, `wpecir_pro_active`, `wpecir_tracked_option_names`; JS filters `wpecir.adminTabs`, `wpecir.reportActions`.
-- **Pro add-on** (`pro/checkout-impact-regression-pro`): email digest alerts for recorded changes (15-minute batching, up to 5 recipients, no setting values in mail) and CSV/JSON report export with spreadsheet-formula neutralisation.
+- **Pro add-on** (separate repository `checkout-impact-regression-pro-for-woocommerce`): email digest alerts for recorded changes (15-minute batching, up to 5 recipients, no setting values in mail) and CSV/JSON report export with spreadsheet-formula neutralisation.
 
 **Evidence layers (2026-11-12):** contract tests (18 scripts, all pass); local runtime on WordPress 7.1.4 / WooCommerce 11.2.2 / PHP 8.3 / SQLite: browser end-to-end flow, package install on a fresh site, activation, schema install and v1→v2 upgrade, REST authorization (anonymous 403, subscriber 403), uninstall preserve and erase, privacy export/erase, Pro alerts and export. CI adds PHP 8.2/8.3/8.4 lint+contracts, package build and the official WordPress.org Plugin Check action. Details: [Phase 7 task evidence](validation/PHASE-7-TASK-EVIDENCE.md).
 
-**Not yet verified:** MySQL/MariaDB runtime (local and Playground runs used SQLite), assistive-technology testing, WPML/Polylang runtime. The official WordPress.org Plugin Check passes in CI (run 43103077615).
+**Not yet verified:** manual screen-reader session (automated axe-core WCAG 2.2 AA audit passes with 0 violations), WPML/Polylang runtime. MySQL/MariaDB 10.11 runtime passed on 2026-11-12.
 
 ### Phase 8 — Release readiness
 
@@ -319,7 +319,7 @@ Dates remain TBD until the team estimates the work. Record actual start/end date
 
 Deferred rows (*v1.x*) are listed but excluded from the v1 denominator. Recalculate from row statuses; never hand-tune.
 
-**Current snapshot (2026-11-12):** Phase 7 v1 scope: 26 of 28 rows Complete, 2 Partial (IMPL-010, IMPL-011) = **93%**. Deferred v1.x: 4 rows (ENV-001, IMPL-005, IMPL-006, IMPL-009). Phase 8: 1 of 4 Complete, 3 Partial = **25%**. Overall = (100×7 + 93 + 25) ÷ 9 = **91%**.
+**Current snapshot (2026-11-12, evening):** Phase 7 v1 scope: 29 of 30 rows Complete, 1 Partial (IMPL-032 wiki publish) = **97%**. Deferred v1.x: 4 rows (ENV-001, IMPL-005, IMPL-006, IMPL-009). Phase 8: 1 of 4 Complete, 3 Partial = **25%**. Overall = (100×7 + 97 + 25) ÷ 9 = **91%**.
 
 ## 9. Backlog
 
@@ -336,16 +336,18 @@ Rows from Phases 1–6 are unchanged and Complete/Deferred as recorded on 2026-1
 | IMPL-004 | v1 | P0 | Scenario catalog and builder | Create/edit(version)/delete with WooCommerce pickers; validation; accessible labels | Complete (2026-11-12; browser e2e) |
 | IMPL-007 | v1 | P0 | Normaliser and diff engine (manual fields) | Exact money, five supported fields, mismatch/incomplete never "unchanged" | Complete for v1 manual fields; adapter normalisation moves with IMPL-005 |
 | IMPL-008 | v1 | P0 | Baseline approval, comparison, reports, history UI | Approve/prefill baseline, stale-version guard, compare, save, list, retention notice | Complete (2026-11-12; browser e2e) |
-| IMPL-010 | v1 (Pro) | P1 | Notifications and redacted export | Digest email with dedupe/batching and no values; CSV/JSON export; delivery failure is surfaced | Partial (alerts and export verified on runtime; a failed `wp_mail` is not yet shown in the UI) |
-| IMPL-011 | v1 | P0 | Compatibility, security, performance, accessibility | Published matrix contains only verified entries | Partial (WP 7.1.4 / Woo 11.2.2 on PHP 8.3 and Playground PHP 8.2, both SQLite; CI lint PHP 8.2–8.4; Plugin Check passes; MySQL runtime and AT testing pending) |
+| IMPL-010 | v1 (Pro) | P1 | Notifications and redacted export | Digest email with dedupe/batching and no values; CSV/JSON export; delivery failure is surfaced | Complete (2026-11-12; 3 retries, last failure shown in the Alerts tab; export pages all reports; runtime on SQLite and MariaDB) |
+| IMPL-011 | v1 | P0 | Compatibility, security, performance, accessibility | Published matrix contains only verified entries | Complete for the published matrix (2026-11-12): WP 7.1.4 + Woo 11.2.2 on PHP 8.2 (Playground), 8.3 (local) and 8.4 (CI Playground), SQLite and MariaDB 10.11; Plugin Check passes; axe-core WCAG 2.2 AA 0 violations on all tabs + keyboard tab navigation. WPML/Polylang and screen-reader sessions are not claimed |
 | IMPL-012 … IMPL-025 | v1 | P1 | Contract-test hardening tasks from 2026-11-07 | As recorded in evidence | Complete (14 rows; unchanged) |
 | IMPL-026 | v1 | P0 | Settings: retention days and erase-on-delete | REST + UI; 7–365 validated server-side; applies to new reports | Complete (2026-11-12; contract + browser) |
 | IMPL-027 | v1 | P0 | Admin UI v2 and in-plugin documentation | Full-width tabbed screen under WooCommerce, keyboard-operable tabs, Docs tab, Plugins-screen links, responsive to 390 px | Complete (2026-11-12; screenshots in evidence) |
 | IMPL-028 | v1 (Pro) | P1 | Pro add-on package | Separate plugin requiring the free plugin; Alerts tab and export via public hooks; uninstall removes Pro options only | Complete (2026-11-12; runtime + contract) |
 | IMPL-029 | v1 | P1 | i18n readiness | All UI strings literal and translatable in JS and PHP; script translations loaded | Complete (2026-11-12) |
 | IMPL-030 | v1 | P1 | WooCommerce feature compatibility declarations | HPOS and Cart/Checkout blocks declared compatible (no order access) | Complete (2026-11-12) |
+| IMPL-031 | v1 | P0 | Pro in its own repository, linked to free | Pro repo uses the repo slug as plugin slug/text domain; free contains no Pro code; Pro refuses to run without free (Requires Plugins + version gate); both CIs run the compatibility contract, a free + Pro Playground integration run and build both ZIPs together | Complete (2026-11-12; contract mutation test fails as expected; integration run passes incl. "Pro cannot activate without free") |
+| IMPL-032 | v1 | P1 | Wiki documentation | Wiki pages in `docs/wiki/`, linked from the plugin (Docs tab + Plugins screen) and published to the GitHub Wiki | Partial (pages, links and sync workflow done; the repository Wiki must be enabled by the owner before the first publish) |
 
-Counting: BUILD-001, IMPL-001–004, 007, 008, 010, 011, IMPL-012…025 (14), IMPL-026…030 (5) = 28 rows.
+Counting: BUILD-001, IMPL-001–004, 007, 008, 010, 011, IMPL-012…025 (14), IMPL-026…032 (7) = 30 rows.
 
 ### Deferred to v1.x (blocked by Phase 6 NO-GO)
 
@@ -383,6 +385,9 @@ Counting: BUILD-001, IMPL-001–004, 007, 008, 010, 011, IMPL-012…025 (14), IM
 - **D-018 (2026-11-12):** Progress is reported as v1-scope completion plus deferred count; Phase 6 NO-GO is shown explicitly. Reason: the old task-count formula let test-only tasks raise the bar while 0 of 11 core tasks were complete.
 - **D-019 (2026-11-12):** v1.0 is the manual comparison product. Automatic observation is v1.x, gated by ENV-001 and Phase 6.
 - **D-020 (2026-11-12):** AI contributors work on branches and open pull requests; the owner merges. "..." or "?" does not authorise external or irreversible actions.
+- **D-022 (2026-11-12):** Plugin names, slugs, main files and text domains equal the repository slugs: `checkout-impact-regression-for-woocommerce` and `checkout-impact-regression-pro-for-woocommerce`.
+- **D-023 (2026-11-12):** Pro lives in its own repository. The free plugin contains no Pro code; Pro never works without free. The two stay in sync through Pro's `tests/free-api-contract.php`, a shared Playground integration run and paired builds in both CIs (same-named branches are tested together; nightly runs catch drift; optional `CROSS_REPO_TOKEN` triggers the other repo on merge).
+- **D-024 (2026-11-12):** `readme.txt` is generated from `wordpress-org/readme.md` with the WPEssential readme system (`tools/readme-to-txt.php`); CI fails when they differ.
 - **D-021 (2026-11-12):** Free plugin slug `checkout-impact-regression-for-woocommerce` (name "Checkout Impact Regression for WooCommerce", author WPEssential, Plugin URI `https://wpessential.org/plugins/<slug>`). Pro is a separate plugin `checkout-impact-regression-pro` sold on WooCommerce.com: email alerts and report export. No feature in the free plugin is locked or time-limited.
 
 ### Open questions

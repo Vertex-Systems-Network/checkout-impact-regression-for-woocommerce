@@ -770,6 +770,16 @@
 	background: var(--wpecir-subtle);
 }
 
+.wpecir-docs__links {
+	display: grid;
+	gap: 8px;
+	margin: 0;
+}
+
+.wpecir-docs__links .button {
+	text-align: center;
+}
+
 .wpecir-docs__content {
 	display: grid;
 	gap: 16px;

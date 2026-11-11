@@ -1,13 +1,25 @@
-name: CI, Plugin Check and packages
+name: CI, Pro compatibility, Plugin Check and packages
+
+# The free plugin and Pro live in separate repositories but ship together.
+# Every run checks the free plugin against Pro (same-named branch if it exists,
+# otherwise main): Pro's compatibility contract, Pro's tests, a combined
+# WordPress Playground integration run, and both ZIPs in one artifact.
 
 on:
   push:
     branches: [main]
   pull_request:
   workflow_dispatch:
+  repository_dispatch:
+    types: [pro-updated]
+  schedule:
+    - cron: '17 2 * * *'
 
 permissions:
   contents: read
+
+env:
+  PRO_REPO: Vertex-Systems-Network/checkout-impact-regression-pro-for-woocommerce
 
 jobs:
   test:
@@ -29,13 +41,11 @@ jobs:
           composer validate --strict
           composer install --no-interaction --prefer-dist --no-progress --no-dev --optimize-autoloader
       - name: Lint PHP
-        shell: bash
-        run: |
-          find . -type f -name '*.php' -not -path './.git/*' -not -path './dist/*' -not -path './build/*' -print0 | xargs -0 -n1 php -l > /dev/null
+        run: find . -type f -name '*.php' -not -path './.git/*' -not -path './dist/*' -not -path './build/*' -print0 | xargs -0 -n1 php -l > /dev/null
       - name: Check JavaScript syntax
-        run: |
-          node --check assets/js/admin.js
-          node --check pro/checkout-impact-regression-pro/assets/pro.js
+        run: node --check assets/js/admin.js
+      - name: readme.txt is generated from wordpress-org/readme.md
+        run: php tools/readme-to-txt.php --check
       - name: Run contract tests
         shell: bash
         run: |
@@ -47,20 +57,56 @@ jobs:
             esac
           done
 
+  pro-compat:
+    name: Pro compatibility (contract + Pro tests)
+    runs-on: ubuntu-latest
+    outputs:
+      pro_ref: ${{ steps.ref.outputs.ref }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: ref
+        name: Pick the Pro branch (same name as this branch, else main)
+        shell: bash
+        run: |
+          branch="${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}"
+          ref=main
+          if [ -n "$branch" ] && git ls-remote --exit-code --heads "https://github.com/$PRO_REPO" "$branch" >/dev/null 2>&1; then ref="$branch"; fi
+          echo "ref=$ref" >> "$GITHUB_OUTPUT"
+          echo "Testing against $PRO_REPO@$ref" >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ env.PRO_REPO }}
+          ref: ${{ steps.ref.outputs.ref }}
+          path: pro-repo
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+      - name: Pro still works with this free plugin
+        run: |
+          FREE_DIR="$GITHUB_WORKSPACE" php pro-repo/tests/free-api-contract.php
+          php pro-repo/tests/pro-contract.php
+          node --check pro-repo/assets/pro.js
+
   package:
-    name: Build installable ZIPs
-    needs: test
+    name: Build free + Pro ZIPs
+    needs: [test, pro-compat]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ env.PRO_REPO }}
+          ref: ${{ needs.pro-compat.outputs.pro_ref }}
+          path: pro-repo
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
           tools: composer:v2
           coverage: none
-      - name: Build free (WordPress.org) and Pro (WooCommerce Marketplace) packages
-        run: ./bin/build.sh
-      - name: Upload packages
+      - name: Build both packages
+        run: PRO_DIR=pro-repo ./bin/build.sh
+      - name: Upload free + Pro packages
         uses: actions/upload-artifact@v4
         with:
           name: plugin-packages
@@ -68,11 +114,14 @@ jobs:
             dist/*.zip
             dist/*.sha256
           if-no-files-found: error
-      - name: Keep unpacked free build for Plugin Check
+      - name: Keep unpacked builds for Plugin Check and integration
         uses: actions/upload-artifact@v4
         with:
-          name: free-build
-          path: build/checkout-impact-regression-for-woocommerce
+          name: unpacked-builds
+          path: |
+            build/checkout-impact-regression-for-woocommerce
+            pro-repo/build/checkout-impact-regression-pro-for-woocommerce
+            pro-repo/tests/integration
 
   plugin-check:
     name: WordPress.org Plugin Check (free plugin)
@@ -81,9 +130,45 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: free-build
-          path: checkout-impact-regression-for-woocommerce
+          name: unpacked-builds
+          path: unpacked
       - uses: wordpress/plugin-check-action@v1
         with:
-          build-dir: ./checkout-impact-regression-for-woocommerce
+          build-dir: ./unpacked/build/checkout-impact-regression-for-woocommerce
           slug: checkout-impact-regression-for-woocommerce
+
+  integration:
+    name: Free + Pro together in WordPress Playground (PHP ${{ matrix.php }})
+    needs: package
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['8.2', '8.4']
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: unpacked-builds
+          path: unpacked
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Run integration check (latest WordPress + WooCommerce)
+        run: |
+          chmod +x unpacked/pro-repo/tests/integration/run.sh
+          unpacked/pro-repo/tests/integration/run.sh unpacked/build/checkout-impact-regression-for-woocommerce unpacked/pro-repo/build/checkout-impact-regression-pro-for-woocommerce ${{ matrix.php }}
+
+  notify-pro:
+    name: Ask the Pro repository to re-test
+    needs: [package, integration]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch free-updated to Pro (needs CROSS_REPO_TOKEN secret)
+        env:
+          TOKEN: ${{ secrets.CROSS_REPO_TOKEN }}
+        run: |
+          if [ -z "$TOKEN" ]; then echo "CROSS_REPO_TOKEN not set; Pro re-tests on its nightly schedule instead." >> "$GITHUB_STEP_SUMMARY"; exit 0; fi
+          curl -fsS -X POST -H "Authorization: Bearer $TOKEN" -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$PRO_REPO/dispatches" \
+            -d "{\"event_type\":\"free-updated\",\"client_payload\":{\"sha\":\"$GITHUB_SHA\"}}"

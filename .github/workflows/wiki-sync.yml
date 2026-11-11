@@ -1,0 +1,32 @@
+name: Publish docs/wiki to the GitHub Wiki
+
+# docs/wiki/*.md is the source; the GitHub Wiki is a published copy.
+# The wiki must be enabled and have at least one page (create "Home" once in the UI).
+on:
+  push:
+    branches: [main]
+    paths: ['docs/wiki/**']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Push pages to the wiki repository
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git clone "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.wiki.git" wiki
+          rm -f wiki/*.md
+          cp docs/wiki/*.md wiki/
+          cd wiki
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git diff --cached --quiet && { echo "Wiki already up to date"; exit 0; }
+          git commit -m "Sync wiki from ${GITHUB_SHA::7}"
+          git push

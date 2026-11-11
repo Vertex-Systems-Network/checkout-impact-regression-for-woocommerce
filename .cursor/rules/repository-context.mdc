@@ -3,4 +3,4 @@ description: Load the canonical Checkout Impact Regression for WooCommerce proje
 alwaysApply: true
 ---
 
-Follow `AGENTS.md` (canonical). Read `README.md` and `docs/DEVELOPMENT-PLAN.md` before changes; the plan is the source of truth for scope, decisions, backlog and progress formula. Work on a branch and open a pull request; do not push to `main`. Resume prompts never authorise external or irreversible actions. v1.0 is manual comparison; never run real checkout; no product CLI; free plugin stays fully useful, Pro lives in `pro/`.
+Follow `AGENTS.md` (canonical). Read `README.md` and `docs/DEVELOPMENT-PLAN.md` before changes; the plan is the source of truth for scope, decisions, backlog and progress formula. Work on a branch and open a pull request; do not push to `main`. Resume prompts never authorise external or irreversible actions. v1.0 is manual comparison; never run real checkout; no product CLI; free plugin stays fully useful, Pro lives in its own repository (checkout-impact-regression-pro-for-woocommerce).

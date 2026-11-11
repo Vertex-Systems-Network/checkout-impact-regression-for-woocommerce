@@ -179,6 +179,22 @@ Screenshots used for WordPress.org are in `wordpress-org/screenshot-1..7.png` (c
 `wordpress-org/blueprints/blueprint.json` enables the WordPress.org "Live Preview" button once the plugin is approved (installs WooCommerce + the plugin and seeds demo products, a Germany zone and a coupon).
 
 
+### 2026-11-12 (evening) — MySQL, accessibility, Pro split
+
+| Check | Layer | Result |
+|---|---|---|
+| WordPress 7.1.4 + WooCommerce 11.2.2 on **MariaDB 10.11.14**, PHP 8.3: activation (free + Pro), 7 tables, unique indexes, real settings hooks, browser e2e (free and Pro), REST auth, Pro export of 25 reports with exact 6-decimal money, purge, delete cascade, privacy export/erase | local runtime (MySQL) | Pass |
+| Real v1 → v2 column migration on MariaDB: `object_label` dropped and option set to 1, then an anonymous settings change re-added the column via `dbDelta` and recorded the event | local runtime (MySQL) | Pass |
+| Uninstall on MariaDB: default keeps 7 tables; opt-in erase drops all tables and options | local runtime (MySQL) | Pass |
+| axe-core (WCAG 2.0/2.1/2.2 A + AA) on Overview, Scenarios, Compare (with baseline), Reports (expanded), Change log, Settings, Alerts, Docs | local runtime | 0 violations |
+| Keyboard: Arrow Right on the tab list moves focus and selection and updates the URL hash | local runtime | Pass |
+| Free/Pro compatibility contract; mutation check (renamed JS filter + removed column) fails as expected | contract | Pass |
+| Free + Pro in WordPress Playground (PHP 8.2): 18 checks incl. REST routes, export, alerts, anonymous 403, Pro listed as dependent, Pro cannot activate without free (`plugin_missing_dependencies`), Pro activates after free | Playground runtime | Pass |
+| `readme.txt` round-trip through the WPEssential readme generator | contract | Pass (only the new External services section differs) |
+
+Not claimed: a manual screen-reader session, WPML/Polylang.
+
+
 ## Historical logs moved from the development plan (2026-11-12)
 
 > These dated entries were appended to `DEVELOPMENT-PLAN.md` between 2026-11-09 and 2026-11-10. They are kept verbatim as history. Percentages in them (71%, 73%, 74%, 75%) were superseded by the 2026-11-12 progress model (D-018).

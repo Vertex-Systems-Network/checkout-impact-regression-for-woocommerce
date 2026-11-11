@@ -103,6 +103,7 @@ final class AdminPage {
 		}
 
 		$meta[] = '<a href="' . esc_url( self::url( 'docs' ) ) . '">' . esc_html__( 'Documentation', 'checkout-impact-regression-for-woocommerce' ) . '</a>';
+		$meta[] = '<a href="' . esc_url( WPECIR_WIKI_URL ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'Wiki', 'checkout-impact-regression-for-woocommerce' ) . '</a>';
 
 		return $meta;
 	}
@@ -146,6 +147,7 @@ final class AdminPage {
 				'woocommerceActive' => class_exists( 'WooCommerce' ),
 				'restNonce'         => wp_create_nonce( 'wp_rest' ),
 				'pluginUrl'         => WPECIR_SITE_URL,
+				'wikiUrl'           => WPECIR_WIKI_URL,
 				'proActive'         => (bool) apply_filters( 'wpecir_pro_active', false ),
 				'store'             => $this->store_data(),
 			)

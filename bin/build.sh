@@ -1,37 +1,38 @@
 #!/usr/bin/env bash
-# Builds the installable ZIPs:
-#   dist/checkout-impact-regression-for-woocommerce-<version>.zip  (WordPress.org, free)
-#   dist/checkout-impact-regression-pro-<version>.zip              (WooCommerce Marketplace, Pro)
-# Only whitelisted runtime files are packaged; tests, docs and AI files never ship.
+# Builds dist/checkout-impact-regression-for-woocommerce-<version>.zip (WordPress.org).
+# With PRO_DIR=<path to a checkout of checkout-impact-regression-pro-for-woocommerce>
+# it also builds the Pro ZIP into the same dist/, so both packages always ship together.
+# Only allowlisted runtime files are packaged; tests, docs and AI files never ship.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-FREE_SLUG=checkout-impact-regression-for-woocommerce
-PRO_SLUG=checkout-impact-regression-pro
+SLUG=checkout-impact-regression-for-woocommerce
 version() { grep -m1 -E '^\s*\*\s*Version:' "$1" | sed -E 's/.*Version:\s*//' | tr -d '[:space:]'; }
-FREE_VERSION=$(version "$FREE_SLUG.php")
-PRO_VERSION=$(version "pro/$PRO_SLUG/$PRO_SLUG.php")
-STABLE=$(grep -m1 '^Stable tag:' readme.txt | sed -E 's/Stable tag:\s*//' | tr -d '[:space:]')
-CONST=$(grep -oE "WPECIR_VERSION', '[^']+'" "$FREE_SLUG.php" | grep -oE "[0-9][^']*")
-[ "$FREE_VERSION" = "$STABLE" ] || { echo "readme Stable tag ($STABLE) != plugin Version ($FREE_VERSION)"; exit 1; }
-[ "$FREE_VERSION" = "$CONST" ] || { echo "WPECIR_VERSION ($CONST) != plugin Version ($FREE_VERSION)"; exit 1; }
+VERSION=$(version "$SLUG.php")
+CONST=$(grep -oE "WPECIR_VERSION', '[^']+'" "$SLUG.php" | grep -oE "[0-9][^']*")
+[ "$VERSION" = "$CONST" ] || { echo "WPECIR_VERSION ($CONST) != plugin Version ($VERSION)"; exit 1; }
+
+# readme.txt is generated from wordpress-org/readme.md (WPEssential readme system).
+php tools/readme-to-txt.php --check
 
 composer install --no-interaction --no-dev --optimize-autoloader --quiet
 
-rm -rf dist build && mkdir -p dist build/$FREE_SLUG build/$PRO_SLUG
-cp -R "$FREE_SLUG.php" uninstall.php readme.txt LICENSE composer.json assets includes vendor build/$FREE_SLUG/
-cp -R pro/$PRO_SLUG/. build/$PRO_SLUG/
-cp LICENSE build/$PRO_SLUG/
-find build -name '.gitkeep' -delete
+rm -rf build/$SLUG && mkdir -p build/$SLUG dist
+rm -f dist/$SLUG-*.zip dist/$SLUG-*.zip.sha256
+cp -R "$SLUG.php" uninstall.php readme.txt LICENSE composer.json assets includes vendor build/$SLUG/
 find build -name '.DS_Store' -delete
 
-(cd build && zip -qr ../dist/$FREE_SLUG-$FREE_VERSION.zip $FREE_SLUG && zip -qr ../dist/$PRO_SLUG-$PRO_VERSION.zip $PRO_SLUG)
-for z in dist/*.zip; do
-	unzip -tq "$z" >/dev/null
-	(cd dist && sha256sum "$(basename "$z")" > "$(basename "$z").sha256")
+(cd build && zip -qr ../dist/$SLUG-$VERSION.zip $SLUG)
+unzip -tq dist/$SLUG-$VERSION.zip >/dev/null
+(cd dist && sha256sum $SLUG-$VERSION.zip > $SLUG-$VERSION.zip.sha256)
+for required in "$SLUG.php" vendor/autoload.php readme.txt; do
+	unzip -Z1 dist/$SLUG-$VERSION.zip | grep -qx "$SLUG/$required" || { echo "missing $required"; exit 1; }
 done
-unzip -Z1 dist/$FREE_SLUG-$FREE_VERSION.zip | grep -qx "$FREE_SLUG/$FREE_SLUG.php"
-unzip -Z1 dist/$FREE_SLUG-$FREE_VERSION.zip | grep -qx "$FREE_SLUG/vendor/autoload.php"
-unzip -Z1 dist/$FREE_SLUG-$FREE_VERSION.zip | grep -qx "$FREE_SLUG/readme.txt"
-if unzip -Z1 dist/$FREE_SLUG-$FREE_VERSION.zip | grep -qE '/(tests|docs|pro|\.github)/|AGENTS\.md|CLAUDE\.md'; then echo "dev files leaked into free ZIP"; exit 1; fi
+if unzip -Z1 dist/$SLUG-$VERSION.zip | grep -qE '/(tests|docs|tools|\.github)/|AGENTS\.md|CLAUDE\.md|/pro/'; then echo "dev or Pro files leaked into the free ZIP"; exit 1; fi
+
+if [ -n "${PRO_DIR:-}" ]; then
+	PRO_DIR=$(realpath "$PRO_DIR")
+	FREE_DIR="$PWD" "$PRO_DIR/bin/build.sh" --pro-only
+	cp "$PRO_DIR"/dist/checkout-impact-regression-pro-for-woocommerce-*.zip* dist/
+fi
 ls -lh dist
