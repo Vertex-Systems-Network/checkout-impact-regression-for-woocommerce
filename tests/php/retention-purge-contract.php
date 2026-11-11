@@ -9,6 +9,39 @@
 
 define( 'ABSPATH', __DIR__ . '/fixtures/' );
 define( 'ARRAY_A', 'ARRAY_A' );
+
+if ( ! function_exists( 'wpecir_test_identifiers' ) ) {
+	/**
+	 * Resolve %i identifier placeholders like wpdb::prepare() so doubles see table names.
+	 *
+	 * @param string $query Query.
+	 * @param array  $args  Arguments.
+	 * @return array
+	 */
+	function wpecir_test_identifiers( $query, $args ) {
+		if ( 1 === count( $args ) && is_array( $args[0] ) ) {
+			$args = $args[0];
+		}
+		$args = array_values( $args );
+		$rest = array();
+		$i    = 0;
+		$out  = preg_replace_callback(
+			'/%[ids]/',
+			static function ( $m ) use ( &$i, &$rest, $args ) {
+				$arg = $args[ $i ] ?? null;
+				++$i;
+				if ( '%i' === $m[0] ) {
+					return (string) $arg;
+				}
+				$rest[] = $arg;
+				return $m[0];
+			},
+			$query
+		);
+		return array( $out, $rest );
+	}
+}
+
 $GLOBALS['wpecir_retention_can_manage'] = false;
 
 class WP_Error {
@@ -28,7 +61,13 @@ class WPECIR_Retention_Test_WPDB {
 	public $queries = array();
 
 	public function prepare( $query, ...$args ) {
+		list( $query, $args ) = wpecir_test_identifiers( $query, $args );
 		$this->prepared[] = array( $query, $args );
+		if ( 0 === strpos( $query, 'DELETE' ) ) {
+			foreach ( $args as $arg ) {
+				$query = preg_replace( '/%d/', (string) (int) $arg, $query, 1 );
+			}
+		}
 		return $query;
 	}
 	public function get_col( $query ) {

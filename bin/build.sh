@@ -19,7 +19,7 @@ CONST=$(grep -oE "WPECIR_VERSION', '[^']+'" "$FREE_SLUG.php" | grep -oE "[0-9][^
 composer install --no-interaction --no-dev --optimize-autoloader --quiet
 
 rm -rf dist build && mkdir -p dist build/$FREE_SLUG build/$PRO_SLUG
-cp -R "$FREE_SLUG.php" uninstall.php readme.txt LICENSE assets includes languages vendor build/$FREE_SLUG/
+cp -R "$FREE_SLUG.php" uninstall.php readme.txt LICENSE composer.json assets includes vendor build/$FREE_SLUG/
 cp -R pro/$PRO_SLUG/. build/$PRO_SLUG/
 cp LICENSE build/$PRO_SLUG/
 find build -name '.gitkeep' -delete

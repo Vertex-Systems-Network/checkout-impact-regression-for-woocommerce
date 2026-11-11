@@ -136,7 +136,7 @@ final class AdminPage {
 			is_readable( $js_path ) ? (string) filemtime( $js_path ) : WPECIR_VERSION,
 			true
 		);
-		wp_set_script_translations( 'wpecir-admin', 'checkout-impact-regression-for-woocommerce', WPECIR_PATH . 'languages' );
+		wp_set_script_translations( 'wpecir-admin', 'checkout-impact-regression-for-woocommerce' );
 
 		wp_localize_script(
 			'wpecir-admin',

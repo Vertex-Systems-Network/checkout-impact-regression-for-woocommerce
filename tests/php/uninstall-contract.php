@@ -33,6 +33,9 @@ function delete_option( $option ) {
 
 class WPECIR_Uninstall_Test_WPDB {
 	public $prefix = 'wp_';
+	public function prepare( $query, ...$args ) {
+		return str_replace( '%i', (string) $args[0], $query );
+	}
 	public function query( $query ) {
 		$GLOBALS['wpecir_uninstall_queries'][] = $query;
 		return true;

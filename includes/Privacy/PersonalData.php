@@ -92,20 +92,26 @@ final class PersonalData {
 		$versions = $wpdb->prefix . 'wpecir_scenario_versions';
 		$baselines= $wpdb->prefix . 'wpecir_baselines';
 
-		$sql = $wpdb->prepare(
-			"SELECT 'scenario' AS record_type, id AS record_id, 0 AS record_version, created_at AS record_date FROM {$scenarios} WHERE created_by = %d
-			UNION ALL
-			SELECT 'scenario_version' AS record_type, id AS record_id, version AS record_version, created_at AS record_date FROM {$versions} WHERE created_by = %d
-			UNION ALL
-			SELECT 'baseline_approval' AS record_type, id AS record_id, revision AS record_version, approved_at AS record_date FROM {$baselines} WHERE approved_by = %d
-			ORDER BY record_date ASC LIMIT %d OFFSET %d",
-			$user->ID,
-			$user->ID,
-			$user->ID,
-			$per_page,
-			$offset
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- privacy export reads the plugin's own tables.
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT 'scenario' AS record_type, id AS record_id, 0 AS record_version, created_at AS record_date FROM %i WHERE created_by = %d
+				UNION ALL
+				SELECT 'scenario_version' AS record_type, id AS record_id, version AS record_version, created_at AS record_date FROM %i WHERE created_by = %d
+				UNION ALL
+				SELECT 'baseline_approval' AS record_type, id AS record_id, revision AS record_version, approved_at AS record_date FROM %i WHERE approved_by = %d
+				ORDER BY record_date ASC LIMIT %d OFFSET %d",
+				$scenarios,
+				$user->ID,
+				$versions,
+				$user->ID,
+				$baselines,
+				$user->ID,
+				$per_page,
+				$offset
+			),
+			ARRAY_A
 		);
-		$rows = $wpdb->get_results( $sql, ARRAY_A );
 		$data = array();
 
 		foreach ( $rows as $row ) {
@@ -150,9 +156,11 @@ final class PersonalData {
 		$scenarios = $wpdb->prefix . 'wpecir_scenarios';
 		$versions  = $wpdb->prefix . 'wpecir_scenario_versions';
 		$baselines = $wpdb->prefix . 'wpecir_baselines';
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery -- anonymise authorship in the plugin's own tables.
 		$wpdb->update( $scenarios, array( 'created_by' => 0 ), array( 'created_by' => $user->ID ), array( '%d' ), array( '%d' ) );
 		$wpdb->update( $versions, array( 'created_by' => 0 ), array( 'created_by' => $user->ID ), array( '%d' ), array( '%d' ) );
 		$wpdb->update( $baselines, array( 'approved_by' => 0 ), array( 'approved_by' => $user->ID ), array( '%d' ), array( '%d' ) );
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery
 
 		return array(
 			'items_removed'  => false,

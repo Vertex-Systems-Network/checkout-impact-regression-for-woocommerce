@@ -15,7 +15,7 @@ if ( 'yes' !== get_option( 'wpecir_erase_data_on_uninstall', 'no' ) ) {
 
 global $wpdb;
 
-$tables = array(
+$wpecir_tables = array(
 	$wpdb->prefix . 'wpecir_findings',
 	$wpdb->prefix . 'wpecir_observations',
 	$wpdb->prefix . 'wpecir_runs',
@@ -25,8 +25,9 @@ $tables = array(
 	$wpdb->prefix . 'wpecir_scenarios',
 );
 
-foreach ( $tables as $table ) {
-	$wpdb->query( 'DROP TABLE IF EXISTS ' . $table );
+foreach ( $wpecir_tables as $wpecir_table ) {
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange -- explicit, opt-in removal of the plugin's own tables.
+	$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', $wpecir_table ) );
 }
 
 delete_option( 'wpecir_schema_version' );

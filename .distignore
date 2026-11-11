@@ -12,7 +12,6 @@ CLAUDE.md
 GEMINI.md
 CHATGPT.md
 README.md
-composer.json
 composer.lock
 .gitignore
 .distignore

@@ -7,6 +7,8 @@
 
 namespace WPEssential\CheckoutImpactRegression\Storage;
 
+// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- this repository is the only access layer for the plugin's own custom tables; results are per-request and must not be served from a persistent cache after writes.
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -36,7 +38,27 @@ final class Repository {
 	}
 
 	/**
-	 * Check the store-management capability used by plugin mutations.
+	 * Delete rows whose column matches one of the given integer IDs.
+	 *
+	 * @param string $suffix Table suffix.
+	 * @param string $column Column name.
+	 * @param int[]  $ids    IDs.
+	 * @return int|false
+	 */
+	private function delete_where_in( $suffix, $column, $ids ) {
+		global $wpdb;
+
+		$ids = array_values( array_filter( array_map( 'absint', (array) $ids ) ) );
+		if ( ! $ids ) {
+			return 0;
+		}
+		$placeholders = implode( ',', array_fill( 0, count( $ids ), '%d' ) );
+		// phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- placeholders are generated from the ID count.
+		return $wpdb->query( $wpdb->prepare( "DELETE FROM %i WHERE %i IN ($placeholders)", array_merge( array( $this->table( $suffix ), $column ), $ids ) ) );
+	}
+
+	/**
+	 * Whether the current user may manage plugin records.
 	 *
 	 * @return bool
 	 */
@@ -184,7 +206,7 @@ final class Repository {
 			return new \WP_Error( 'wpecir_forbidden', __( 'You are not allowed to manage checkout scenarios.', 'checkout-impact-regression-for-woocommerce' ) );
 		}
 
-		$scenario = $wpdb->get_row( $wpdb->prepare( 'SELECT id FROM ' . $this->table( 'scenarios' ) . ' WHERE id = %d', absint( $scenario_id ) ) );
+		$scenario = $wpdb->get_row( $wpdb->prepare( 'SELECT id FROM %i WHERE id = %d', $this->table( 'scenarios' ), absint( $scenario_id ) ) );
 		if ( ! $scenario ) {
 			return new \WP_Error( 'wpecir_scenario_not_found', __( 'The requested scenario does not exist.', 'checkout-impact-regression-for-woocommerce' ) );
 		}
@@ -228,7 +250,7 @@ final class Repository {
 		global $wpdb;
 
 		$versions = $this->table( 'scenario_versions' );
-		$version  = 1 + (int) $wpdb->get_var( $wpdb->prepare( 'SELECT MAX(version) FROM ' . $versions . ' WHERE scenario_id = %d', $scenario_id ) );
+		$version  = 1 + (int) $wpdb->get_var( $wpdb->prepare( 'SELECT MAX(version) FROM %i WHERE scenario_id = %d', $versions, $scenario_id ) );
 		$context  = hash( 'sha256', $input_json );
 		$ok       = $wpdb->insert(
 			$versions,
@@ -264,14 +286,14 @@ final class Repository {
 			return new \WP_Error( 'wpecir_forbidden', __( 'You are not allowed to view checkout scenarios.', 'checkout-impact-regression-for-woocommerce' ) );
 		}
 
-		$row = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM ' . $this->table( 'scenarios' ) . ' WHERE id = %d', absint( $scenario_id ) ), ARRAY_A );
+		$row = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM %i WHERE id = %d', $this->table( 'scenarios' ), absint( $scenario_id ) ), ARRAY_A );
 		if ( ! $row ) {
 			return new \WP_Error( 'wpecir_scenario_not_found', __( 'The requested scenario does not exist.', 'checkout-impact-regression-for-woocommerce' ) );
 		}
 
 		$version = $wpdb->get_row(
 			$wpdb->prepare(
-				'SELECT * FROM ' . $this->table( 'scenario_versions' ) . ' WHERE scenario_id = %d ORDER BY version DESC LIMIT 1',
+				'SELECT * FROM %i WHERE scenario_id = %d ORDER BY version DESC LIMIT 1', $this->table( 'scenario_versions' ),
 				absint( $scenario_id )
 			),
 			ARRAY_A
@@ -299,7 +321,7 @@ final class Repository {
 		$per_page = min( 100, max( 1, absint( $per_page ) ) );
 		$offset   = ( $page - 1 ) * $per_page;
 		$sql      = $wpdb->prepare(
-			'SELECT * FROM ' . $this->table( 'scenarios' ) . ' ORDER BY updated_at DESC, id DESC LIMIT %d OFFSET %d',
+			'SELECT * FROM %i ORDER BY updated_at DESC, id DESC LIMIT %d OFFSET %d', $this->table( 'scenarios' ),
 			$per_page,
 			$offset
 		);
@@ -321,7 +343,7 @@ final class Repository {
 		}
 
 		$rows = $wpdb->get_results(
-			$wpdb->prepare( 'SELECT * FROM ' . $this->table( 'scenario_versions' ) . ' WHERE scenario_id = %d ORDER BY version DESC', absint( $scenario_id ) ),
+			$wpdb->prepare( 'SELECT * FROM %i WHERE scenario_id = %d ORDER BY version DESC', $this->table( 'scenario_versions' ), absint( $scenario_id ) ),
 			ARRAY_A
 		);
 
@@ -360,7 +382,7 @@ final class Repository {
 
 		$version = $wpdb->get_row(
 			$wpdb->prepare(
-				'SELECT id, scenario_id FROM ' . $this->table( 'scenario_versions' ) . ' WHERE id = %d AND scenario_id = %d',
+				'SELECT id, scenario_id FROM %i WHERE id = %d AND scenario_id = %d', $this->table( 'scenario_versions' ),
 				absint( $version_id ),
 				absint( $scenario_id )
 			)
@@ -380,7 +402,7 @@ final class Repository {
 		}
 
 		$table    = $this->table( 'baselines' );
-		$revision = 1 + (int) $wpdb->get_var( $wpdb->prepare( 'SELECT MAX(revision) FROM ' . $table . ' WHERE scenario_id = %d', absint( $scenario_id ) ) );
+		$revision = 1 + (int) $wpdb->get_var( $wpdb->prepare( 'SELECT MAX(revision) FROM %i WHERE scenario_id = %d', $table, absint( $scenario_id ) ) );
 		$now      = current_time( 'mysql', true );
 		$ok       = $wpdb->insert(
 			$table,
@@ -426,7 +448,7 @@ final class Repository {
 		}
 
 		$rows = $wpdb->get_results(
-			$wpdb->prepare( 'SELECT * FROM ' . $this->table( 'baselines' ) . ' WHERE scenario_id = %d ORDER BY revision DESC', absint( $scenario_id ) ),
+			$wpdb->prepare( 'SELECT * FROM %i WHERE scenario_id = %d ORDER BY revision DESC', $this->table( 'baselines' ), absint( $scenario_id ) ),
 			ARRAY_A
 		);
 
@@ -455,7 +477,7 @@ final class Repository {
 
 		$row = $wpdb->get_row(
 			$wpdb->prepare(
-				'SELECT * FROM ' . $this->table( 'baselines' ) . ' WHERE id = %d AND scenario_id = %d AND state = %s',
+				'SELECT * FROM %i WHERE id = %d AND scenario_id = %d AND state = %s', $this->table( 'baselines' ),
 				absint( $baseline_id ),
 				absint( $scenario_id ),
 				'approved'
@@ -502,7 +524,7 @@ final class Repository {
 			$baseline_id = absint( $baseline_id );
 			$baseline    = $wpdb->get_var(
 				$wpdb->prepare(
-					'SELECT id FROM ' . $this->table( 'baselines' ) . ' WHERE id = %d AND scenario_id = %d AND scenario_version_id = %d AND context_fingerprint = %s AND state = %s',
+					'SELECT id FROM %i WHERE id = %d AND scenario_id = %d AND scenario_version_id = %d AND context_fingerprint = %s AND state = %s', $this->table( 'baselines' ),
 					$baseline_id,
 					$scenario_id,
 					$version_id,
@@ -517,7 +539,7 @@ final class Repository {
 
 		$version = $wpdb->get_row(
 			$wpdb->prepare(
-				'SELECT id FROM ' . $this->table( 'scenario_versions' ) . ' WHERE id = %d AND scenario_id = %d AND context_fingerprint = %s',
+				'SELECT id FROM %i WHERE id = %d AND scenario_id = %d AND context_fingerprint = %s', $this->table( 'scenario_versions' ),
 				$version_id,
 				$scenario_id,
 				$context
@@ -671,7 +693,7 @@ final class Repository {
 		$limit       = min( 20, max( 1, absint( $limit ) ) );
 		$runs        = $wpdb->get_results(
 			$wpdb->prepare(
-				'SELECT id,scenario_version_id,baseline_id,state,context_fingerprint,created_at,expires_at FROM ' . $this->table( 'runs' ) . ' WHERE scenario_id = %d AND state = %s AND (expires_at IS NULL OR expires_at >= %s) ORDER BY created_at DESC,id DESC LIMIT %d',
+				'SELECT id,scenario_version_id,baseline_id,state,context_fingerprint,created_at,expires_at FROM %i WHERE scenario_id = %d AND state = %s AND (expires_at IS NULL OR expires_at >= %s) ORDER BY created_at DESC,id DESC LIMIT %d', $this->table( 'runs' ),
 				$scenario_id,
 				'manual_preview',
 				current_time( 'mysql', true ),
@@ -684,11 +706,11 @@ final class Repository {
 		foreach ( $runs as $run ) {
 			$run_id = absint( $run['id'] );
 			$observations = $wpdb->get_results(
-				$wpdb->prepare( 'SELECT field_key,state,observation_json FROM ' . $this->table( 'observations' ) . ' WHERE run_id = %d ORDER BY id ASC', $run_id ),
+				$wpdb->prepare( 'SELECT field_key,state,observation_json FROM %i WHERE run_id = %d ORDER BY id ASC', $this->table( 'observations' ), $run_id ),
 				ARRAY_A
 			);
 			$findings = $wpdb->get_results(
-				$wpdb->prepare( 'SELECT field_key,classification,severity,expected_json,observed_json,evidence_json FROM ' . $this->table( 'findings' ) . ' WHERE run_id = %d ORDER BY id ASC', $run_id ),
+				$wpdb->prepare( 'SELECT field_key,classification,severity,expected_json,observed_json,evidence_json FROM %i WHERE run_id = %d ORDER BY id ASC', $this->table( 'findings' ), $run_id ),
 				ARRAY_A
 			);
 
@@ -784,11 +806,10 @@ final class Repository {
 		}
 
 		$scenario_id = absint( $scenario_id );
-		$run_ids     = $wpdb->get_col( $wpdb->prepare( 'SELECT id FROM ' . $this->table( 'runs' ) . ' WHERE scenario_id = %d', $scenario_id ) );
+		$run_ids     = $wpdb->get_col( $wpdb->prepare( 'SELECT id FROM %i WHERE scenario_id = %d', $this->table( 'runs' ), $scenario_id ) );
 		if ( $run_ids ) {
-			$ids = implode( ',', array_map( 'absint', $run_ids ) );
-			$wpdb->query( 'DELETE FROM ' . $this->table( 'observations' ) . ' WHERE run_id IN (' . $ids . ')' );
-			$wpdb->query( 'DELETE FROM ' . $this->table( 'findings' ) . ' WHERE run_id IN (' . $ids . ')' );
+			$this->delete_where_in( 'observations', 'run_id', $run_ids );
+			$this->delete_where_in( 'findings', 'run_id', $run_ids );
 		}
 		$wpdb->delete( $this->table( 'runs' ), array( 'scenario_id' => $scenario_id ), array( '%d' ) );
 		$wpdb->delete( $this->table( 'baselines' ), array( 'scenario_id' => $scenario_id ), array( '%d' ) );
@@ -836,7 +857,7 @@ final class Repository {
 		$object_hash = hash( 'sha256', $object_type . ':' . $object_id );
 		$event_key   = hash( 'sha256', implode( '|', array( $source, $object_hash, $context_hash, $occurred_at ) ) );
 		$table       = $this->table( 'change_events' );
-		$existing    = $wpdb->get_var( $wpdb->prepare( 'SELECT id FROM ' . $table . ' WHERE event_key = %s', $event_key ) );
+		$existing    = $wpdb->get_var( $wpdb->prepare( 'SELECT id FROM %i WHERE event_key = %s', $table, $event_key ) );
 		if ( $existing ) {
 			return (int) $existing;
 		}
@@ -892,7 +913,7 @@ final class Repository {
 		$table = $this->table( 'change_events' );
 
 		return $wpdb->get_results(
-			'SELECT id, source, object_type, object_fingerprint, object_label, context_fingerprint, occurred_at, created_at FROM ' . $table . ' ORDER BY occurred_at DESC, id DESC LIMIT ' . $limit,
+			$wpdb->prepare( 'SELECT id, source, object_type, object_fingerprint, object_label, context_fingerprint, occurred_at, created_at FROM %i ORDER BY occurred_at DESC, id DESC LIMIT %d', $table, $limit ),
 			ARRAY_A
 		);
 	}
@@ -913,7 +934,7 @@ final class Repository {
 		$limit = min( 500, max( 1, absint( $limit ) ) );
 		$ids   = $wpdb->get_col(
 			$wpdb->prepare(
-				'SELECT id FROM ' . $this->table( 'runs' ) . ' WHERE expires_at IS NOT NULL AND expires_at < %s ORDER BY expires_at ASC LIMIT %d',
+				'SELECT id FROM %i WHERE expires_at IS NOT NULL AND expires_at < %s ORDER BY expires_at ASC LIMIT %d', $this->table( 'runs' ),
 				current_time( 'mysql', true ),
 				$limit
 			)
@@ -923,10 +944,9 @@ final class Repository {
 		}
 
 		$ids = array_map( 'absint', $ids );
-		$list= implode( ',', $ids );
-		$wpdb->query( 'DELETE FROM ' . $this->table( 'observations' ) . ' WHERE run_id IN (' . $list . ')' );
-		$wpdb->query( 'DELETE FROM ' . $this->table( 'findings' ) . ' WHERE run_id IN (' . $list . ')' );
-		$wpdb->query( 'DELETE FROM ' . $this->table( 'runs' ) . ' WHERE id IN (' . $list . ')' );
+		$this->delete_where_in( 'observations', 'run_id', $ids );
+		$this->delete_where_in( 'findings', 'run_id', $ids );
+		$this->delete_where_in( 'runs', 'id', $ids );
 
 		return count( $ids );
 	}

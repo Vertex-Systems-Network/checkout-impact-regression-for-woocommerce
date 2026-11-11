@@ -10,6 +10,39 @@
 
 define( 'ABSPATH', __DIR__ . '/' );
 define( 'ARRAY_A', 'ARRAY_A' );
+
+if ( ! function_exists( 'wpecir_test_identifiers' ) ) {
+	/**
+	 * Resolve %i identifier placeholders like wpdb::prepare() so doubles see table names.
+	 *
+	 * @param string $query Query.
+	 * @param array  $args  Arguments.
+	 * @return array
+	 */
+	function wpecir_test_identifiers( $query, $args ) {
+		if ( 1 === count( $args ) && is_array( $args[0] ) ) {
+			$args = $args[0];
+		}
+		$args = array_values( $args );
+		$rest = array();
+		$i    = 0;
+		$out  = preg_replace_callback(
+			'/%[ids]/',
+			static function ( $m ) use ( &$i, &$rest, $args ) {
+				$arg = $args[ $i ] ?? null;
+				++$i;
+				if ( '%i' === $m[0] ) {
+					return (string) $arg;
+				}
+				$rest[] = $arg;
+				return $m[0];
+			},
+			$query
+		);
+		return array( $out, $rest );
+	}
+}
+
 $GLOBALS['wpecir_event_capabilities'] = array();
 function current_user_can( $capability ) { return in_array( $capability, $GLOBALS['wpecir_event_capabilities'], true ); }
 function absint( $value ) { return abs( (int) $value ); }
@@ -35,9 +68,10 @@ class WPECIR_Event_Test_WPDB {
 	public $history_rows = array();
 
 	public function prepare( $query, ...$args ) {
+		list( $query, $args ) = wpecir_test_identifiers( $query, $args );
 		foreach ( $args as $arg ) {
 			$quoted = "'" . addslashes( (string) $arg ) . "'";
-			$query = preg_replace( '/%s/', $quoted, $query, 1 );
+			$query = preg_replace( '/%[sd]/', is_int( $arg ) ? (string) $arg : $quoted, $query, 1 );
 		}
 		return $query;
 	}
