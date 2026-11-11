@@ -19,6 +19,10 @@ if ( ! function_exists( 'apply_filters' ) ) {
 }
 if ( ! function_exists( 'get_option' ) ) {
 	function get_option( $name, $default = false ) {
+		// Simulate an up-to-date schema so Schema::ensure_current() is a no-op.
+		if ( 'wpecir_schema_version' === $name && class_exists( '\\WPEssential\\CheckoutImpactRegression\\Storage\\Schema', false ) ) {
+			return \WPEssential\CheckoutImpactRegression\Storage\Schema::VERSION;
+		}
 		return $default;
 	}
 }

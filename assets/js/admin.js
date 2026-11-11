@@ -761,8 +761,12 @@
 			}
 		}, [ props.settings ] );
 		const limits = props.settings && props.settings.limits ? props.settings.limits : { min_days: 7, max_days: 365 };
+		const ready = Boolean( props.settings ) && ! props.failed;
 		const save = function ( event ) {
 			event.preventDefault();
+			if ( ! ready ) {
+				return;
+			}
 			setBusy( true );
 			setMessage( null );
 			wp.apiFetch( { path: API + '/settings', method: 'POST', data: { retention_days: String( days ), erase_on_uninstall: erase } } )
@@ -781,7 +785,7 @@
 					),
 					h( 'p', { className: 'wpecir-help' }, __( 'Off by default, so reinstalling keeps your scenarios. Deactivating the plugin never deletes data.', 'checkout-impact-regression-for-woocommerce' ) )
 				),
-				h( 'div', { className: 'wpecir-form-actions' }, h( 'button', { type: 'submit', className: 'button button-primary', disabled: busy }, busy ? __( 'Saving…', 'checkout-impact-regression-for-woocommerce' ) : __( 'Save settings', 'checkout-impact-regression-for-woocommerce' ) ) )
+				h( 'div', { className: 'wpecir-form-actions' }, h( 'button', { type: 'submit', className: 'button button-primary', disabled: busy || ! ready }, busy ? __( 'Saving…', 'checkout-impact-regression-for-woocommerce' ) : ! ready ? __( 'Loading settings…', 'checkout-impact-regression-for-woocommerce' ) : __( 'Save settings', 'checkout-impact-regression-for-woocommerce' ) ) )
 			)
 		);
 	}
@@ -850,6 +854,7 @@
 		const [ events, setEvents ] = useState( [] );
 		const [ eventsLoading, setEventsLoading ] = useState( true );
 		const [ settings, setSettings ] = useState( null );
+		const [ settingsFailed, setSettingsFailed ] = useState( false );
 		const [ error, setError ] = useState( '' );
 		const [ compareId, setCompareId ] = useState( null );
 		const [ focusId, setFocusId ] = useState( null );
@@ -872,7 +877,7 @@
 		useEffect( function () {
 			refresh();
 			refreshEvents();
-			wp.apiFetch( { path: API + '/settings' } ).then( setSettings ).catch( function () {} );
+			wp.apiFetch( { path: API + '/settings' } ).then( setSettings ).catch( function ( requestError ) { setSettingsFailed( true ); setError( errorMessage( requestError, __( 'Could not load settings. Reload the page before changing them.', 'checkout-impact-regression-for-woocommerce' ) ) ); } );
 			const onHash = function () { setTab( currentTab() ); };
 			window.addEventListener( 'hashchange', onHash );
 			return function () { window.removeEventListener( 'hashchange', onHash ); };
@@ -894,7 +899,7 @@
 			{ key: 'compare', label: __( 'Compare', 'checkout-impact-regression-for-woocommerce' ), render: function () { return h( CompareTab, { scenarios: scenarios, loading: loading, initialScenario: compareId, go: go, onSelect: function ( id ) { if ( id ) { setFocusId( id ); } } } ); } },
 			{ key: 'reports', label: __( 'Reports', 'checkout-impact-regression-for-woocommerce' ), render: function () { return h( ReportsTab, { scenarios: scenarios, settings: settings, focusId: focusId } ); } },
 			{ key: 'changes', label: __( 'Change log', 'checkout-impact-regression-for-woocommerce' ), count: events.length, render: function () { return h( ChangesTab, { events: events, loading: eventsLoading, refresh: refreshEvents } ); } },
-			{ key: 'settings', label: __( 'Settings', 'checkout-impact-regression-for-woocommerce' ), render: function () { return h( SettingsTab, { settings: settings, onSaved: setSettings } ); } },
+			{ key: 'settings', label: __( 'Settings', 'checkout-impact-regression-for-woocommerce' ), render: function () { return h( SettingsTab, { settings: settings, failed: settingsFailed, onSaved: setSettings } ); } },
 			{ key: 'docs', label: __( 'Docs', 'checkout-impact-regression-for-woocommerce' ), render: function () { return h( DocsTab, { go: go } ); } },
 		];
 		if ( hooks ) {

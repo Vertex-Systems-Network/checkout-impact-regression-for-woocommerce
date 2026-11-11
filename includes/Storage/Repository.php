@@ -683,9 +683,10 @@ final class Repository {
 	 *
 	 * @param int $scenario_id Scenario identifier.
 	 * @param int $limit Maximum report count.
+	 * @param int $offset Number of newer reports to skip.
 	 * @return array|\WP_Error
 	 */
-	public function list_manual_comparisons( $scenario_id, $limit = 10 ) {
+	public function list_manual_comparisons( $scenario_id, $limit = 10, $offset = 0 ) {
 		global $wpdb;
 
 		if ( ! $this->can_manage() ) {
@@ -696,11 +697,12 @@ final class Repository {
 		$limit       = min( 20, max( 1, absint( $limit ) ) );
 		$runs        = $wpdb->get_results(
 			$wpdb->prepare(
-				'SELECT id,scenario_version_id,baseline_id,state,context_fingerprint,created_at,expires_at FROM %i WHERE scenario_id = %d AND state = %s AND (expires_at IS NULL OR expires_at >= %s) ORDER BY created_at DESC,id DESC LIMIT %d', $this->table( 'runs' ),
+				'SELECT id,scenario_version_id,baseline_id,state,context_fingerprint,created_at,expires_at FROM %i WHERE scenario_id = %d AND state = %s AND (expires_at IS NULL OR expires_at >= %s) ORDER BY created_at DESC,id DESC LIMIT %d OFFSET %d', $this->table( 'runs' ),
 				$scenario_id,
 				'manual_preview',
 				current_time( 'mysql', true ),
-				$limit
+				$limit,
+				max( 0, absint( $offset ) )
 			),
 			ARRAY_A
 		);
@@ -843,6 +845,11 @@ final class Repository {
 			return new \WP_Error( 'wpecir_forbidden', __( 'You are not allowed to record change events.', 'checkout-impact-regression-for-woocommerce' ) );
 		}
 
+		$schema = Schema::ensure_current();
+		if ( is_wp_error( $schema ) ) {
+			return $schema;
+		}
+
 		$source      = sanitize_key( $source );
 		$object_type = sanitize_key( $object_type );
 		$object_id   = sanitize_text_field( $object_id );
@@ -912,8 +919,12 @@ final class Repository {
 			return new \WP_Error( 'wpecir_forbidden', __( 'You are not allowed to view change events.', 'checkout-impact-regression-for-woocommerce' ) );
 		}
 
-		$limit = max( 1, min( 100, absint( $limit ) ) );
-		$table = $this->table( 'change_events' );
+		$limit  = max( 1, min( 100, absint( $limit ) ) );
+		$table  = $this->table( 'change_events' );
+		$schema = Schema::ensure_current();
+		if ( is_wp_error( $schema ) ) {
+			return $schema;
+		}
 
 		return $wpdb->get_results(
 			$wpdb->prepare( 'SELECT id, source, object_type, object_fingerprint, object_label, context_fingerprint, occurred_at, created_at FROM %i ORDER BY occurred_at DESC, id DESC LIMIT %d', $table, $limit ),

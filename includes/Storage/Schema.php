@@ -40,6 +40,20 @@ final class Schema {
 	}
 
 	/**
+	 * Bring the schema up to date before code that depends on new columns runs,
+	 * including cron, front-end and REST requests where admin_init never fires.
+	 * Safe to call often: it is a single cached option read when current.
+	 *
+	 * @return true|\WP_Error
+	 */
+	public static function ensure_current() {
+		if ( self::VERSION === get_option( self::VERSION_OPTION, '' ) ) {
+			return true;
+		}
+		return self::maybe_upgrade( true );
+	}
+
+	/**
 	 * Run schema installation during plugin activation.
 	 *
 	 * @return true|\WP_Error

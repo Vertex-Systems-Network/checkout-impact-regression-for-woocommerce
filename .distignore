@@ -15,3 +15,5 @@ README.md
 composer.lock
 .gitignore
 .distignore
+/.cursor
+/.impeccable

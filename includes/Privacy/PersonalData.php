@@ -23,7 +23,6 @@ final class PersonalData {
 	public static function register_hooks() {
 		add_filter( 'wp_privacy_personal_data_exporters', array( __CLASS__, 'register_exporter' ) );
 		add_filter( 'wp_privacy_personal_data_erasers', array( __CLASS__, 'register_eraser' ) );
-		add_action( 'admin_init', array( __CLASS__, 'add_policy_content' ) );
 		add_action( 'admin_init', array( __CLASS__, 'add_privacy_policy_content' ) );
 	}
 
@@ -168,18 +167,5 @@ final class PersonalData {
 			'messages'       => array( __( 'Author and approver identifiers were anonymized; scenario and baseline history was retained.', 'checkout-impact-regression-for-woocommerce' ) ),
 			'done'           => true,
 		);
-	}
-
-	/**
-	 * Suggest privacy policy text under Settings → Privacy.
-	 *
-	 * @return void
-	 */
-	public static function add_policy_content() {
-		if ( ! function_exists( 'wp_add_privacy_policy_content' ) ) {
-			return;
-		}
-		$content = '<p>' . esc_html__( 'Checkout Impact Regression for WooCommerce stores checkout test scenarios, approved baselines and comparison reports created by store managers. It records the WordPress user ID of the person who created or approved them. It does not collect data from customers or site visitors and sends nothing to external services. Saved comparison reports are deleted automatically after the retention period set by the store.', 'checkout-impact-regression-for-woocommerce' ) . '</p>';
-		wp_add_privacy_policy_content( __( 'Checkout Impact Regression for WooCommerce', 'checkout-impact-regression-for-woocommerce' ), wp_kses_post( $content ) );
 	}
 }
