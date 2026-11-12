@@ -18,12 +18,12 @@
 | Privacy exporter/eraser + suggested policy text | runtime test | Done |
 | Icon 128/256, banner 772×250 / 1544×500, screenshots 1–7, Live Preview blueprint | `wordpress-org/` | Done |
 | User documentation | `docs/wiki/` → GitHub Wiki (enable Wiki in repo settings first) | Pages done |
-| Package ZIP without dev files | `./bin/build.sh` or CI artifact **plugin-packages** | Done |
+| Package ZIP without dev files | `./bin/build.sh` or CI artifact **free-plugin-package** | Done |
 | Plugin Check (official action) | CI job **WordPress.org Plugin Check** | Pass (CI run 43103077615) |
 
 ## Owner steps (need your WordPress.org login)
 
-1. Merge the pull request, then download `checkout-impact-regression-for-woocommerce-1.0.0.zip` from the CI **plugin-packages** artifact (or run `./bin/build.sh`).
+1. Merge the pull request, then download `checkout-impact-regression-for-woocommerce-1.0.0.zip` from the CI **free-plugin-package** artifact (or run `./bin/build.sh`).
 2. Make sure the Plugin Check job is green. Fix any error it reports before uploading.
 3. Log in as `wpessential` at <https://wordpress.org/plugins/developers/add/>, accept the guidelines and upload the ZIP. Confirm the slug shown is `checkout-impact-regression-for-woocommerce`.
 4. Answer the review email from the Plugins Team within 7 days. Reply from the same account; re-upload a fixed ZIP from the same page if asked.
