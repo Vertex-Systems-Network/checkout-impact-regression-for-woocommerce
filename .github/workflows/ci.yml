@@ -16,6 +16,11 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+    inputs:
+      pro_ref:
+        description: 'Pro branch to test against (free of charge here). Empty = same-named branch, else main.'
+        required: false
+        default: ''
   repository_dispatch:
     types: [pro-updated]
   schedule:
@@ -76,6 +81,7 @@ jobs:
         shell: bash
         env:
           TOKEN: ${{ secrets.PRO_REPO_TOKEN }}
+          PRO_REF: ${{ inputs.pro_ref }}
         run: |
           if [ -z "$TOKEN" ]; then
             echo "available=false" >> "$GITHUB_OUTPUT"
@@ -83,9 +89,14 @@ jobs:
             exit 0
           fi
           url="https://x-access-token:${TOKEN}@github.com/$PRO_REPO"
-          branch="${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}"
-          sha=$(git ls-remote "$url" "refs/heads/$branch" | cut -f1)
-          [ -n "$sha" ] || sha=$(git ls-remote "$url" refs/heads/main | cut -f1)
+          if [ -n "$PRO_REF" ]; then
+            sha=$(git ls-remote "$url" "refs/heads/$PRO_REF" | cut -f1)
+            [ -n "$sha" ] || { echo "::error::Pro branch '$PRO_REF' not found"; exit 1; }
+          else
+            branch="${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}"
+            sha=$(git ls-remote "$url" "refs/heads/$branch" | cut -f1)
+            [ -n "$sha" ] || sha=$(git ls-remote "$url" refs/heads/main | cut -f1)
+          fi
           echo "available=true" >> "$GITHUB_OUTPUT"
           echo "sha=$sha" >> "$GITHUB_OUTPUT"
           echo "Testing against $PRO_REPO@$sha" >> "$GITHUB_STEP_SUMMARY"
@@ -184,22 +195,3 @@ jobs:
         run: |
           (cd pro-repo && ./bin/build.sh --pro-only >/dev/null)
           pro-repo/tests/integration/run.sh free-build pro-repo/build/checkout-impact-regression-pro-for-woocommerce ${{ matrix.php }}
-
-  notify-pro:
-    name: Ask the Pro repository to re-test
-    needs: [package, integration]
-    # Run when the package built and integration passed, or was skipped because PRO_REPO_TOKEN is not set.
-    if: >-
-      always() && github.event_name == 'push' && github.ref == 'refs/heads/main' &&
-      needs.package.result == 'success' &&
-      (needs.integration.result == 'success' || needs.integration.result == 'skipped')
-    runs-on: ubuntu-latest
-    steps:
-      - name: Dispatch free-updated to Pro (needs CROSS_REPO_TOKEN secret)
-        env:
-          TOKEN: ${{ secrets.CROSS_REPO_TOKEN }}
-        run: |
-          if [ -z "$TOKEN" ]; then echo "CROSS_REPO_TOKEN not set; Pro re-tests on its nightly schedule instead." >> "$GITHUB_STEP_SUMMARY"; exit 0; fi
-          curl -fsS -X POST -H "Authorization: Bearer $TOKEN" -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/$PRO_REPO/dispatches" \
-            -d "{\"event_type\":\"free-updated\",\"client_payload\":{\"sha\":\"$GITHUB_SHA\"}}"
