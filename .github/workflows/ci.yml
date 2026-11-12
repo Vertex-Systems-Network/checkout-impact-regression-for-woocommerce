@@ -16,6 +16,11 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
+    inputs:
+      pro_ref:
+        description: 'Pro branch to test against (free of charge here). Empty = same-named branch, else main.'
+        required: false
+        default: ''
   repository_dispatch:
     types: [pro-updated]
   schedule:
@@ -76,6 +81,7 @@ jobs:
         shell: bash
         env:
           TOKEN: ${{ secrets.PRO_REPO_TOKEN }}
+          PRO_REF: ${{ inputs.pro_ref }}
         run: |
           if [ -z "$TOKEN" ]; then
             echo "available=false" >> "$GITHUB_OUTPUT"
@@ -83,9 +89,14 @@ jobs:
             exit 0
           fi
           url="https://x-access-token:${TOKEN}@github.com/$PRO_REPO"
-          branch="${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}"
-          sha=$(git ls-remote "$url" "refs/heads/$branch" | cut -f1)
-          [ -n "$sha" ] || sha=$(git ls-remote "$url" refs/heads/main | cut -f1)
+          if [ -n "$PRO_REF" ]; then
+            sha=$(git ls-remote "$url" "refs/heads/$PRO_REF" | cut -f1)
+            [ -n "$sha" ] || { echo "::error::Pro branch '$PRO_REF' not found"; exit 1; }
+          else
+            branch="${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}"
+            sha=$(git ls-remote "$url" "refs/heads/$branch" | cut -f1)
+            [ -n "$sha" ] || sha=$(git ls-remote "$url" refs/heads/main | cut -f1)
+          fi
           echo "available=true" >> "$GITHUB_OUTPUT"
           echo "sha=$sha" >> "$GITHUB_OUTPUT"
           echo "Testing against $PRO_REPO@$sha" >> "$GITHUB_STEP_SUMMARY"
