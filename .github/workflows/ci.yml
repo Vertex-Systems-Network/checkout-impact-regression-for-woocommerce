@@ -188,7 +188,11 @@ jobs:
   notify-pro:
     name: Ask the Pro repository to re-test
     needs: [package, integration]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # Run when the package built and integration passed, or was skipped because PRO_REPO_TOKEN is not set.
+    if: >-
+      always() && github.event_name == 'push' && github.ref == 'refs/heads/main' &&
+      needs.package.result == 'success' &&
+      (needs.integration.result == 'success' || needs.integration.result == 'skipped')
     runs-on: ubuntu-latest
     steps:
       - name: Dispatch free-updated to Pro (needs CROSS_REPO_TOKEN secret)

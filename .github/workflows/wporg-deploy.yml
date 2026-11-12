@@ -23,10 +23,10 @@ jobs:
           coverage: none
       - name: Build the same allowlisted package that CI and Plugin Check use
         run: ./bin/build.sh
-      - name: Stage SVN assets (images and blueprints only, not the readme source)
+      - name: Stage SVN assets (icons, banners, screenshots and blueprints only, not the readme source)
         run: |
           mkdir -p build/wporg-assets
-          cp wordpress-org/*.png build/wporg-assets/
+          cp wordpress-org/*.png wordpress-org/icon.svg build/wporg-assets/
           cp -R wordpress-org/blueprints build/wporg-assets/
       - name: Deploy to WordPress.org SVN
         uses: 10up/action-wordpress-plugin-deploy@54bd289b8525fd23a5c365ec369185f2966529c2 # stable
