@@ -2,8 +2,14 @@ name: CI, Pro compatibility, Plugin Check and packages
 
 # The free plugin and Pro live in separate repositories but ship together.
 # Every run checks the free plugin against Pro (same-named branch if it exists,
-# otherwise main): Pro's compatibility contract, Pro's tests, a combined
-# WordPress Playground integration run, and both ZIPs in one artifact.
+# otherwise main): Pro's compatibility contract, Pro's tests and a combined
+# WordPress Playground integration run.
+#
+# This repository is public, so it NEVER uploads a Pro ZIP or Pro build: Pro is
+# checked out and tested inside the job only. Pro packages are built and kept in
+# the private Pro repository. Reading the private Pro repository needs the
+# PRO_REPO_TOKEN secret (fine-grained token, Contents: read on the Pro repo);
+# without it (for example on pull requests from forks) the Pro jobs are skipped.
 
 on:
   push:
@@ -61,67 +67,75 @@ jobs:
     name: Pro compatibility (contract + Pro tests)
     runs-on: ubuntu-latest
     outputs:
-      pro_ref: ${{ steps.ref.outputs.ref }}
+      pro_sha: ${{ steps.ref.outputs.sha }}
+      available: ${{ steps.ref.outputs.available }}
     steps:
       - uses: actions/checkout@v4
       - id: ref
-        name: Pick the Pro branch (same name as this branch, else main)
+        name: Pick the Pro commit (same-named branch, else main)
         shell: bash
+        env:
+          TOKEN: ${{ secrets.PRO_REPO_TOKEN }}
         run: |
+          if [ -z "$TOKEN" ]; then
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "PRO_REPO_TOKEN is not available; Pro compatibility jobs skipped." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          url="https://x-access-token:${TOKEN}@github.com/$PRO_REPO"
           branch="${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}"
-          ref=main
-          if [ -n "$branch" ] && git ls-remote --exit-code --heads "https://github.com/$PRO_REPO" "$branch" >/dev/null 2>&1; then ref="$branch"; fi
-          echo "ref=$ref" >> "$GITHUB_OUTPUT"
-          echo "Testing against $PRO_REPO@$ref" >> "$GITHUB_STEP_SUMMARY"
+          sha=$(git ls-remote "$url" "refs/heads/$branch" | cut -f1)
+          [ -n "$sha" ] || sha=$(git ls-remote "$url" refs/heads/main | cut -f1)
+          echo "available=true" >> "$GITHUB_OUTPUT"
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          echo "Testing against $PRO_REPO@$sha" >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/checkout@v4
+        if: steps.ref.outputs.available == 'true'
         with:
           repository: ${{ env.PRO_REPO }}
-          ref: ${{ steps.ref.outputs.ref }}
+          ref: ${{ steps.ref.outputs.sha }}
+          token: ${{ secrets.PRO_REPO_TOKEN }}
           path: pro-repo
+          persist-credentials: false
       - uses: shivammathur/setup-php@v2
+        if: steps.ref.outputs.available == 'true'
         with:
           php-version: '8.3'
           coverage: none
       - name: Pro still works with this free plugin
+        if: steps.ref.outputs.available == 'true'
         run: |
           FREE_DIR="$GITHUB_WORKSPACE" php pro-repo/tests/free-api-contract.php
           php pro-repo/tests/pro-contract.php
           node --check pro-repo/assets/pro.js
 
   package:
-    name: Build free + Pro ZIPs
+    name: Build the free ZIP
     needs: [test, pro-compat]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/checkout@v4
-        with:
-          repository: ${{ env.PRO_REPO }}
-          ref: ${{ needs.pro-compat.outputs.pro_ref }}
-          path: pro-repo
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
           tools: composer:v2
           coverage: none
-      - name: Build both packages
-        run: PRO_DIR=pro-repo ./bin/build.sh
-      - name: Upload free + Pro packages
+      - name: Build the free package (Pro packages are built only in the private Pro repository)
+        run: ./bin/build.sh
+      - name: Upload the free package
         uses: actions/upload-artifact@v4
         with:
-          name: plugin-packages
+          name: free-plugin-package
           path: |
-            dist/*.zip
-            dist/*.sha256
+            dist/checkout-impact-regression-for-woocommerce-*.zip
+            dist/checkout-impact-regression-for-woocommerce-*.zip.sha256
           if-no-files-found: error
-      - name: Keep unpacked builds for Plugin Check and integration
+      - name: Keep the unpacked free build for Plugin Check and integration
         uses: actions/upload-artifact@v4
         with:
-          name: unpacked-builds
-          path: |
-            build/checkout-impact-regression-for-woocommerce
-            pro-repo/build/checkout-impact-regression-pro-for-woocommerce
-            pro-repo/tests/integration
+          name: free-build
+          path: build/checkout-impact-regression-for-woocommerce
+          retention-days: 3
 
   plugin-check:
     name: WordPress.org Plugin Check (free plugin)
@@ -130,16 +144,17 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: unpacked-builds
-          path: unpacked
+          name: free-build
+          path: checkout-impact-regression-for-woocommerce
       - uses: wordpress/plugin-check-action@v1
         with:
-          build-dir: ./unpacked/build/checkout-impact-regression-for-woocommerce
+          build-dir: ./checkout-impact-regression-for-woocommerce
           slug: checkout-impact-regression-for-woocommerce
 
   integration:
     name: Free + Pro together in WordPress Playground (PHP ${{ matrix.php }})
-    needs: package
+    needs: [package, pro-compat]
+    if: needs.pro-compat.outputs.available == 'true'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -148,15 +163,27 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: unpacked-builds
-          path: unpacked
+          name: free-build
+          path: free-build
+      - name: Check out Pro (in this job only; never uploaded)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.PRO_REPO }}
+          ref: ${{ needs.pro-compat.outputs.pro_sha }}
+          token: ${{ secrets.PRO_REPO_TOKEN }}
+          path: pro-repo
+          persist-credentials: false
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-      - name: Run integration check (latest WordPress + WooCommerce)
+      - name: Build Pro locally and run the integration check (latest WordPress + WooCommerce)
         run: |
-          chmod +x unpacked/pro-repo/tests/integration/run.sh
-          unpacked/pro-repo/tests/integration/run.sh unpacked/build/checkout-impact-regression-for-woocommerce unpacked/pro-repo/build/checkout-impact-regression-pro-for-woocommerce ${{ matrix.php }}
+          (cd pro-repo && ./bin/build.sh --pro-only >/dev/null)
+          pro-repo/tests/integration/run.sh free-build pro-repo/build/checkout-impact-regression-pro-for-woocommerce ${{ matrix.php }}
 
   notify-pro:
     name: Ask the Pro repository to re-test
