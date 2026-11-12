@@ -184,22 +184,3 @@ jobs:
         run: |
           (cd pro-repo && ./bin/build.sh --pro-only >/dev/null)
           pro-repo/tests/integration/run.sh free-build pro-repo/build/checkout-impact-regression-pro-for-woocommerce ${{ matrix.php }}
-
-  notify-pro:
-    name: Ask the Pro repository to re-test
-    needs: [package, integration]
-    # Run when the package built and integration passed, or was skipped because PRO_REPO_TOKEN is not set.
-    if: >-
-      always() && github.event_name == 'push' && github.ref == 'refs/heads/main' &&
-      needs.package.result == 'success' &&
-      (needs.integration.result == 'success' || needs.integration.result == 'skipped')
-    runs-on: ubuntu-latest
-    steps:
-      - name: Dispatch free-updated to Pro (needs CROSS_REPO_TOKEN secret)
-        env:
-          TOKEN: ${{ secrets.CROSS_REPO_TOKEN }}
-        run: |
-          if [ -z "$TOKEN" ]; then echo "CROSS_REPO_TOKEN not set; Pro re-tests on its nightly schedule instead." >> "$GITHUB_STEP_SUMMARY"; exit 0; fi
-          curl -fsS -X POST -H "Authorization: Bearer $TOKEN" -H "Accept: application/vnd.github+json" \
-            "https://api.github.com/repos/$PRO_REPO/dispatches" \
-            -d "{\"event_type\":\"free-updated\",\"client_payload\":{\"sha\":\"$GITHUB_SHA\"}}"

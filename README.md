@@ -48,7 +48,7 @@ The free plugin has no locked or time-limited features and contains no Pro code.
 - Pro's [`tests/free-api-contract.php`](https://github.com/Vertex-Systems-Network/checkout-impact-regression-pro-for-woocommerce/blob/main/tests/free-api-contract.php) lists every hook, method, JS filter and CSS class Pro uses from this plugin. Both repositories' CI run it.
 - Both CIs run free + Pro together in WordPress Playground (latest WordPress + WooCommerce, PHP 8.2 and 8.4).
 - Pro is paid: this public repository never builds or uploads a Pro package. The private Pro repository's CI builds **both** ZIPs (artifacts expire after 7 days and are visible only to people with access to that repository).
-- Same-named branches in the two repositories are tested together; nightly runs catch drift; an optional `CROSS_REPO_TOKEN` secret re-runs the other repository's CI after every merge.
+- Same-named branches in the two repositories are tested together. This public repository's CI tests free + Pro on every push, pull request and nightly, so drift is caught without using paid runner minutes. The private Pro repository runs CI only when started by hand; an optional `CROSS_REPO_TOKEN` secret in the Pro repo re-runs this CI after a Pro merge.
 
 ## Requirements
 
