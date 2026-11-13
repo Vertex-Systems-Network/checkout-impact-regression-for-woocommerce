@@ -319,7 +319,7 @@ Dates remain TBD until the team estimates the work. Record actual start/end date
 
 Deferred rows (*v1.x*) are listed but excluded from the v1 denominator. Recalculate from row statuses; never hand-tune.
 
-**Current snapshot (2026-11-12, evening):** Phase 7 v1 scope: 29 of 30 rows Complete, 1 Partial (IMPL-032 wiki publish) = **97%**. Deferred v1.x: 4 rows (ENV-001, IMPL-005, IMPL-006, IMPL-009). Phase 8: 1 of 4 Complete, 3 Partial = **25%**. Overall = (100×7 + 97 + 25) ÷ 9 = **91%**.
+**Current snapshot (2026-11-14):** Phase 7 v1 scope: 30 of 30 rows Complete = **100%**. Deferred v1.x: 4 rows (ENV-001, IMPL-005, IMPL-006, IMPL-009). Phase 8: 1 of 4 Complete, 3 Partial = **25%**. Overall = (100×7 + 100 + 25) ÷ 9 = **92%**.
 
 ## 9. Backlog
 
@@ -345,7 +345,7 @@ Rows from Phases 1–6 are unchanged and Complete/Deferred as recorded on 2026-1
 | IMPL-029 | v1 | P1 | i18n readiness | All UI strings literal and translatable in JS and PHP; script translations loaded | Complete (2026-11-12) |
 | IMPL-030 | v1 | P1 | WooCommerce feature compatibility declarations | HPOS and Cart/Checkout blocks declared compatible (no order access) | Complete (2026-11-12) |
 | IMPL-031 | v1 | P0 | Pro in its own repository, linked to free | Pro repo uses the repo slug as plugin slug/text domain; free contains no Pro code; Pro refuses to run without free (Requires Plugins + version gate); both CIs run the compatibility contract and a free + Pro Playground integration run; only the private Pro CI publishes both ZIPs (D-025) | Complete (2026-11-12; contract mutation test fails as expected; integration run passes incl. "Pro cannot activate without free") |
-| IMPL-032 | v1 | P1 | Wiki documentation | Wiki pages in `docs/wiki/`, linked from the plugin (Docs tab + Plugins screen) and published to the GitHub Wiki | Partial (pages, links and sync workflow done; Wiki enabled 2026-11-14; the owner must save one page in the Wiki UI once so GitHub creates the wiki repository, then the sync workflow publishes all pages) |
+| IMPL-032 | v1 | P1 | Wiki documentation | Wiki pages in `docs/wiki/`, linked from the plugin (Docs tab + Plugins screen) and published to the GitHub Wiki | Complete (2026-11-14; Wiki enabled, first page created by the owner, wiki-sync run 43521531635 published all 10 pages and the sidebar from `docs/wiki/`) |
 
 Counting: BUILD-001, IMPL-001–004, 007, 008, 010, 011, IMPL-012…025 (14), IMPL-026…032 (7) = 30 rows.
 
